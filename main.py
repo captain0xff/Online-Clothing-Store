@@ -1,3 +1,4 @@
+#To connect CLOTHE database with a GUI
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 mycon = sqltor.connect(host = 'localhost', user = 'root', passwd = 'root', database = 'clothes')
