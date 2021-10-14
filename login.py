@@ -1,128 +1,123 @@
+'''The code for the main login page'''
+#Import the needed modules
 import PySimpleGUI as sg
-import mysql.connector as sqltor
+import mysql.connector as sql
+import settings as st
 
-def denimDestination():
-    def custEmp():
-        """This function asks the user if he/she is a customer or an employee."""
-        sg.theme('DarkAmber')
-        layout = [[sg.Text('Welcome to Denim Destination: ')],
-                  [sg.Text('Are you an Employee? ')],
-                  [sg.Text('Or are you a Customer ?')],
-                  [sg.Button('Employee'), sg.Button('Customer'), sg.Button('Exit')]]
+#Connect to the mysql database and create a cursor
+mycon=sql.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
+cursor=mycon.cursor()
 
-        window = sg.Window('WELCOME', layout, margins=(50, 50))
-        while True:
-            event, values = window.read()
-            break
-        window.close()
-        return event
+#Set the PysimpleGUI theme
+sg.theme('DarkAmber')
 
+def Main_menu():
+    #The welcome menu
+    layout=[[sg.Image('Logo.png')],
+            [sg.Btn('Customer Login',key='CL',size=(29,2)),sg.Btn('Employee Login',key='EL',size=(28,2))]]
 
-    def loginEmp():
-        """
-        If the user chooses Employee in the window produced by custEmp(), this function is called
-        It is a login page for the employees
-        """
-        sg.theme('DarkAmber')
-        layout = [[sg.Text('Employee ID: '), sg.Input(key = 'id')],
-                  [sg.Text('User Name:   '), sg.Input(key='uname')],
-                  [sg.Text('Password:     '), sg.Input(key='password', password_char='*')],
-                  [sg.Button('Login'), sg.Button('Exit'), sg.Button('Go Back')]]
-        #password_char parameter masks the given password with *
-        window = sg.Window('Login - Employee', layout)
-        while True:
-            event, values = window.read()
-            #values variable points at a dictionary with id, uname and password
-            print(values)
-            if event in (None, 'Exit', 'Go Back'):
-                break
-            elif event=='Login':
-                if values['id']:
-                    cursor.execute('SELECT * FROM EMPLOYEES WHERE ID = %d;' %(int(values['id'])))
-                    data = cursor.fetchall()
-                    print(data)
-                    if data:
-                        #Checks if an employee with the given credentials exists of not
-                        if data[0][2]==values['uname'] and data[0][3]==values['password']:
-                            confirm = sg.popup_ok('Login Successful')
-                            window.close()
-                            return confirm
-                    sg.popup_ok('User name or Password Incorrect')
-                else:
-                    #If the user doesn't input any ID and clicks Login
-                    sg.popup_ok('Please Enter Some Data')
-        window.close()
-        return event
+    #Create the main menu window
+    window=sg.Window(st.caption,layout)
+
+    rng=True
+    while rng:
+        #Take events and values
+        e,v=window.read()
+        if e==sg.WIN_CLOSED:
+            rng=False
+        elif e=='CL':
+            Customer_sign_in_menu()
+
+        elif e=='EL':
+            Employee_sign_in_menu()
+
+    #If any option is selected close the main window
+    window.close()
 
 
-
-    def cust():
-        """
-        If the user chooses Customer in the window produced by custEmp(), this function is called
-        This is a Login/Sign Up Page for Customers.
-        """
-        def sign_up_window():
-            button = sg.Btn('Sign up', key='DN', disabled=True)
-            layout = [[sg.Text('Please sign up...')],
-                      [sg.Text('Email ID', size=(7, 1)), sg.Input('', key='EI')],
-                      [sg.Text('Password', size=(7, 1)), sg.Input('', key='PD')],
-                      [sg.Text('Phone No.', size=(7, 1)), sg.Input('', key='PH')],
-                      [sg.Checkbox('I agree to the terms and conditions', key='CK', enable_events=True)],
-                      [button, sg.Btn('Cancel', key='CN2')]]
-
-            window_sign_up = sg.Window('Sign Up', layout)
-
-            rng = True
-            while rng:
-                e, v = window_sign_up.read()
-                if e == sg.WIN_CLOSED or e == 'CN2':
-                    rng = False
-                if v['CK'] == True:
-                    button.update(disabled=False)
-
-            window_sign_up.close()
-
-        layout = [[sg.Text('Please Login...')],
-                  [sg.Text('Email ID', size=(8, 1)), sg.Input('', key='ID')],
-                  [sg.Text('Password', size=(8, 1)), sg.Input('', key='PD')],
-                  [sg.Btn('Login', key='OK'), sg.Btn('Cancel', key='CN1'), sg.Btn('Sign up', key='SN')]]
-
-        window = sg.Window('Customer Login', layout)
-
-        rng = True
-        while rng:
-            e, v = window.read()
-
-            if e == sg.WIN_CLOSED or e == 'CN1':
-                rng = False
-            elif e == 'SN':
-                sign_up_window()
-
-        window.close()
+def Employee_sign_in_menu():
+    #Employee sign_in menu
+    pass
 
 
+def Customer_sign_in_menu():
+    #Customer sign_in menu
+    #The layout for the sign in window
+    msg=sg.Text('Please Login...',size=(30,1))
+    layout=[[msg],
+            [sg.Text('Email ID',size=(8,1)),sg.Input('',key='ID')],
+            [sg.Text('Password',size=(8,1)),sg.Input('',key='PD')],
+            [sg.Btn('Login',key='OK'),sg.Btn('Sign up',key='SN')]]
 
-    mycon = sqltor.connect(host = 'localhost', user = 'root', passwd = 'root', database = 'denim_destination_db')
-    cursor = mycon.cursor()
+    #Create the sign in window
+    window=sg.Window(st.caption,layout)
+
+    rng=True
+    while rng:
+        #Take events and values
+        e,v=window.read()
+        if e==sg.WIN_CLOSED:
+            rng=False
+        elif e=='SN':
+            Customer_sign_up()
+        elif e=='OK':
+            email=v['ID']
+            passwd=v['PD']
+            cursor.execute('select email_id,password from customer')
+            data=cursor.fetchall()
+            for i in data:
+                if email==i[0] and passwd==i[1]:
+                    rng=False
+                    break
+            else:
+                msg.update(value='Invalid email or password...')
+
+    window.close()
 
 
-    empCust = custEmp()
-    while True:
-        if empCust=='Employee':
-            confirm = loginEmp()
-            if confirm=='Go Back':
-                empCust = custEmp()
-            if confirm=='Exit' or confirm=='OK':
-                break
+def Customer_sign_up():
+    #Menu for new customers to sign_up
+    #Create the sign up button and store it in a var for future usage
+    button=sg.Btn('Sign up',key='DN',disabled=True)
 
-        elif empCust=='Customer':
-            logSign = cust()
-            if logSign=='Go Back':
-                empCust = custEmp()
-            if logSign=='Exit':
-                break
-        elif empCust=='Exit':
-            break
+    #The layout of the window
+    layout=[[sg.Text('Please sign up...')],
+            [sg.Text('Email ID',size=(8,1)),sg.Input('',key='EI')],
+            [sg.Text('Password',size=(8,1)),sg.Input('',key='PD')],
+            [sg.Text('Name',size=(8,1)),sg.Input('',key='NM')],
+            [sg.Text('Phone No.',size=(8,1)),sg.Input('',key='PH')],
+            [sg.Checkbox('I agree to the terms and conditions',key='CK',enable_events=True)],
+            [button,sg.Btn('Cancel',key='CN2')]]
 
-denimDestination()
+    #Create the window for sign up
+    window=sg.Window(st.caption,layout)
 
+    #Add data to the customer data base
+    command='insert into customer values({name},{ph},{email},{passwd},0)'
+
+    rng=True
+    while rng:
+        #Take events and values
+        e,v=window.read()
+        print(e,v)
+        if e==sg.WIN_CLOSED or e=='CN2':
+            rng=False
+        elif v['CK']==True:
+            button.update(disabled=False)
+        if e=='DN':
+            name='\''+v['NM']+'\''
+            email='\''+v['EI']+'\''
+            password='\''+v['PD']+'\''
+            command=command.format(name=name,ph=int(v['PH']),email=email,passwd=password)
+            print(command)
+            cursor.execute(command)
+            mycon.commit()
+            rng=False
+
+    #Close the window
+    window.close()
+
+
+#Run the code only if the current file run
+if __name__=='__main__':
+    Main_menu()
