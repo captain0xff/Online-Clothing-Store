@@ -2,7 +2,7 @@
 
 import mysql.connector as sqltor
 #establishing the connection
-psswd = input("Enter the password of ur db: ")
+psswd = input("Enter the password of ur mysql: ")
 mycon = sqltor.connect(user='root', password=psswd, host='localhost')
 cursor = mycon.cursor()
 
