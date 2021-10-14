@@ -26,7 +26,7 @@ print("Relation product created successfully....")
 sql_employees = """CREATE TABLE EMPLOYEES(
     ID integer NOT NULL PRIMARY KEY,
     Name VARCHAR(50),
-    Username VARCHAR(10),
+    Username VARCHAR(25),
     Password VARCHAR(90) CHECK(LENGTH(Password) > 7))"""
 
 cursor.execute(sql_employees)
