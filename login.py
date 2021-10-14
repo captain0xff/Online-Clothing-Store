@@ -61,19 +61,44 @@ def denimDestination():
         If the user chooses Customer in the window produced by custEmp(), this function is called
         This is a Login/Sign Up Page for Customers.
         """
-        sg.theme('DarkAmber')
-        layout = [[sg.Text('Login or Sign Up: ')],
-                  [sg.Text('Do you want to Login? ----> '), sg.Button('Log-in', size=(10, 1))],
-                  [sg.Text('Do you want to Sign Up? ----> '), sg.Button('Sign Up', size=(10, 1))],
-                  [sg.Button('Go Back')]]
-        window = sg.Window('Customer', layout, margins=(50, 50))
-        while True:
-            event, values = window.read()
-            print(event)
-            if event in (None, 'Exit', 'Go Back'):
-                break
+        def sign_up_window():
+            button = sg.Btn('Sign up', key='DN', disabled=True)
+            layout = [[sg.Text('Please sign up...')],
+                      [sg.Text('Email ID', size=(7, 1)), sg.Input('', key='EI')],
+                      [sg.Text('Password', size=(7, 1)), sg.Input('', key='PD')],
+                      [sg.Text('Phone No.', size=(7, 1)), sg.Input('', key='PH')],
+                      [sg.Checkbox('I agree to the terms and conditions', key='CK', enable_events=True)],
+                      [button, sg.Btn('Cancel', key='CN2')]]
+
+            window_sign_up = sg.Window('Sign Up', layout)
+
+            rng = True
+            while rng:
+                e, v = window_sign_up.read()
+                if e == sg.WIN_CLOSED or e == 'CN2':
+                    rng = False
+                if v['CK'] == True:
+                    button.update(disabled=False)
+
+            window_sign_up.close()
+
+        layout = [[sg.Text('Please Login...')],
+                  [sg.Text('Email ID', size=(8, 1)), sg.Input('', key='ID')],
+                  [sg.Text('Password', size=(8, 1)), sg.Input('', key='PD')],
+                  [sg.Btn('Login', key='OK'), sg.Btn('Cancel', key='CN1'), sg.Btn('Sign up', key='SN')]]
+
+        window = sg.Window('Customer Login', layout)
+
+        rng = True
+        while rng:
+            e, v = window.read()
+
+            if e == sg.WIN_CLOSED or e == 'CN1':
+                rng = False
+            elif e == 'SN':
+                sign_up_window()
+
         window.close()
-        return event
 
 
 
