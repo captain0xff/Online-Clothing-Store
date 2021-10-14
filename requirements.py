@@ -1,7 +1,4 @@
 '''Check if the required modules are available or not.'''
-
-from os import system
-
 def version_compare(ava,req):
     req=req.split('.')
     not_satisfied=False
