@@ -66,7 +66,12 @@ VALUES('Gaurav Chanda', 1123978046, 'gauravchanda@gmail.com', 'gauravchanda', 10
 ('Devarshi Ray', 1110010993, 'devarshiray@gmail.com', 'ilovemanga', 100000);""")
 print("Data of Customers added")
 
-
+cursor.execute("""INSERT INTO PRODUCTS
+VALUES(1,'Jeans','Wrangler','XL',23,425.23,699.56),
+(2,'Shirt','Peter England','L',56,256.25,352.23),
+(3,'T Shirt','Lewis','S',15,230.5,299.99),
+(4,'Coat','Peter England','M',25,12000,17999.99)
+""")
 
 mycon.commit()
 
