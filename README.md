@@ -5,3 +5,9 @@ Group Members:-
 Pratyush Prashob(Leader)  
 Siddhartha Mondal  
 Sayantan Deb  
+
+#Synopsis  
+Thank you  
+Acknowledgement  
+Bibliography  
+Certificate  
