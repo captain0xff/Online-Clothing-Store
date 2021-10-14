@@ -46,12 +46,10 @@ cursor.execute(sql_customer)
 print("Relation customer created successfully....")
 
 sql_purchase = """create table PURCHASE(
-    Invoice_Number varchar(15) not null primary key,
-    Product_ID int,
+    Invoice_Number int not null primary key,
     Purchase_Date date,
     Purchase_Amount decimal(8,2),
     Customer_ID integer,
-    foreign key(Product_ID) references PRODUCTS(ID),
     foreign key(Customer_ID) references CUSTOMER(ID))"""
 
 cursor.execute(sql_purchase)
