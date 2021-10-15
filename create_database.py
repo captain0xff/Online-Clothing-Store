@@ -9,7 +9,7 @@ cursor = mycon.cursor()
 cursor.execute("DROP database IF EXISTS denim_destination_db")
 sql_create = "CREATE database denim_destination_db"
 cursor.execute(sql_create)
-cursor.execute("USE DENIM_DESTINATION_DB")
+cursor.execute("USE denim_destination_db")
 print("Database Created Succesfully....")
 print("Creating tables now....")
 sql_products = """create table PRODUCTS(
