@@ -8,20 +8,28 @@ def purchaseMenu():
     def cart(cartData1, price1):
         sg.theme('DarkAmber')
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
-        table=sg.Table(cartData1, headings=heading1, justification='left', key='-TABLE2-')
+        table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',enable_events=True)
         layout1 = [[sg.Text('YOUR CART')],
                   [table],
                   [sg.Text('Total Amount {}'.format(price1))],
-                  [sg.Button('Buy'), sg.Button('Go Back'),sg.Button('Clear Cart',key='CLR')]]
+                  [sg.Button('Buy'), sg.Button('Go Back'),sg.Button('Clear',key='CLR'),sg.Button('Remove',key='RM')]]
         window1 = sg.Window('Your Cart', layout1, margins=(100, 50), finalize=True)
+        remove_from_cart=None
         while True:
             #print(cartData)
             event1, values1 = window1.read()
-            print(event1,values1)
             if event1 in (None, 'Go Back'):
+                cartData1=[]
                 break
             if event1=='CLR':
                 cartData1=[]
+                table.update(cartData1)
+            if event1=='-TABLE2-':
+                remove_from_cart=values1['-TABLE2-'][0]
+            print(remove_from_cart)
+            if event1=='RM' and len(cartData1)>remove_from_cart:
+                print('hello')
+                cartData1.pop(remove_from_cart)
                 table.update(cartData1)
 
             if event1=='Buy':
