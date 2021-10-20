@@ -3,6 +3,8 @@
 import PySimpleGUI as sg
 import mysql.connector as sql
 import settings as st
+import employee_func
+import purchasing
 
 #Connect to the mysql database and create a cursor
 mycon=sql.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
@@ -18,8 +20,9 @@ def Main_menu():
 
     #Create the main menu window
     window=sg.Window(st.caption,layout,finalize=True)
-
     window['IMG'].expand(True,True,True)
+
+    option_choosen=None
 
     rng=True
     while rng:
@@ -28,13 +31,21 @@ def Main_menu():
         if e==sg.WIN_CLOSED:
             rng=False
         elif e=='CL':
-            Customer_sign_in_menu()
+            option_choosen=1
+            rng=False
 
         elif e=='EL':
-            Employee_sign_in_menu()
+            option_choosen=0
+            rng=False
 
     #If any option is selected close the main window
     window.close()
+
+    if option_choosen==1:
+        Customer_sign_in_menu()
+    elif option_choosen==0:
+        Employee_sign_in_menu()
+
 
 
 def Employee_sign_in_menu():
@@ -50,14 +61,17 @@ def Employee_sign_in_menu():
               [sg.Button('Login'), sg.Button('Go Back')]]
     # password_char parameter masks the given password with *
     window = sg.Window('Login - Employee', layout)
+    option_choosen=None
     while True:
         event, values = window.read()
         # values variable points at a dictionary with id, uname and password
-        print(values)
-        if event in (None, 'Go Back'):
+        if event==sg.WIN_CLOSED:
+            break
+        if event=='Go Back':
+            option_choosen=2
             break
         elif event == 'Login':
-            if event=='id' and values['id'][-1] in '0123456789':
+            if values['id'][-1] in '0123456789':
                 if values['id'] and values['uname'] and values['password']:
                     cursor.execute('SELECT * FROM EMPLOYEES WHERE ID = %d;' % (int(values['id'])))
                     data = cursor.fetchall()
@@ -65,9 +79,8 @@ def Employee_sign_in_menu():
                     if data:
                         # Checks if an employee with the given credentials exists of not
                         if data[0][2] == values['uname'] and data[0][3] == values['password']:
-                            confirm = sg.popup_ok('Login Successful')
-                            window.close()
-                            return confirm
+                            option_choosen=1
+                            break
                     msg.update(value = 'Invalid employee ID, username or password...')
                 else:
                     # If the user doesn't input any ID and clicks Login
@@ -75,6 +88,11 @@ def Employee_sign_in_menu():
             else:
                 msg.update('Please enter positive integer in employee ID...')
     window.close()
+
+    if option_choosen==1:
+        employee_func.Main()
+    elif option_choosen==2:
+        Main_menu()
 
 
 def Customer_sign_in_menu():
@@ -84,10 +102,13 @@ def Customer_sign_in_menu():
     layout=[[msg],
             [sg.Text('Email ID',size=(8,1)),sg.Input('',key='ID')],
             [sg.Text('Password',size=(8,1)),sg.Input('',key='PD',password_char='*')],
-            [sg.Btn('Login',key='OK'),sg.Btn('Sign up',key='SN')]]
+            [sg.Btn('Login',key='OK'),sg.Btn('Go Back',key='GB'),sg.Btn('Sign up',key='SN')]]
 
     #Create the sign in window
     window=sg.Window('Customer Sign in',layout)
+
+    #Some variables
+    option_choosen=None
 
     rng=True
     while rng:
@@ -95,25 +116,30 @@ def Customer_sign_in_menu():
         e,v=window.read()
         if e==sg.WIN_CLOSED:
             rng=False
+        elif e=='GB':
+            option_choosen=2
+            rng=False
         elif e=='SN':
             Customer_sign_up()
         elif e=='OK':
             email=v['ID']
             passwd=v['PD']
             if email and passwd:
-                cursor.execute('select email_id,password from customer')
+                cursor.execute('select email_id,password from customers')
                 data=cursor.fetchall()
                 for i in data:
                     if email==i[0] and passwd==i[1]:
-                        sg.popup_ok('Login Successful')
+                        option_choosen=1
                         rng=False
-                        break
                 else:
                     msg.update(value='Invalid email or password...')
             else:
                 msg.update(value='Please enter all the data...')
-
     window.close()
+    if option_choosen==1:
+        purchasing.Main()
+    elif option_choosen==2:
+        Main_menu()
 
 
 def Customer_sign_up():
@@ -135,7 +161,7 @@ def Customer_sign_up():
     window=sg.Window('Customer Sign up',layout)
 
     #Add data to the customer data base
-    command="insert into customer values('{name}','{ph}','{email}','{passwd}',0)"
+    command="insert into customers values('{name}','{ph}','{email}','{passwd}',0)"
 
     rng=True
     while rng:
@@ -152,7 +178,7 @@ def Customer_sign_up():
             phone_no=v['PH']
             if name and email and password and phone_no:
                 if len(phone_no)==10 and phone_no[0]!='0':
-                    cursor.execute('select Email_ID,Phone_Number from customer')
+                    cursor.execute('select Email_ID,Phone_Number from customers')
                     data=cursor.fetchall()
                     for i in data:
                         if email==i[0] or phone_no==i[1]:
