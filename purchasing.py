@@ -1,17 +1,19 @@
 import PySimpleGUI as sg
 import mysql.connector as sqltor
-mycon = sqltor.connect(host = 'localhost', user = 'root', passwd = 'sayantan@sql', database = 'denim_destination_db')
+mycon = sqltor.connect(host = 'localhost', user = 'root', passwd = 'root', database = 'denim_destination_db')
 cursor = mycon.cursor()
 
 
 def purchaseMenu():
-    def cart(cartData1, price1):
+    def cart(cartData1):
+        nonlocal price
         sg.theme('DarkAmber')
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
         table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',enable_events=True)
+        priceMsg = sg.Text('{}'.format(price))
         layout1 = [[sg.Text('YOUR CART')],
                   [table],
-                  [sg.Text('Total Amount {}'.format(price1))],
+                  [sg.Text('Total Amount = '), priceMsg],
                   [sg.Button('Buy'), sg.Button('Go Back'),sg.Button('Clear',key='CLR'),sg.Button('Remove',key='RM')]]
         window1 = sg.Window('Your Cart', layout1, margins=(100, 50), finalize=True)
         remove_from_cart=None
@@ -19,18 +21,32 @@ def purchaseMenu():
             #print(cartData)
             event1, values1 = window1.read()
             if event1 in (None, 'Go Back'):
-                cartData1=[]
                 break
             if event1=='CLR':
                 cartData1=[]
+                cartDict.clear()
                 table.update(cartData1)
+                price = 0.0
+                priceMsg.update('{}'.format(price))
             if event1=='-TABLE2-':
                 remove_from_cart=values1['-TABLE2-'][0]
+                print(remove_from_cart)
             print(remove_from_cart)
-            if event1=='RM' and len(cartData1)>remove_from_cart:
+            if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
                 print('hello')
-                cartData1.pop(remove_from_cart)
+                print(cartData1)
+                dat = cartData1[remove_from_cart]
+                price-=float(dat[5])
+                var = 0
+                for i in cartDict:
+                    if var==remove_from_cart:
+                        cartDict.pop(i)
+                        cartData1.pop(remove_from_cart)
+                        break
+                    var+=1
                 table.update(cartData1)
+                priceMsg.update('{}'.format(price))
+
 
             if event1=='Buy':
                 confirm = sg.popup_yes_no('Are you sure you want to buy these products?')
@@ -43,10 +59,10 @@ def purchaseMenu():
                         quantity = quantity[0][4]-i[4]
                         if quantity>1:
                             cursor.execute('UPDATE Products SET Quantity = {} WHERE ID = {}'.format(quantity, id1))
-                        else:
+                        else: 
                             cursor.execute('DELETE FROM Products WHERE ID = {}'.format(id1))
                         mycon.commit()
-                    sg.popup_ok('Purchase Successful. Total Amount Spent = {}'.format(price1))
+                    sg.popup_ok('Purchase Successful. Total Amount Spent = {}'.format(price))
                     break
         window1.close()
         return event
@@ -77,23 +93,25 @@ def purchaseMenu():
         if event in (None, 'Exit'):
             break
         if event=='-TABLE1-':
-            prod=str(values['-TABLE1-'][0]+1)
+            idSelected = values['-TABLE1-'][0]
+            prod=str(data[idSelected][0])
             inp.update(prod)
         if event =='Add to Cart':
             # Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
             cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %(prod_ID_selected))
             proData = cursor.fetchall()
+            #print(proData)
             temp = (proData[0][0], proData[0][1], proData[0][2], proData[0][3], proData[0][6])
             cartData.append(temp)
-            price+=proData[0][5]
-            i = temp
-            if i in cartDict:
-                cartDict[i][1] += i[4]
-                cartDict[i][0] += 1
+            price+=float(temp[4])
+            #print(price)
+            if temp in cartDict:
+                cartDict[temp][1] += temp[4]
+                cartDict[temp][0] += 1
             else:
-                cartDict[i] = [1, i[4]]
-            print(cartDict)
+                cartDict[temp] = [1, temp[4]]
+            #print(cartDict)
             # This part of the code is responsible for updating the table as we add items to cart
             quantity = proData[0][4]
             for i in range(len(data)):
@@ -106,17 +124,21 @@ def purchaseMenu():
             window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
             window['-TABLE1-'].update(data)
 
+        if event == 'Go to Cart' and len(cartDict)==0:
+            msg.update('Empty Cart...')
+
         if event == 'Go to Cart' and len(cartDict)!=0:
             cartDataFinal = []
+            print(cartDict)
             for i in cartDict:
                 cartDataFinal.append(list(i)[:4]+cartDict[i])
-            action = cart(cartDataFinal, price)
+            action = cart(cartDataFinal)
+            msg.update('')
             if action=='Buy':
                 sg.popup_timed('Thank you for shopping with us')
                 window.close()
                 break
-        if event == 'Go to Cart' and len(cartDict)==0:
-            msg.update('Empty Cart...')
+
         print(event, values)
     mycon.commit()
 
