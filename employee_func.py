@@ -1,17 +1,20 @@
 #Broke many lines in two parts cuz pylint loves it
 """This module will be used for functionalities of the employee"""
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 import settings as st
+import csv
 
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
-def employee_screen():
+def employee_screen(emp = ''):
     """This Function is responsible for the display of Employee Screen"""
     sg.theme('DarkAmber')
     font = ("Arial", 11)
     layout = [
-        [sg.Text("Welcome",font=font)],
+        [sg.Text(f"Welcome {emp}",font=font)],
         [sg.Text('')],
         [sg.Text('Please choose the function')],
         [sg.Button("Update Stock Data",key = 'Update'),
@@ -26,6 +29,10 @@ def employee_screen():
             break
         if event == 'Update':
             update_stock()
+        if event == 'See Customer Details':
+            cust_details()
+        if event == "Show Profit Analysis":
+            profit_analysis()
 
 def update_stock():
     """This function is responsible for handling update related functions"""
@@ -36,7 +43,7 @@ def update_stock():
         for i in range(len(data)):
             data[i] = list(data[i])
             for j in range(len(data[i])):
-                if isinstance(data[i][j],str):
+                if isinstance(data[i][j],int):
                     data[i][j] = str(data[i][j])
         heading = ['ID','Name','Brand','Size','Quantity','Cost_Price','Selling_Price']
         layout1 = [[sg.Text('Product List')],
@@ -48,7 +55,7 @@ def update_stock():
         win = sg.Window('Product List',layout1,finalize=True)
         while True:
             event,value = win.read()
-            #print(event,value)
+            print(event,value)
             if event == 'Update':
                 try:
                     update_data(value['Table'][0]+1)
@@ -130,8 +137,108 @@ def update_stock():
             print(event,value)
             if event is None:
                 break
+
     display_stock()
+def cust_details():
+    cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
+    data = cursor.fetchall()
+    heading = ['Name','Phone_Number','Email_ID','Total_Purchase_Amt']
+    table = sg.Table(data,headings=heading,key = 'Table',enable_events=True)
+    layout = [[sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name'),sg.Button('Search',key = 'search_name')],
+    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email'),sg.Button('Search',key = 'search_email')],
+    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob'),sg.Button('Search',key = 'search_phn')],
+    [table],
+    [sg.Input(key = 'show_det'),sg.Button('Show Details', disabled=True,key = 'show')],
+    [sg.Button('Exit')]
+    ]
+    win = sg.Window('Select Customer',layout,finalize=True)
+    def show_details(dat):
+        try: 
+            with open(f'Customer data//{dat[2]}.csv') as f: #Opens the csv file 
+                rdr = csv.reader(f)
+                heading = next(rdr) 
+                print(heading)
+                purchase_data = list(rdr)
+                #print("DATA",dat)
+                print('pur data',purchase_data)
+                table = sg.Table(purchase_data,headings=heading)
+            layout = [
+                [sg.Text(f'Name: {dat[0]}')],
+                [sg.Text(f'Mobile Number: {dat[1]}')],
+                [sg.Text(f'Email: {dat[2]}')],
+                [sg.Text(f'Total Amount Purchased: {dat[0]}')],
+                [table],
+                [sg.Button('Exit',key = 'Exit')] 
+            ]
+            win = sg.Window(f'{dat[2]}',layout)
+            while True:
+                print("Lol")
+                
+                event1,value = win.read()
+                print(event1,value)
+                if event1  in ('Exit',None):
+                    win.close()
+                    break
+        except FileNotFoundError:
+            sg.popup("NO RECORDS FOUND")
+    while True:
+        event,value = win.read()
+        #print(event,value)
+        if event == 'search_name':
+            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
+            WHERE Name LIKE '{value['Name']}%'"""
+            cursor.execute(query)
+            data =  cursor.fetchall()
+            #print(data)
+            win['Table'].update(data)
+            #break
+        elif event == 'search_email':
+            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
+            WHERE Email_ID = '{value['email']}'"""
+            #print(query)
+            cursor.execute(query)
+            data =  cursor.fetchall()
+            #print(data)
+            win['Table'].update(data)
+        elif event == 'search_phn':
+            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
+            WHERE Phone_Number = '{value['mob']}'"""
+            #print(query)
+            cursor.execute(query)
+            data =  cursor.fetchall()
+            #print(data)
+            win['Table'].update(data)
+        if event == 'Table':
+            em = data[value['Table'][0]][2] #Basically extracting email 
+            #print(data[value['Table'][0]])
+            win['show_det'].update(em)
+            win['show'].update(disabled = False)
+        if event == 'show':
+            print("EVENT OUTSIDE",event)
+            show_details(data[value['Table'][0]])
+            
+        if event in (None,'Exit'):
+            break
+
+def profit_analysis():
+    cursor.execute("SELECT Purchase_Date,SUM(Purchase_Amount) FROM PURCHASE GROUP BY Purchase_Date")
+    data = cursor.fetchall()
+    day = []
+    sale = []
+    for i in range(len(data)):
+        day.append(data[i][0])
+        sale.append(data[i][1])
+    print(day)
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
+    plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+    plt.plot(day, sale, color='red', marker='o')
+    plt.title('Sale per Day', fontsize=14)
+    plt.xlabel('Date', fontsize=14)
+    plt.ylabel('Total Sale Amount', fontsize=14)
+    plt.grid(True)
+    plt.show()
 mycon.commit()
+
 #Run the code only if the current file run
 if __name__=='__main__':
     employee_screen()
