@@ -45,7 +45,7 @@ cursor.execute(sql_customer)
 print("Relation customer created successfully....")
 
 sql_purchase = """create table PURCHASE(
-    Invoice_Number int not null primary key,
+    Invoice_Number varchar(15) not null primary key,
     Purchase_Date date,
     Purchase_Amount decimal(8,2),
     Customer_Email varchar(200),
@@ -77,7 +77,9 @@ cursor.execute('''insert into products(ID,Name,Brand,Size,Quantity,Cost_Price,Se
 ('8','Jumper','Pepe Jeans','XL','25','789.69','850.90'),
 ('9','Hat','Peter England','S','156','109.50','159.99'),
 ('10','Sherwani','Manyavar','XL','15','7890.40','13330.90'),
-('11','Lehenga','Manish Malhotra','XL','15','589.36','650.99');''')
+('11','Lehenga','Manish Malhotra','XL','15','589.36','650.99'),
+('12','Kurti','Meow','XL','42','250.63','499.99'),
+('13','Salwar Kameez','Shristhi','XL','26','569.63','899.99')''')
 print('Products added...')
 
 mycon.commit()
