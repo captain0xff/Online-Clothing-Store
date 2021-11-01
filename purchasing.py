@@ -11,7 +11,7 @@ cursor = mycon.cursor()
 
 def Main(email):
     def cart(cartData1):
-        nonlocal price
+        global price,data
         sg.theme('DarkAmber')
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
         table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',enable_events=True)
@@ -26,6 +26,7 @@ def Main(email):
         while True:
             #print(cartData)
             event1, values1 = window1.read()
+            #print(event1)
             if event1 in (None, 'Go Back'):
                 break
             if event1=='CLR':
@@ -34,7 +35,11 @@ def Main(email):
                 table.update(cartData1)
                 price = 0.0
                 priceMsg.update('{}'.format(price))
-                buyButton.update(disabled = True)
+                cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
+                data = list(cursor.fetchall())
+                sg.popup_timed('The cart has been cleared!')
+                window1.close()
+
             if event1=='-TABLE2-':
                 remove_from_cart=values1['-TABLE2-'][0]
                 print(remove_from_cart)
@@ -105,15 +110,15 @@ def Main(email):
                         export(cartData1,email)
                     """----End of CSV part----"""
                     return event1
+        window1.close()
 
-
-
-
+    global price
+    global cartData
+    global cartDict
+    global data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
-    cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
-    #Converted everything into list just to make things easier :)
-    data = list(cursor.fetchall())
+
     print(data)
     for i in range(len(data)):
         data[i] = list(data[i])
@@ -128,10 +133,8 @@ def Main(email):
 
     window = sg.Window('Products', layout, finalize = True)
 
-    price = 0
-    cartData = []
-    cartDict = {}
     prod=None
+    flag = False
     while True:
         event, values = window.read()
         print(event)
@@ -178,17 +181,27 @@ def Main(email):
             #print(cartDict)
             for i in cartDict:
                 cartDataFinal.append(list(i)[:4]+cartDict[i])
-            action = cart(cartDataFinal)
-            msg.update('')
+            flag = True
+            window.close()
+            break
+    if flag:
+        action = cart(cartDataFinal)
+        msg.update('')
             #print(action)
-            if action=='Buy':
-                sg.popup_timed('Thank you for shopping with us')
-                window.close()
-                break
+        if action=='Buy':
+            sg.popup_timed('Thank you for shopping with us')
+            window.close()
+        else:
+            Main(email)
 
-       # print(event, values)
     mycon.commit()
 #purchaseMenu('gauravchanda@gmail.com')
 mycon.commit()
+
+price = 0
+cartData = []
+cartDict = {}
+cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
+data = list(cursor.fetchall())
 if __name__=='__main__':
     Main(ID)
