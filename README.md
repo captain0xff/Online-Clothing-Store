@@ -16,3 +16,12 @@ They can select multiple products and add them to cart and make purchases.
 1. Men
 2. Women
 3. Kid
+
+#Pie Chart
+Category
+
+#Bar Graph
+Brand
+
+#Todo
+Slider
