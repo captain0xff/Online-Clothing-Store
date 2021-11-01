@@ -12,3 +12,7 @@ They will be able to make an account on the website and sign in later to make pu
 They can select multiple products and add them to cart and make purchases.
 
 
+#Category
+1. Men
+2. Women
+3. Kid
