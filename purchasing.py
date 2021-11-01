@@ -9,7 +9,7 @@ mycon = sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.
 cursor = mycon.cursor()
 
 
-def purchaseMenu(email):
+def Main(email):
     def cart(cartData1):
         nonlocal price
         sg.theme('DarkAmber')
@@ -186,4 +186,4 @@ def purchaseMenu(email):
 #purchaseMenu('gauravchanda@gmail.com')
 mycon.commit()
 if __name__=='__main__':
-    purchaseMenu(ID)
+    Main(ID)
