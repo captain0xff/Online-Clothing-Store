@@ -114,14 +114,16 @@ def Main(email):
     cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
     #Converted everything into list just to make things easier :)
     data = list(cursor.fetchall())
+    print(data)
     for i in range(len(data)):
         data[i] = list(data[i])
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-')
+    spin=sg.Spin(1,initial_value=1,disabled=True)
     layout = [[sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)],
-              [sg.Text('Product ID:'), msg,
-               sg.Text(size=(20, 1), key='-OUTPUT-')],
+              [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
+              [sg.Text('Quantity'),spin],
               [sg.Button('Add to Cart'), sg.Button('Exit'), sg.Button('Go to Cart')]]
 
     window = sg.Window('Products', layout, finalize = True)
@@ -129,14 +131,17 @@ def Main(email):
     price = 0
     cartData = []
     cartDict = {}
+    prod=None
     while True:
         event, values = window.read()
+        print(event)
         if event in (None, 'Exit'):
             break
         if event=='-TABLE1-':
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
             inp.update(prod)
+            spin.update(values=tuple(range(1,data[idSelected][4]+1)),disabled=False)
         if event =='Add to Cart':
             # Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
