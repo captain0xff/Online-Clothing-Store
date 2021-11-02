@@ -124,7 +124,7 @@ def Main(email):
         data[i] = list(data[i])
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-')
-    spin=sg.Spin(1,initial_value=1,disabled=True,enable_events=True)
+    spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
     layout = [[sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
@@ -137,7 +137,7 @@ def Main(email):
     flag = False
     while True:
         event, values = window.read()
-        print(event)
+        print(event, values)
         if event in (None, 'Exit'):
             break
         if event=='-TABLE1-':
@@ -145,6 +145,7 @@ def Main(email):
             prod=str(data[idSelected][0])
             inp.update(prod)
             spin.update(values=tuple(range(1,data[idSelected][4]+1)),disabled=False)
+
         if event =='Add to Cart':
             # Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
@@ -153,26 +154,30 @@ def Main(email):
             #print(proData)
             temp = (proData[0][0], proData[0][1], proData[0][2], proData[0][3], proData[0][6])
             cartData.append(temp)
-            price+=float(temp[4])
-            #print(price)
-            if temp in cartDict:
-                cartDict[temp][1] += temp[4]
-                cartDict[temp][0] += 1
+            q = str(values['Spin'])
+            if  (q.isdigit()==False) or ('.' in q) or (int(q)>proData[0][4]) or (int(q)<=0) or ((temp in cartDict) and (proData[0][4]-cartDict[temp][0]-int(q)<0)):
+                msg.update('Invalid Quantity')
             else:
-                cartDict[temp] = [1, temp[4]]
-            #print(cartDict)
-            # This part of the code is responsible for updating the table as we add items to cart
-            quantity = proData[0][4]
-            for i in range(len(data)):
-                prod_searched = list(data[i])
-                prod_searched.pop(4)
-                if prod_searched[0] == prod_ID_selected:
-                    data[i][4] = quantity-cartDict[tuple(prod_searched)][0]
-                    #print(data)
-            msg.update('Added to Cart')
-            window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
-            window['-TABLE1-'].update(data)
-
+                q = int(q)
+                if temp not in cartDict:
+                    cartDict[temp] = [q, temp[4]*q]
+                else:
+                    cartDict[temp][0] += q
+                    cartDict[temp][1] += temp[4]*q
+                price+=float(temp[4]*q)
+                #print(cartDict)
+                # This part of the code is responsible for updating the table as we add items to cart
+                quantity = proData[0][4]
+                for i in range(len(data)):
+                    prod_searched = list(data[i])
+                    prod_searched.pop(4)
+                    if prod_searched[0] == prod_ID_selected:
+                        data[i][4] = quantity-cartDict[tuple(prod_searched)][0]
+                        #print(data)
+                msg.update('Added to Cart')
+                window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
+                window['-TABLE1-'].update(data)
+                spin.update(1,disabled = True)
         if event == 'Go to Cart' and len(cartDict)==0:
             msg.update('Empty Cart...')
 
