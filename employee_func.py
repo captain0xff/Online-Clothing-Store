@@ -9,7 +9,7 @@ import csv
 
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
-def employee_screen(emp = ''):
+def Main(emp = ''):
     """This Function is responsible for the display of Employee Screen"""
     sg.theme('DarkAmber')
     font = ("Arial", 11)
@@ -73,7 +73,7 @@ def update_stock():
                 win['GB'].update(disabled = False)
             if event == 'GB':
                 win.close()
-                employee_screen()
+                Main()
             elif event is None:
                 break
 
@@ -241,4 +241,4 @@ mycon.commit()
 
 #Run the code only if the current file run
 if __name__=='__main__':
-    employee_screen()
+    Main()
