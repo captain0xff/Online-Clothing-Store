@@ -15,19 +15,19 @@ sg.theme('DarkAmber')
 
 def Main_menu():
     #The welcome menu
-    layout=[[sg.Image('Logo.png',key='IMG')],
-            [sg.Btn('Customer Login',key='CL',size=(29,2)),sg.Btn('Employee Login',key='EL',size=(29,2))]]
+    image='Logo.gif'
+    layout=[[sg.Image(key='IMG')],
+            [sg.Btn('Customer Login',key='CL',expand_x=True),sg.Btn('Employee Login',key='EL',expand_x=True)]]
 
     #Create the main menu window
-    window=sg.Window(st.caption,layout,finalize=True)
-    window['IMG'].expand(True,True,True)
-
+    window=sg.Window(st.caption,layout,finalize=True,element_justification='center')
+    img=window['IMG']
     option_choosen=None
 
     rng=True
     while rng:
         #Take events and values
-        e,v=window.read()
+        e,v=window.read(timeout=1)
         if e==sg.WIN_CLOSED:
             rng=False
         elif e=='CL':
@@ -37,6 +37,7 @@ def Main_menu():
         elif e=='EL':
             option_choosen=0
             rng=False
+        img.update_animation_no_buffering(image, 2000)
 
     #If any option is selected close the main window
     window.close()
@@ -57,7 +58,7 @@ def Employee_sign_in_menu():
     layout = [[msg],
               [sg.Text('Employee ID: '), sg.Input(key='id')],
               [sg.Text('User Name:   '), sg.Input(key='uname')],
-              [sg.Text('Password:     '), sg.Input(key='password', password_char='*')],
+              [sg.Text('Password:     '), sg.Input(key='password', password_char='\u2022')],
               [sg.Button('Login'), sg.Button('Go Back')]]
     # password_char parameter masks the given password with *
     window = sg.Window('Login - Employee', layout)
@@ -71,8 +72,8 @@ def Employee_sign_in_menu():
             option_choosen=2
             break
         elif event == 'Login':
-            if values['id'][-1] in '0123456789':
-                if values['id'] and values['uname'] and values['password']:
+            if values['id'] and values['uname'] and values['password']:
+                if values['id'][-1] in '0123456789':
                     cursor.execute('SELECT * FROM EMPLOYEES WHERE ID = %d;' % (int(values['id'])))
                     data = cursor.fetchall()
                     print(data)
@@ -81,12 +82,16 @@ def Employee_sign_in_menu():
                         if data[0][2] == values['uname'] and data[0][3] == values['password']:
                             option_choosen=1
                             break
-                    msg.update(value = 'Invalid employee ID, username or password...')
+                    msg.update(value = 'Invalid employee ID, username or password...',text_color='red')
+                    print('\a')
                 else:
-                    # If the user doesn't input any ID and clicks Login
-                    msg.update(value = 'Please enter all the data')
+                    msg.update('Please enter positive integer in employee ID...',text_color='red')
+                    print('\a')
             else:
-                msg.update('Please enter positive integer in employee ID...')
+                # If the user doesn't input any ID and clicks Login
+                msg.update(value = 'Please enter all the data',text_color='red')
+                print('\a')
+            
     window.close()
 
     if option_choosen==1:
@@ -98,11 +103,13 @@ def Employee_sign_in_menu():
 def Customer_sign_in_menu():
     #Customer sign_in menu
     #The layout for the sign in window
-    msg=sg.Text('Please Login...',size=(30,1))
+    msg=sg.Text('Login to access our wide range of products...')
     layout=[[msg],
-            [sg.Text('Email ID',size=(8,1)),sg.Input('',key='ID')],
-            [sg.Text('Password',size=(8,1)),sg.Input('',key='PD',password_char='*')],
-            [sg.Btn('Login',key='OK'),sg.Btn('Go Back',key='GB'),sg.Btn('Sign up',key='SN')]]
+            [sg.Text('Email ID',size=(7,1)),sg.Input('',key='ID')],
+            [sg.Text('Password',size=(7,1)),sg.Input('',key='PD',password_char='\u2022')],
+            [sg.Btn('Login',key='OK'),
+            sg.Btn('Go Back',key='GB'),
+            sg.Btn('Sign up',key='SN')]]
 
     #Create the sign in window
     window=sg.Window('Customer Sign in',layout)
@@ -131,10 +138,13 @@ def Customer_sign_in_menu():
                     if email==i[0] and passwd==i[1]:
                         option_choosen=1
                         rng=False
+                        break
                 else:
-                    msg.update(value='Invalid email or password...')
+                    msg.update(value='Invalid email or password...',text_color='red')
+                    print('\a')
             else:
-                msg.update(value='Please enter all the data...')
+                msg.update(value='Please enter all the data...',text_color='red')
+                print('\a')
     window.close()
     if option_choosen==1:
         purchasing.Main(email)
@@ -148,10 +158,10 @@ def Customer_sign_up():
     button=sg.Btn('Sign up',key='DN',disabled=True)
 
     #The layout of the window
-    msg=sg.Text('Please sign up...',size=(50,1))
+    msg=sg.Text('New to Denim Destination? Sign up..',size=(50,1))
     layout=[[msg],
             [sg.Text('Email ID',size=(8,1)),sg.Input('',key='EI')],
-            [sg.Text('Password',size=(8,1)),sg.Input('',key='PD',password_char='*')],
+            [sg.Text('Password',size=(8,1)),sg.Input('',key='PD',password_char='\u2022')],
             [sg.Text('Name',size=(8,1)),sg.Input('',key='NM')],
             [sg.Text('Phone No.',size=(8,1)),sg.Input('',key='PH')],
             [sg.Checkbox('I agree to the terms and conditions',key='CK',enable_events=True)],
@@ -182,7 +192,8 @@ def Customer_sign_up():
                     data=cursor.fetchall()
                     for i in data:
                         if email==i[0] or phone_no==i[1]:
-                            msg.update('Another account has the same email or phone number...')
+                            msg.update('Another account has the same email or phone number...',text_color='red')
+                            print('\a')
                             break
                     else:
                         command=command.format(name=name,ph=phone_no,email=email,passwd=password)
@@ -190,9 +201,11 @@ def Customer_sign_up():
                         mycon.commit()
                         rng=False
                 else:
-                    msg.update('Invalid phone number...')
+                    msg.update('Invalid phone number...',text_color='red')
+                    print('\a')
             else:
-                msg.update('Please enter all the data...')
+                msg.update('Please enter all the data...',text_color='red')
+                print('\a')
 
 
 
