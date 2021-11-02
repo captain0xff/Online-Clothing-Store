@@ -44,7 +44,6 @@ def Main(email):
                 remove_from_cart=values1['-TABLE2-'][0]
             print(remove_from_cart)
             if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
-                #print('hello')
                 print(cartData1)
                 dat = cartData1[remove_from_cart]
                 quan=dat[4]
@@ -61,6 +60,10 @@ def Main(email):
                     var+=1
                 table.update(cartData1)
                 priceMsg.update('{}'.format(price))
+
+                if len(cartData1)==0:
+                    sg.popup_timed('The cart is empty!')
+                    window1.close()
 
 
             if event1=='Buy':
@@ -210,7 +213,7 @@ cartData = []
 cartDict = {}
 cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
 data = list(cursor.fetchall())
-'''if __name__=='__main__':
-    Main(ID)'''
+if __name__=='__main__':
+    Main(ID)
 
-Main('gauravchanda@gmail.com')
+#Main('gauravchanda@gmail.com')
