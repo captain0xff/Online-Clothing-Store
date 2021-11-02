@@ -15,7 +15,7 @@ def Main(email):
         sg.theme('DarkAmber')
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
         table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',enable_events=True)
-        priceMsg = sg.Text('{}'.format(price))
+        priceMsg = sg.Text('{:.2f}'.format(price))
         buyButton = sg.Button('Buy')
         layout1 = [[sg.Text('YOUR CART')],
                   [table],
@@ -51,6 +51,7 @@ def Main(email):
                     if i[0]==dat[0]:
                         i[4]+=dat[4]
                 price-=float(dat[5])
+                price = round(price,2)
                 var = 0
                 for i in cartDict:
                     if var==remove_from_cart:
@@ -59,7 +60,7 @@ def Main(email):
                         break
                     var+=1
                 table.update(cartData1)
-                priceMsg.update('{}'.format(price))
+                priceMsg.update('{:.2f}'.format(price))
 
                 if len(cartData1)==0:
                     sg.popup_timed('The cart is empty!')
@@ -171,6 +172,7 @@ def Main(email):
                     cartDict[temp][0] += q
                     cartDict[temp][1] += temp[4]*q
                 price+=float(temp[4]*q)
+                price = round(price, 2)
                 #print(cartDict)
                 # This part of the code is responsible for updating the table as we add items to cart
                 quantity = proData[0][4]
