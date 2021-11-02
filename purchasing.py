@@ -42,12 +42,15 @@ def Main(email):
 
             if event1=='-TABLE2-':
                 remove_from_cart=values1['-TABLE2-'][0]
-                print(remove_from_cart)
             print(remove_from_cart)
             if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
                 #print('hello')
-                #print(cartData1)
+                print(cartData1)
                 dat = cartData1[remove_from_cart]
+                quan=dat[4]
+                for i in data:
+                    if i[0]==dat[0]:
+                        i[4]+=dat[4]
                 price-=float(dat[5])
                 var = 0
                 for i in cartDict:
@@ -200,7 +203,6 @@ def Main(email):
             Main(email)
 
     mycon.commit()
-#purchaseMenu('gauravchanda@gmail.com')
 mycon.commit()
 
 price = 0
@@ -208,5 +210,7 @@ cartData = []
 cartDict = {}
 cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
 data = list(cursor.fetchall())
-if __name__=='__main__':
-    Main(ID)
+'''if __name__=='__main__':
+    Main(ID)'''
+
+Main('gauravchanda@gmail.com')
