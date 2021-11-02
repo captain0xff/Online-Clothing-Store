@@ -157,6 +157,7 @@ def Customer_sign_in_menu():
                 print('\a')
     window.close()
     if option_choosen==1:
+        purchasing.mycon.commit()
         purchasing.Main(email)
     elif option_choosen==2:
         Main_menu()
