@@ -124,7 +124,7 @@ def Main(email):
         data[i] = list(data[i])
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-')
-    spin=sg.Spin(1,initial_value=1,disabled=True)
+    spin=sg.Spin(1,initial_value=1,disabled=True,enable_events=True)
     layout = [[sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
