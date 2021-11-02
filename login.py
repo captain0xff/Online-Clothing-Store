@@ -5,7 +5,17 @@ import mysql.connector as sql
 import settings as st
 import employee_func
 import purchasing
-
+import sys
+import warnings
+import time
+import os
+"""Code for checking environment"""
+idle = True if 'idlelib.run' in sys.modules else False #Credit goes to stackexchange
+if idle == True:
+    warnings.warn("This code malfunctions in IDLE... Launching in terminal...")
+    time.sleep(3)
+    current_dir = os.getcwd()
+    os.system(f"{current_dir}/login.py")
 #Connect to the mysql database and create a cursor
 mycon=sql.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor=mycon.cursor()
