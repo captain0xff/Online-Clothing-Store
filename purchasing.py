@@ -125,14 +125,24 @@ def Main(email):
     global data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
-
-    print(data)
+    cursor.execute('select distinct category from products')
+    categories=['All']
+    for i in cursor.fetchall():
+        categories.append(i[0])
+    cursor.execute('select distinct brand from products')
+    brands=['All']
+    for i in cursor.fetchall():
+        brands.append(i[0])
     for i in range(len(data)):
         data[i] = list(data[i])
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-')
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
-    layout = [[sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)],
+    table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)
+    layout = [[sg.DropDown(categories,default_value='All',key='CAT',size=(10,1)),
+                sg.DropDown(brands,default_value='All',key='BR'),
+                sg.Btn('Sort',key='SR')],
+              [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
               [sg.Text('Quantity'),spin],
@@ -152,6 +162,21 @@ def Main(email):
             prod=str(data[idSelected][0])
             inp.update(prod)
             spin.update(values=tuple(range(1,data[idSelected][4]+1)),disabled=False)
+
+        if event=='SR':
+            current_brand=values['BR']
+            current_cat=values['CAT']
+            if current_brand=='All':current_brand='%'
+            if current_cat=='All':current_cat='%'
+            cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
+            FROM PRODUCTS 
+            WHERE category like \'{cat}\' and brand like \'{brand}\''''
+            cmd=cmd.format(cat=current_cat,brand=current_brand)
+            cursor.execute(cmd)
+            data=cursor.fetchall()
+            for i in range(len(data)):
+                data[i] = list(data[i])
+            table.update(data)
 
         if event =='Add to Cart':
             # Declared the variable for my convenience and ease of understanding
@@ -220,8 +245,7 @@ price = 0
 cartData = []
 cartDict = {}
 cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
-data = list(cursor.fetchall())
-#if __name__=='__main__':
-#    Main(ID)
-
-Main('gauravchanda@gmail.com')
+data = cursor.fetchall()
+'''if __name__=='__main__':
+    Main(ID)'''
+Main('gaur')
