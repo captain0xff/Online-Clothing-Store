@@ -223,7 +223,8 @@ def profit_analysis():
     plt.grid(True)
     plt.show()
 
-Main()
+if __name__=='__main__':
+    Main()
 
 
 mycon.commit()
