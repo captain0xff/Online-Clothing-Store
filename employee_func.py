@@ -43,7 +43,7 @@ def Main(emp = ''):
                 win['Table'].update(data)
             except IndexError:
                 sg.popup( "Warning: No Product Selected",title = "WARNING")
-        if event == 'search_name':
+        if event == 'search_name' or 'Name':
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             WHERE Name LIKE '{value['Name']}%'"""
             cursor.execute(query)
@@ -92,10 +92,10 @@ def display_stock():
             for j in range(len(data[i])):
                 if isinstance(data[i][j],int):
                     data[i][j] = str(data[i][j])
-        heading = ['ID','Name','Brand','Size','Quantity','Cost_Price','Selling_Price']
+        heading = ['Prod ID','Name','Brand','Size','Quantity','Cost_Price','Selling_Price']
         layout1 = [[sg.Text('Product List')],
         [sg.Table(data,headings = heading,key = 'Table',justification='left'
-        ,auto_size_columns=False,def_col_width=10)],
+        ,auto_size_columns=True,expand_y = True)],
         [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update')],
         ]
         return layout1
@@ -168,7 +168,7 @@ def cust_details():
     data = cursor.fetchall()
     heading = ['Name','Phone_Number','Email_ID','Total_Purchase_Amt']
     table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
-    layout = [[sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name'),sg.Button('Search',key = 'search_name')],
+    layout = [[sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),sg.Button('Search',key = 'search_name')],
     [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email'),sg.Button('Search',key = 'search_email')],
     [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob'),sg.Button('Search',key = 'search_phn')],
     [table],
