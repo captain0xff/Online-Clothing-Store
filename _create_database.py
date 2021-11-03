@@ -19,7 +19,8 @@ sql_products = """create table PRODUCTS(
     Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL'),
     Quantity INTEGER,
     Cost_Price DECIMAL(8,2),
-    Selling_Price DECIMAL(8,2))"""
+    Selling_Price DECIMAL(8,2),
+    Category VARCHAR(5) CHECK(Category = 'KIDS' OR Category = 'MEN' OR Category = 'WOMEN' ))"""
 
 
 cursor.execute(sql_products)
@@ -66,20 +67,21 @@ VALUES('Gaurav Chanda', 1123978046, 'gauravchanda@gmail.com', 'gauravchanda', 10
 ('Devarshi Ray', 1110010993, 'devarshiray@gmail.com', 'ilovemanga', 100000);""")
 print("Data of Customers added...")
 
-cursor.execute('''insert into products(ID,Name,Brand,Size,Quantity,Cost_Price,Selling_Price) values
-('1','Jeans','Wrangler','XL','23','425.23','699.56'),
-('2','Shirt','Peter England','L','56','256.25','352.23'),
-('3','T Shirt','Lewis','S','15','230.50','299.99'),
-('4','Coat','Peter England','M','25','12000.00','17999.99'),
-('5','T Shirt','Peter England','S','43','230.56','325.99'),
-('6','Chinos','Buffalo','M','25','325.69','399.99'),
-('7','Jacket','Denim & Jeans','L','13','254.69','350.00'),
-('8','Jumper','Pepe Jeans','XL','25','789.69','850.90'),
-('9','Hat','Peter England','S','156','109.50','159.99'),
-('10','Sherwani','Manyavar','XL','15','7890.40','13330.90'),
-('11','Lehenga','Manish Malhotra','XL','15','589.36','650.99'),
-('12','Kurti','Meow','XL','42','250.63','499.99'),
-('13','Salwar Kameez','Shristhi','XL','26','569.63','899.99')''')
+cursor.execute('''insert into products
+values('1','Jeans','Wrangler','XL','23','425.23','699.56','MEN');
+('2','Shirt','Peter England','L','56','256.25','352.23','MEN');
+('3','T Shirt','Lewis','S','15','230.50','299.99','MEN');
+('4','Coat','Peter England','M','25','12000.00','17999.99','MEN');
+('5','T Shirt','Peter England','S','43','230.56','325.99','MEN');
+('6','Chinos','Buffalo','M','25','325.69','399.99','MEN');
+('7','Jacket','Denim & Jeans','L','13','254.69','350.00','MEN');
+('8','Jumper','Pepe Jeans','XL','25','789.69','850.90','WOMEN');
+('9','Hat','Peter England','S','156','109.50','159.99','KIDS');
+('10','Sherwani','Manyavar','XL','14','7890.40','13330.90','MEN');
+('11','Lehenga','Manish Malhotra','XL','15','589.36','650.99','WOMEN');
+('12','Kurti','Meow','XL','42','250.63','499.99','WOMEN');
+('13','Salwar Kameez','Shristhi','XL','26','569.63','899.99','WOMEN');
+''')
 print('Products added...')
 
 mycon.commit()
