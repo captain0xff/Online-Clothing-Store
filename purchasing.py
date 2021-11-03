@@ -186,6 +186,12 @@ def Main(email):
                 window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
                 window['-TABLE1-'].update(data)
                 spin.update(1,disabled = True)
+                temp_table = []
+                for i in range(len(data)):
+                    if data[i][4] != 0:  #data[i][4] is the quantity
+                        temp_table.append(data[i])
+                #print("Data",data)
+                window['-TABLE1-'].update(temp_table)
         if event == 'Go to Cart' and len(cartDict)==0:
             msg.update('Empty Cart...')
 
@@ -215,7 +221,7 @@ cartData = []
 cartDict = {}
 cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
 data = list(cursor.fetchall())
-if __name__=='__main__':
-    Main(ID)
+#if __name__=='__main__':
+#    Main(ID)
 
-#Main('gauravchanda@gmail.com')
+Main('gauravchanda@gmail.com')
