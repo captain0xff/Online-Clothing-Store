@@ -10,12 +10,13 @@ import csv
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 def Main(emp = ''):
+    global data
     """This Function is responsible for the display of Employee Screen"""
     sg.theme('DarkAmber')
     font = ("Arial", 11)
     stck_data = display_stock()
     finance = [[sg.Button('Daily Profit',key = "Daily Profit")]]
-    customer_det = cust_details()
+    customer_det = cust_details(data)
     layout = [
         [sg.Text(f"Welcome {emp}",font=font)],
         [sg.Text('')],
@@ -28,7 +29,7 @@ def Main(emp = ''):
     win = sg.Window('Welcome',layout)
     while True:
         event,value = win.read() #Values variable was getting wasted
-        #print(event,value)
+        print(event,value)
         if event == 'Add':
             add_stock()
             cursor.execute("SELECT * FROM PRODUCTS")
@@ -43,6 +44,14 @@ def Main(emp = ''):
                 win['Table'].update(data)
             except IndexError:
                 sg.popup( "Warning: No Product Selected",title = "WARNING")
+        if event == "sort_amt":
+            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
+            ORDER BY Total_Price DESC"""
+            cursor.execute(query)
+            data1 =  cursor.fetchall()
+            print('data 1',data1)
+            win['cust_Table'].update(data1)
+            #print('Meow')
         if event == 'search_name' or 'Name':
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             WHERE Name LIKE '{value['Name']}%'"""
@@ -71,7 +80,8 @@ def Main(emp = ''):
             cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
             data = cursor.fetchall()
             print(data)
-            em = data[value['cust_Table'][0]][2] #Basically extracting email 
+            em = data[value['cust_Table'][0]][2] #Basically extracting email
+
             #print(data[value['Table'][0]])
             win['show_det'].update(em)
             win['show'].update(disabled = False)
@@ -163,18 +173,25 @@ def update_data(ID):
             if event is None:
                 break
 
-def cust_details():
-    cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
-    data = cursor.fetchall()
+
+
+cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
+data = cursor.fetchall()
+def cust_details(d):
+    #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
+    #data = cursor.fetchall()
+    print('data',d)
     heading = ['Name','Phone_Number','Email_ID','Total_Purchase_Amt']
-    table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
-    layout = [[sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),sg.Button('Search',key = 'search_name')],
+    table = sg.Table(d,headings=heading,key = 'cust_Table',enable_events=True)
+    layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',enable_events=True),sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
+    [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),sg.Button('Search',key = 'search_name')],
     [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email'),sg.Button('Search',key = 'search_email')],
     [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob'),sg.Button('Search',key = 'search_phn')],
     [table],
     [sg.Input(key = 'show_det'),sg.Button('Show Details', disabled=True,key = 'show')],
     [sg.Button('Exit')]
     ]
+    print('layout',list(layout[4]))
     return layout
 
 def show_details(dat):
