@@ -293,4 +293,4 @@ cartDict = {}
 cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
 data = cursor.fetchall()
 if __name__=='__main__':
-    Main('Gauravsaya')
+    Main('gauravchanda@gmail.com')
