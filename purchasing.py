@@ -119,29 +119,85 @@ def Main(email):
                     return event1
         window1.close()
 
+
+    def filter_menu(data):
+        cursor.execute('select distinct category from products')
+        categories=[]
+        for i in cursor.fetchall():
+            categories.append(i[0])
+        cursor.execute('select distinct brand from products')
+        brands=[]
+        for i in cursor.fetchall():
+                brands.append(i[0])
+        txt=sg.Text('Filter or sort the data..',size=(35,1))
+        layout=[[txt],[sg.Text('Categories')]]
+        for i in categories:
+            elem=sg.Checkbox(i,default=True,key=i)
+            layout.append([elem])
+        layout.append([sg.Text('Brands')])
+        for i in brands:
+            elem=sg.Checkbox(i,default=True,key=i)
+            layout.append([elem])
+        layout.append([sg.Text('Sort')])
+        layout.append([sg.Radio('High To Low',1)])
+        layout.append([sg.Radio('Low To High',1)])
+        layout.append([sg.Radio('Name',1,default=True)])
+        layout.append([sg.Btn('Apply Filters',key='AP')])
+
+        window2=sg.Window('Filters',layout)
+        rng=True
+        filters_applied=False
+        while rng:
+            events,values=window2.read()
+            if events==sg.WIN_CLOSED:
+                rng=False
+            elif events=='AP':
+                brands_sel=[]
+                cats_sel=[]
+                for i in values:
+                    if i in categories and values[i]==True:
+                        cats_sel.append(i)
+                    elif i in brands and values[i]==True:
+                        brands_sel.append(i)
+                if brands_sel and cats_sel:
+                    if len(brands_sel)!=1:
+                        brands_sel=tuple(brands_sel)
+                    else:
+                        brands_sel="('{}')".format(brands_sel[0])
+                    if len(cats_sel)!=1:
+                        cats_sel=tuple(cats_sel)
+                    else:
+                        cats_sel="('{}')".format(cats_sel[0])
+                    cmd="""SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
+                    FROM PRODUCTS
+                    WHERE Brand in {brand} and category in {category}
+                    """.format(brand=brands_sel,category=cats_sel)
+                    cursor.execute(cmd)
+                    data=cursor.fetchall()
+                    if data:
+                        window2.close()
+                        return data
+                    else:
+                        txt.update('No product matches the given filter options',text_color='red')
+                        print('\a')
+                else:
+                    txt.update('No category or brand selected',text_color='red')
+                    print('\a')
+        window2.close()
     global price
     global cartData
     global cartDict
     global data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
-    cursor.execute('select distinct category from products')
-    categories=['All']
-    for i in cursor.fetchall():
-        categories.append(i[0])
-    cursor.execute('select distinct brand from products')
-    brands=['All']
-    for i in cursor.fetchall():
-        brands.append(i[0])
     for i in range(len(data)):
         data[i] = list(data[i])
+
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-')
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
     table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)
-    layout = [[sg.DropDown(categories,default_value='All',key='CAT',size=(10,1)),
-                sg.DropDown(brands,default_value='All',key='BR'),
-                sg.Btn('Sort',key='SR')],
+    layout = [[sg.Btn('Filters',key='FL')],
               [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
@@ -163,21 +219,11 @@ def Main(email):
             inp.update(prod)
             spin.update(values=tuple(range(1,data[idSelected][4]+1)),disabled=False)
 
-        if event=='SR':
-            current_brand=values['BR']
-            current_cat=values['CAT']
-            if current_brand=='All':current_brand='%'
-            if current_cat=='All':current_cat='%'
-            cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
-            FROM PRODUCTS 
-            WHERE category like \'{cat}\' and brand like \'{brand}\''''
-            cmd=cmd.format(cat=current_cat,brand=current_brand)
-            cursor.execute(cmd)
-            data=cursor.fetchall()
-            for i in range(len(data)):
-                data[i] = list(data[i])
-            table.update(data)
-
+        if event=='FL':
+            filtered_data=filter_menu(data)
+            if filtered_data:
+                data=filtered_data
+                table.update(data)
         if event =='Add to Cart':
             # Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
@@ -247,4 +293,4 @@ cartDict = {}
 cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
 data = cursor.fetchall()
 if __name__=='__main__':
-    Main(ID)
+    Main('Gauravsaya')
