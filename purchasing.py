@@ -119,7 +119,6 @@ def Main(email):
                     return event1
         window1.close()
 
-
     def filter_menu(data):
         cursor.execute('select distinct category from products')
         categories=[]
@@ -130,35 +129,45 @@ def Main(email):
         for i in cursor.fetchall():
                 brands.append(i[0])
         txt=sg.Text('Filter or sort the data..',size=(35,1))
-        layout=[[txt],[sg.Text('Categories')]]
+        layout=[[txt]]
+        layout.append([sg.Text('Sort')])
+        layout.append([sg.Radio('Name',1,default=True,key='R1')])
+        layout.append([sg.Radio('High To Low',1,key='R2')])
+        layout.append([sg.Radio('Low To High',1,key='R3')])
+        layout.append([sg.Text('Categories')])
         for i in categories:
             elem=sg.Checkbox(i,default=True,key=i)
             layout.append([elem])
         layout.append([sg.Text('Brands')])
+        brand=[]
         for i in brands:
-            elem=sg.Checkbox(i,default=True,key=i)
-            layout.append([elem])
-        layout.append([sg.Text('Sort')])
-        layout.append([sg.Radio('High To Low',1)])
-        layout.append([sg.Radio('Low To High',1)])
-        layout.append([sg.Radio('Name',1,default=True)])
+            elem=sg.Checkbox(i,default=False,key=i)
+            brand.append([elem])
+        layout.append([sg.Column(brand,scrollable=True)])
+
+
         layout.append([sg.Btn('Apply Filters',key='AP')])
+        
 
         window2=sg.Window('Filters',layout)
         rng=True
         filters_applied=False
         while rng:
             events,values=window2.read()
+            print(events,values)
             if events==sg.WIN_CLOSED:
                 rng=False
             elif events=='AP':
                 brands_sel=[]
                 cats_sel=[]
+                sort_sel='R1'
                 for i in values:
                     if i in categories and values[i]==True:
                         cats_sel.append(i)
                     elif i in brands and values[i]==True:
                         brands_sel.append(i)
+                    elif i in ('R1','R2','R3') and values[i]==True:
+                        sort_sel=i
                 if brands_sel and cats_sel:
                     if len(brands_sel)!=1:
                         brands_sel=tuple(brands_sel)
@@ -168,10 +177,18 @@ def Main(email):
                         cats_sel=tuple(cats_sel)
                     else:
                         cats_sel="('{}')".format(cats_sel[0])
+                    if sort_sel=='R1':
+                        sort_sel='Name'
+                    elif sort_sel=='R2':
+                        sort_sel='Selling_Price DESC'
+                    else:
+                        sort_sel='Selling_Price'
                     cmd="""SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
                     FROM PRODUCTS
                     WHERE Brand in {brand} and category in {category}
-                    """.format(brand=brands_sel,category=cats_sel)
+                    ORDER BY {sort}
+                    """.format(brand=brands_sel,category=cats_sel,sort=sort_sel)
+                    print(cmd)
                     cursor.execute(cmd)
                     data=cursor.fetchall()
                     if data:
