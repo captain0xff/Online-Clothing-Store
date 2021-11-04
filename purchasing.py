@@ -46,7 +46,6 @@ def Main(email):
             if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
                 print(cartData1)
                 dat = cartData1[remove_from_cart]
-                quan=dat[4]
                 for i in data:
                     if i[0]==dat[0]:
                         i[4]+=dat[4]
