@@ -192,6 +192,7 @@ def Main(email):
                     cursor.execute(cmd)
                     data=cursor.fetchall()
                     if data:
+                        data=[list(i) for i in data]
                         window2.close()
                         return data
                     else:
@@ -209,7 +210,6 @@ def Main(email):
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
     for i in range(len(data)):
         data[i] = list(data[i])
-
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-')
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
