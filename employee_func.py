@@ -141,6 +141,7 @@ def add_stock():
             window.close()
             break
 
+
 def update_data(ID):
     """This function allows employee to modify the details of existing stock"""
     lay = [[sg.Text('Product ID',size = (18,1)),
