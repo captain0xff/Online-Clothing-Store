@@ -167,7 +167,7 @@ def Main(email):
                         brands_sel.append(i)
                     elif i in ('R1','R2','R3') and values[i]==True:
                         sort_sel=i
-                if brands_sel and cats_sel:
+                if (brands_sel and cats_sel) or (sort_sel in ('R1','R2', 'R3')):
                     if len(brands_sel)!=1:
                         brands_sel=tuple(brands_sel)
                     else:
@@ -182,6 +182,13 @@ def Main(email):
                         sort_sel='Selling_Price DESC'
                     else:
                         sort_sel='Selling_Price'
+                    print(brands_sel)
+                    print(cats_sel)
+                    print(sort_sel)
+                    if sort_sel in ('Name', 'Selling_Price DESC', 'Selling_Price'):
+                        if len(brands_sel)==0:
+                            brands_sel = tuple(brands)
+                        print(brands_sel, cats_sel)
                     cmd="""SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
                     FROM PRODUCTS
                     WHERE Brand in {brand} and category in {category}
@@ -210,17 +217,22 @@ def Main(email):
     for i in range(len(data)):
         data[i] = list(data[i])
     msg = sg.Text('',size=(20,0))
-    inp=sg.Input(key='-IN-')
+    inp=sg.Input(key='-IN-', enable_events = True)
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
     table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)
+    atcButton = sg.Button('Add to Cart', disabled = True)
+    gtcButton = sg.Button('Go to Cart', disabled = True)
     layout = [[sg.Btn('Filters',key='FL')],
               [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
               [sg.Text('Quantity'),spin],
-              [sg.Button('Add to Cart'), sg.Button('Exit'), sg.Button('Go to Cart')]]
+              [atcButton, gtcButton, sg.Button('Exit')]]
 
     window = sg.Window('Products', layout, finalize = True)
+
+    if len(cartDict) != 0:
+        gtcButton.update(disabled=False)
 
     prod=None
     flag = False
@@ -229,18 +241,35 @@ def Main(email):
         print(event, values)
         if event in (None, 'Exit'):
             break
+
         if event=='-TABLE1-':
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
             inp.update(prod)
             spin.update(values=tuple(range(1,data[idSelected][4]+1)),disabled=False)
+            atcButton.update(disabled = False)
+            flag = True
+
+        if event=='-IN-':
+            atcButton.update(disabled=True)
+            idSelected = int(values['-IN-'])
+            flag = False
+            for i in data:
+                if i[0]==idSelected:
+                    flag = True
+                    break
+            if flag:
+                atcButton.update(disabled = False)
+                spin.update(values=tuple(range(1, data[idSelected-1][4]+1)), disabled=False)
 
         if event=='FL':
             filtered_data=filter_menu(data)
             if filtered_data:
                 data=filtered_data
                 table.update(data)
-        if event =='Add to Cart':
+
+
+        if event =='Add to Cart' and flag:
             # Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
             cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %(prod_ID_selected))
@@ -279,8 +308,11 @@ def Main(email):
                         temp_table.append(data[i])
                 #print("Data",data)
                 window['-TABLE1-'].update(temp_table)
-        if event == 'Go to Cart' and len(cartDict)==0:
-            msg.update('Empty Cart...')
+                spin.update(disabled = True)
+        if len(cartDict)==0:
+            gtcButton.update(disabled=True)
+        else:
+            gtcButton.update(disabled=False)
 
         if event == 'Go to Cart' and len(cartDict)!=0:
             cartDataFinal = []
@@ -290,6 +322,8 @@ def Main(email):
             flag = True
             window.close()
             break
+
+
     if flag:
         action = cart(cartDataFinal)
         msg.update('')
