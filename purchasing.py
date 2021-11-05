@@ -242,6 +242,9 @@ def Main(email):
         if event in (None, 'Exit'):
             break
 
+        if values['-TABLE1-']==[] or values['-IN-']=='':
+            atcButton.update(disabled = True)
+
         if event=='-TABLE1-':
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
@@ -250,7 +253,7 @@ def Main(email):
             atcButton.update(disabled = False)
             flag = True
 
-        if event=='-IN-':
+        if event=='-IN-' and values['-IN-']!='':
             atcButton.update(disabled=True)
             idSelected = int(values['-IN-'])
             flag = False
