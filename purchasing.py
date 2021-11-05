@@ -235,7 +235,7 @@ def Main(email):
         gtcButton.update(disabled=False)
 
     prod=None
-    flag = False
+    flag2 = False
     while True:
         event, values = window.read()
         print(event, values)
@@ -323,12 +323,12 @@ def Main(email):
             #print(cartDict)
             for i in cartDict:
                 cartDataFinal.append(list(i)[:4]+cartDict[i])
-            flag = True
+            flag2 = True
             window.close()
             break
 
 
-    if flag:
+    if flag2:
         action = cart(cartDataFinal)
         msg.update('')
             #print(action)
