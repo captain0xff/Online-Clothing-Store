@@ -150,17 +150,14 @@ def Main(email):
             elem=sg.Checkbox(i,default=True,key=i)
             layout.append([elem])
         layout.append([sg.Text('Brands')])
-        brand=[]
+        layout.append([sg.Checkbox('All',key='BALL',enable_events=True)])
         for i in brands:
             elem=sg.Checkbox(i,default=False,key=i)
-            brand.append([elem])
-        layout.append([sg.Column(brand,scrollable=True)])
+            layout.append([elem])
+        layout2=[[sg.Column(layout,scrollable=True)]]
+        layout2.append([sg.Btn('Apply Filters',key='AP')])
 
-
-        layout.append([sg.Btn('Apply Filters',key='AP')])
-        
-
-        window2=sg.Window('Filters',layout)
+        window2=sg.Window('Filters',layout2)
         rng=True
         filters_applied=False
         while rng:
@@ -168,6 +165,13 @@ def Main(email):
             print(events,values)
             if events==sg.WIN_CLOSED:
                 rng=False
+            if events=='BALL':
+                if values['BALL']:
+                    for i in brands:
+                        window2[i].update(True)
+                else:
+                    for i in brands:
+                        window2[i].update(False)
             elif events=='AP':
                 brands_sel=[]
                 cats_sel=[]
@@ -210,7 +214,6 @@ def Main(email):
                     cursor.execute(cmd)
                     data=cursor.fetchall()
                     if data:
-                        data=[list(i) for i in data]
                         window2.close()
                         return data
                     else:
@@ -226,15 +229,14 @@ def Main(email):
     global data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
-    for i in range(len(data)):
-        data[i] = list(data[i])
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-', enable_events = True)
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
     table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)
     atcButton = sg.Button('Add to Cart', disabled = True)
     gtcButton = sg.Button('Go to Cart', disabled = True)
-    layout = [[sg.Btn('Filters',key='FL')],
+    search=sg.Input(key='SB',enable_events=True)
+    layout = [[sg.Text('Search'),search,sg.Btn('Filters',key='FL')],
               [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
@@ -254,10 +256,17 @@ def Main(email):
         print(event, values)
         if event in (None, 'Exit'):
             break
-
         if values['-TABLE1-']==[] and values['-IN-']=='':
             atcButton.update(disabled = True)
-
+        if event=='SB':
+            cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
+            FROM PRODUCTS
+            WHERE NAME LIKE \'{name}%\'
+            '''
+            cmd=cmd.format(name=values['SB'])
+            cursor.execute(cmd)
+            data=cursor.fetchall()
+            table.update(data)
         if event=='-TABLE1-':
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
@@ -266,7 +275,6 @@ def Main(email):
             spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
             atcButton.update(disabled = False)
             flag = True
-
         if event=='-IN-' and values['-IN-']!='':
             #atcButton.update(disabled=True)
             flag = False
@@ -285,13 +293,19 @@ def Main(email):
                 spin.update(disabled = True)
 
         if event=='FL':
+            window.Disable()
             filtered_data=filter_menu(data)
+            window.Enable()
+            window.Hide()
+            window.UnHide()
             if filtered_data:
                 data=filtered_data
                 table.update(data)
 
 
         if event =='Add to Cart' and flag:
+            for i in range(len(data)):
+                data[i] = list(data[i])
             # Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
             cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %(prod_ID_selected))

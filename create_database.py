@@ -1,9 +1,8 @@
 '''Create the database if not created'''
-
 import mysql.connector as sqltor
+import settings as st
 #establishing the connection
-psswd = input("Enter the password of ur db: ")
-mycon = sqltor.connect(user='root', password=psswd, host='localhost')
+mycon=sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 
 cursor.execute("DROP database IF EXISTS denim_destination_db")
@@ -17,7 +16,7 @@ sql_products = """create table PRODUCTS(
     Name VARCHAR(50),
     Brand VARCHAR(50),
     Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL' OR SIZE='NA'),
-    Quantity INTEGER,
+    Quantity Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL' OR SIZE='NA'),
     Cost_Price DECIMAL(8,2),
     Selling_Price DECIMAL(8,2),
     Category VARCHAR(5) CHECK(Category = 'Kids' OR Category = 'Men' OR Category = 'Women' ))"""
@@ -46,11 +45,18 @@ cursor.execute(sql_customer)
 print("Relation customer created successfully....")
 
 sql_purchase = """create table PURCHASE(
-    Invoice_Number varchar(15) not null primary key,
+    Invoice_Number varchar(15),
     Purchase_Date date,
     Purchase_Amount decimal(8,2),
     Customer_Email varchar(200),
-    foreign key(Customer_Email) references CUSTOMERS(EMAIL_ID))"""
+    Product_ID INT NOT NULL,
+    Product_Name VARCHAR(50),
+    Product_Brand VARCHAR(50),
+    Product_Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL' OR SIZE='NA'),
+    Product_Quantity Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL' OR SIZE='NA'),
+    Product_Cost_Price DECIMAL(8,2),
+    Product_Selling_Price DECIMAL(8,2),
+    """
 
 cursor.execute(sql_purchase)
 print("Relation purchase created successfully....")
@@ -66,6 +72,8 @@ VALUES('Gaurav Chanda', 1123978046, 'gauravchanda@gmail.com', 'gauravchanda', 10
 ('Arunansh Barai', 9833965591, 'arunanshbarai@gmail.com', 'phtkknhs', 9000),
 ('Devarshi Ray', 1110010993, 'devarshiray@gmail.com', 'ilovemanga', 100000);""")
 print("Data of Customers added...")
+
+
 
 cursor.execute('''insert into products
 values('1','Jeans','Wrangler','XL','23','425.23','699.56','Men'),
