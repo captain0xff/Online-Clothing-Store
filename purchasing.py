@@ -51,14 +51,16 @@ def Main(email):
                         i[4]+=dat[4]
                         break
                 else:
-                    a = -1
+                    a = len(data)
+                    tempList = []
                     for i in range(len(data)):
                         if data[i][0]>dat[0]:
-                            tempList = list(dat)
-                            tempList[5] = round(dat[5]/dat[4],2)
                             a = i
                             break
+                    tempList = list(dat)
+                    tempList[5] = round(dat[5]/dat[4], 2)
                     data.insert(a, tempList)
+                    print(data)
                 price-=float(dat[5])
                 price = round(price,2)
                 var = 0
