@@ -10,13 +10,14 @@ import csv
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 def Main(emp = ''):
-    """This Function is responsible for the display of Employee Screen"""
     global data
+    """This Function is responsible for the display of Employee Screen"""
+    #global data
     sg.theme('DarkAmber')
     font = ("Arial", 11)
     stck_data = display_stock()
     finance = [[sg.Button('Daily Profit',key = "Daily Profit")]]
-    customer_det = cust_details(data)
+    customer_det = cust_details()
     layout = [
         [sg.Text(f"Welcome {emp}",font=font)],
         [sg.Text('')],
@@ -29,6 +30,9 @@ def Main(emp = ''):
     win = sg.Window('Welcome',layout)
     while True:
         event,value = win.read() #Values variable was getting wasted
+        if event == 'Delete':
+            #prod_id = 
+            pass
         if event == 'show':
             print(value)
             show_details(data[value['cust_Table'][0]])
@@ -50,9 +54,10 @@ def Main(emp = ''):
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             ORDER BY Total_Price DESC"""
             cursor.execute(query)
-            data1 =  cursor.fetchall()
-            sg.Print(data1)
-            win['cust_Table'].update(data1)
+            
+            data =  cursor.fetchall()
+            #sg.Print(data1)
+            win['cust_Table'].update(data)
             #print('Meow')
         if event in ('search_name','Name') and value:
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
@@ -79,8 +84,8 @@ def Main(emp = ''):
             #print(data)
             win['cust_Table'].update(data)
         if event == 'cust_Table':
-            cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
-            data = cursor.fetchall()
+            #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
+            #data = cursor.fetchall()
             print(data)
             em = data[value['cust_Table'][0]][2] #Basically extracting email
             #print(data[value['Table'][0]])
@@ -106,7 +111,7 @@ def display_stock():
     layout1 = [[sg.Text('Product List')],
     [sg.Table(data,headings = heading,key = 'Table',justification='left'
     ,auto_size_columns=True,expand_y = True)],
-    [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update')],
+    [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update'),sg.Button('Delete',key = 'Delete')],
     ]
     return layout1
 #check
@@ -178,12 +183,13 @@ def update_data(ID):
 
 cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
 data = cursor.fetchall()
-def cust_details(d):
+def cust_details():
+    global data
     #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
-    #data = cursor.fetchall()
-    print('data',d)
+    #d = cursor.fetchall()
+    print('data',data)
     heading = ['Name','Phone_Number','Email_ID','Total_Purchase_Amt']
-    table = sg.Table(d,headings=heading,key = 'cust_Table',enable_events=True)
+    table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',enable_events=True),sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
     [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),sg.Button('Search',key = 'search_name')],
     [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email'),sg.Button('Search',key = 'search_email')],
