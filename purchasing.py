@@ -49,6 +49,16 @@ def Main(email):
                 for i in data:
                     if i[0]==dat[0]:
                         i[4]+=dat[4]
+                        break
+                else:
+                    a = -1
+                    for i in range(len(data)):
+                        if data[i][0]>dat[0]:
+                            tempList = list(dat)
+                            tempList[5] = round(dat[5]/dat[4],2)
+                            a = i
+                            break
+                    data.insert(a, tempList)
                 price-=float(dat[5])
                 price = round(price,2)
                 var = 0
@@ -235,6 +245,7 @@ def Main(email):
         gtcButton.update(disabled=False)
 
     prod=None
+    flag = False
     flag2 = False
     while True:
         event, values = window.read()
@@ -242,28 +253,34 @@ def Main(email):
         if event in (None, 'Exit'):
             break
 
-        if values['-TABLE1-']==[] or values['-IN-']=='':
+        if values['-TABLE1-']==[] and values['-IN-']=='':
             atcButton.update(disabled = True)
 
         if event=='-TABLE1-':
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
             inp.update(prod)
-            spin.update(values=tuple(range(1,data[idSelected][4]+1)),disabled=False)
+            quantity1 = data[idSelected][4]
+            spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
             atcButton.update(disabled = False)
             flag = True
 
         if event=='-IN-' and values['-IN-']!='':
-            atcButton.update(disabled=True)
-            idSelected = int(values['-IN-'])
+            #atcButton.update(disabled=True)
             flag = False
-            for i in data:
-                if i[0]==idSelected:
-                    flag = True
-                    break
+            if values['-IN-'].isdigit():
+                idSelected = int(values['-IN-'])
+                for i in data:
+                    if i[0]==idSelected:
+                        flag = True
+                        break
             if flag:
+                quantity1 = data[idSelected-1][4]
                 atcButton.update(disabled = False)
-                spin.update(values=tuple(range(1, data[idSelected-1][4]+1)), disabled=False)
+                spin.update(values=tuple(range(1, quantity1+1)), disabled=False)
+            else:
+                atcButton.update(disabled = True)
+                spin.update(disabled = True)
 
         if event=='FL':
             filtered_data=filter_menu(data)
@@ -282,7 +299,7 @@ def Main(email):
             cartData.append(temp)
             q = str(values['Spin'])
             if  (q.isdigit()==False) or ('.' in q) or (int(q)>proData[0][4]) or (int(q)<=0) or ((temp in cartDict) and (proData[0][4]-cartDict[temp][0]-int(q)<0)):
-                msg.update('Invalid Quantity')
+                msg.update('Invalid Quantity Entered')
             else:
                 q = int(q)
                 if temp not in cartDict:
@@ -295,6 +312,8 @@ def Main(email):
                 #print(cartDict)
                 # This part of the code is responsible for updating the table as we add items to cart
                 quantity = proData[0][4]
+                print(data)
+                print(cartDict)
                 for i in range(len(data)):
                     prod_searched = list(data[i])
                     prod_searched.pop(4)
@@ -311,6 +330,7 @@ def Main(email):
                         temp_table.append(data[i])
                 #print("Data",data)
                 window['-TABLE1-'].update(temp_table)
+                data = list(temp_table)
                 spin.update(disabled = True)
                 atcButton.update(disabled = True)
         if len(cartDict)==0:
