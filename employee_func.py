@@ -34,7 +34,7 @@ def Main(emp = ''):
             #prod_id = 
             pass
         if event == 'show':
-            print(value)
+            #print(value)
             show_details(data[value['cust_Table'][0]])
         if event == 'Add':
             add_stock()
@@ -86,7 +86,7 @@ def Main(emp = ''):
         if event == 'cust_Table':
             #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
             #data = cursor.fetchall()
-            print(data)
+            #print(data)
             em = data[value['cust_Table'][0]][2] #Basically extracting email
             #print(data[value['Table'][0]])
             win['show_det'].update(em)
@@ -140,7 +140,7 @@ def add_stock():
             Values(%s,%s,%s,%s,%s,%s,%s)"""
             upd_value = [list(value.values())]
             cursor.executemany(insert_prod,upd_value)
-            print(upd_value)
+            #print(upd_value)
             break
         if event in (None, "Go Back"):
             window.close()
@@ -165,7 +165,7 @@ def update_data(ID):
     win = sg.Window('Update Data',layout,finalize=True)
     while True:
         event,value = win.read()
-        print(event,value)
+        #print(event,value)
         if event == 'Confirm':
             for i in value:
                 if value[i] != '' and i!= 'ID':
@@ -187,7 +187,7 @@ def cust_details():
     global data
     #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
     #d = cursor.fetchall()
-    print('data',data)
+    #print('data',data)
     heading = ['Name','Phone_Number','Email_ID','Total_Purchase_Amt']
     table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',enable_events=True),sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
@@ -198,7 +198,7 @@ def cust_details():
     [sg.Input(key = 'show_det'),sg.Button('Show Details', disabled=True,key = 'show')],
     [sg.Button('Exit')]
     ]
-    print('layout',list(layout[4]))
+    #print('layout',list(layout[4]))
     return layout
 
 def show_details(dat):
@@ -206,25 +206,25 @@ def show_details(dat):
         with open(f'Customer data//{dat[2]}.csv') as f: #Opens the csv file 
             rdr = csv.reader(f)
             heading = next(rdr) 
-            print(heading)
+            #print(heading)
             purchase_data = list(rdr)
             #print("DATA",dat)
-            print('pur data',purchase_data)
+            #print('pur data',purchase_data)
             table = sg.Table(purchase_data,headings=heading)
         layout = [
             [sg.Text(f'Name: {dat[0]}')],
             [sg.Text(f'Mobile Number: {dat[1]}')],
             [sg.Text(f'Email: {dat[2]}')],
-            [sg.Text(f'Total Amount Purchased: {dat[0]}')],
+            [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
             [table],
             [sg.Button('Exit',key = 'Exit')] 
         ]
         win = sg.Window(f'{dat[2]}',layout)
         while True:
-            print("Lol")
+            #print("Lol")
             
             event1,value = win.read()
-            print(event1,value)
+            #print(event1,value)
             if event1  in ('Exit',None):
                 win.close()
                 break
