@@ -14,14 +14,14 @@ def Main(email):
         global price,data
         sg.theme('DarkAmber')
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
-        table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',enable_events=True)
+        table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',justification='center',enable_events=True)
         priceMsg = sg.Text('{:.2f}'.format(price))
         buyButton = sg.Button('Buy')
         layout1 = [[sg.Text('YOUR CART')],
                   [table],
                   [sg.Text('Total Amount = '), priceMsg],
                   [buyButton, sg.Button('Go Back'),sg.Button('Clear',key='CLR'),sg.Button('Remove',key='RM')]]
-        window1 = sg.Window('Your Cart', layout1, margins=(100, 50), finalize=True)
+        window1 = sg.Window('Your Cart', layout1, finalize=True)
         remove_from_cart=None
         while True:
             #print(cartData)
