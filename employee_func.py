@@ -109,7 +109,7 @@ def display_stock():
     [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update')],
     ]
     return layout1
-
+#check
 def add_stock():
     """This function enables the employee to add new products in stock"""
     lay = [[sg.Text('Enter Product ID',size = (18,1)),sg.Input(key = 'id')],
