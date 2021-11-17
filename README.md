@@ -25,3 +25,6 @@ Brand
 
 #Todo
 Slider
+
+#Synopsis
+https://docs.google.com/document/d/1r9DZN59mxrZVFsoo1HH7hSGWUhkXhKXFZiB1FXE2g64/edit#
