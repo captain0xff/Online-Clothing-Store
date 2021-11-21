@@ -9,6 +9,8 @@ import sys
 import warnings
 import time
 import os
+
+#Timepass
 """Code for checking environment"""
 idle = True if 'idlelib.run' in sys.modules else False #Credit goes to stackexchange
 if idle == True:
