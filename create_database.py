@@ -98,7 +98,7 @@ values('1','Jeans','Wrangler','XL','23','425.23','699.56','Men'),
 ('28','Track Pants','Hopscoth','S','100','250.00','350.00','Kids'),
 ('29','Sweater','Diamo','M','12','250.00','350.00','Kids'),
 ('30','Knitwear','Anmol','M','6','250.00','350.00','Kids'),
-('31','Mascot Costume','Diamo','M','11','250.00','350.00','Kids');;
+('31','Mascot Costume','Diamo','M','11','250.00','350.00','Kids');
 ''')
 print('Products added...')
 
