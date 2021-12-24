@@ -251,13 +251,15 @@ def Main(email):
     prod=None
     flag = False
     flag2 = False
+    ij = 0
     while True:
+        ij+=1
+        print(ij)
         event, values = window.read()
         print(event, values)
         if event in (None, 'Exit'):
+            print('Line 261')
             break
-        if values['-TABLE1-']==[] and values['-IN-']=='':
-            atcButton.update(disabled = True)
         if event=='SB':
             cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
             FROM PRODUCTS
@@ -267,7 +269,10 @@ def Main(email):
             cursor.execute(cmd)
             data=cursor.fetchall()
             table.update(data)
-        if event=='-TABLE1-':
+        if values['-TABLE1-']==[] and values['-IN-']=='':
+            print('Hello')
+            atcButton.update(disabled = True)
+        elif event=='-TABLE1-':
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
             inp.update(prod)
@@ -304,6 +309,7 @@ def Main(email):
 
 
         if event =='Add to Cart' and flag:
+            print('312')
             for i in range(len(data)):
                 data[i] = list(data[i])
             # Declared the variable for my convenience and ease of understanding
@@ -328,8 +334,8 @@ def Main(email):
                 #print(cartDict)
                 # This part of the code is responsible for updating the table as we add items to cart
                 quantity = proData[0][4]
-                print(data)
-                print(cartDict)
+                #print(data)
+                #print(cartDict)
                 for i in range(len(data)):
                     prod_searched = list(data[i])
                     prod_searched.pop(4)
@@ -349,6 +355,7 @@ def Main(email):
                 data = list(temp_table)
                 spin.update(disabled = True)
                 atcButton.update(disabled = True)
+                print(358)
         if len(cartDict)==0:
             gtcButton.update(disabled=True)
         else:
