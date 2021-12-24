@@ -4,6 +4,7 @@ import settings as st
 from datetime import date
 import csv
 import os
+import time
 current = os.getcwd()
 mycon = sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
@@ -23,10 +24,13 @@ def Main(email):
                   [buyButton, sg.Button('Go Back'),sg.Button('Clear',key='CLR'),sg.Button('Remove',key='RM')]]
         window1 = sg.Window('Your Cart', layout1, finalize=True)
         remove_from_cart=None
+        kl = 0
         while True:
+            kl += 1
+            print('t',kl)
             #print(cartData)
             event1, values1 = window1.read()
-            #print(event1)
+            print(event1,values1)
             if event1 in (None, 'Go Back'):
                 break
             if event1=='CLR':
@@ -40,8 +44,9 @@ def Main(email):
                 sg.popup_timed('The cart has been cleared!')
                 window1.close()
 
-            if event1=='-TABLE2-':
+            if event1=='-TABLE2-' and values1['-TABLE2-']!=[]:
                 remove_from_cart=values1['-TABLE2-'][0]
+                print(49)
             print(remove_from_cart)
             if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
                 print(cartData1)
@@ -254,9 +259,10 @@ def Main(email):
     ij = 0
     while True:
         ij+=1
-        print(ij)
+        #print(ij)
         event, values = window.read()
-        print(event, values)
+        #print(event, values)
+        #time.sleep(1)
         if event in (None, 'Exit'):
             print('Line 261')
             break
@@ -270,9 +276,12 @@ def Main(email):
             data=cursor.fetchall()
             table.update(data)
         if values['-TABLE1-']==[] and values['-IN-']=='':
-            print('Hello')
+            #print('Hello')
             atcButton.update(disabled = True)
-        elif event=='-TABLE1-':
+            #print(1)
+            #time.sleep(5)
+            #print(2)
+        if event=='-TABLE1-' and values['-TABLE1-'] != []:
             idSelected = values['-TABLE1-'][0]
             prod=str(data[idSelected][0])
             inp.update(prod)
@@ -309,7 +318,7 @@ def Main(email):
 
 
         if event =='Add to Cart' and flag:
-            print('312')
+            #print('312')
             for i in range(len(data)):
                 data[i] = list(data[i])
             # Declared the variable for my convenience and ease of understanding
@@ -344,18 +353,18 @@ def Main(email):
                         #print(data)
                 msg.update('Added to Cart')
                 window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
-                window['-TABLE1-'].update(data)
+                table.update(data)
                 spin.update(1,disabled = True)
                 temp_table = []
                 for i in range(len(data)):
                     if data[i][4] != 0:  #data[i][4] is the quantity
                         temp_table.append(data[i])
                 #print("Data",data)
-                window['-TABLE1-'].update(temp_table)
+                table.update(temp_table)
                 data = list(temp_table)
                 spin.update(disabled = True)
                 atcButton.update(disabled = True)
-                print(358)
+                #print(358)
         if len(cartDict)==0:
             gtcButton.update(disabled=True)
         else:
