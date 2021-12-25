@@ -117,34 +117,53 @@ def display_stock():
 #check
 def add_stock():
     """This function enables the employee to add new products in stock"""
-    lay = [[sg.Text('Enter Product ID',size = (18,1)),sg.Input(key = 'id')],
-    [sg.Text('Enter Product Name',size = (18,1)),sg.Input(key = 'name')],
-    [sg.Text('Enter Product Brand',size = (18,1)),sg.Input(key = 'brand')],
-    [sg.Text('Enter Product Size',size = (18,1)),sg.Input(key = 'size')],
-    [sg.Text('Quantity of Product',size = (18,1)),sg.Input(key = 'quantity')],
-    [sg.Text('Cost Price of Product',size = (18,1)),sg.Input(key = 'cost_price')],
-    [sg.Text('Selling Price of Product',size = (18,1)),sg.Input(key ='selling_price')]
-    ]
+    lay = [[sg.Text('Enter Product ID',size = (18,1)),sg.Input(key = 'id',enable_events=True)],
+    [sg.Text('Product Name',size = (18,1)),sg.Input(key = 'name',enable_events=True)],
+    [sg.Text('Product Brand',size = (18,1)),sg.Input(key = 'brand',enable_events=True)],
+    [sg.Text('Product Size',size = (18,1)),sg.Input(key = 'size',enable_events=True)],
+    [sg.Text('Product Quantity',size = (18,1)),sg.Input(key = 'quantity',enable_events=True)],
+    [sg.Text('Product Cost Price',size = (18,1)),sg.Input(key = 'cost_price',enable_events=True)],
+    [sg.Text('Product Selling Price',size = (18,1)),sg.Input(key ='selling_price',enable_events=True)],
+    [sg.Text('Product Category',size = (18,1)),sg.Input(key ='category',enable_events=True)]]
     layout = [[sg.Frame("Add New Stock",lay)],
-    [sg.Button('Go Back'),sg.Button('Confirm')]
+    [sg.Button('Go Back'),sg.Button('Confirm',key = 'Confirm',disabled=True)]
     ]
     window = sg.Window("New Product",layout=layout)
     while True:
         event,value = window.read()
-        #print(event,value)
-        if event == 'Confirm':
-            sg.popup('Stock Added to Database')
-            window.close()
-            insert_prod = """INSERT INTO PRODUCTS
-            (ID,Name,Brand,Size,Quantity,Cost_Price,Selling_Price)
-            Values(%s,%s,%s,%s,%s,%s,%s)"""
-            upd_value = [list(value.values())]
-            cursor.executemany(insert_prod,upd_value)
-            #print(upd_value)
-            break
+        print(event,value)
         if event in (None, "Go Back"):
             window.close()
             break
+        cursor.execute(f"SELECT * from products where ID  = '{value['id']}'")
+        """CHECKING CONSTRAINTS"""
+        prod_id = cursor.fetchone() is None
+        print('141',prod_id)
+        con2 = len(value['name']) <= 50
+        con3 = len(value['brand']) <= 50
+        con4 = value['size'] in ('S','M','L','XL', 'XXL', 'XXXL','NA')
+        con5 = value['quantity'].isnumeric()
+        con6 = string_float(value['cost_price'])  #Checks if valid float
+        con7 = string_float(value['selling_price'])
+        con8 = value['category'] in ('Kids','Men','Women')
+        check = [value['id'],value['name'],value['brand'],value['size'],value['quantity'],
+        value['cost_price'],value['selling_price'],value['category'],con8,con7,con6,con5,con4,con3,con2,prod_id]
+        if all(check):
+            window['Confirm'].update(disabled = False)
+        else:
+            window['Confirm'].update(disabled = True)
+        if event == 'Confirm':
+            insert_prod = """INSERT INTO PRODUCTS
+            (ID,Name,Brand,Size,Quantity,Cost_Price,Selling_Price, Category)
+            Values(%s,%s,%s,%s,%s,%s,%s,%s)"""
+            upd_value = [list(value.values())] 
+            cursor.executemany(insert_prod,upd_value)
+            mycon.commit()
+            sg.popup('Stock Added to Database')
+            window.close()
+            #print(upd_value)
+            break
+        
 
 
 def update_data(ID):
@@ -164,6 +183,8 @@ def update_data(ID):
     ]
     win = sg.Window('Update Data',layout,finalize=True)
     while True:
+        if event is None:
+            break
         event,value = win.read()
         #print(event,value)
         if event == 'Confirm':
@@ -176,9 +197,7 @@ def update_data(ID):
             sg.popup('Data Updated')
             win.close()
         #print(event,value)
-        if event is None:
-            break
-
+        
 
 
 cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
@@ -248,8 +267,16 @@ def profit_analysis():
     plt.grid(True)
     plt.show()
 
+def string_float(s):
+    try:
+        float(s)
+        return True
+    except:
+        return False
+
 if __name__=='__main__':
     Main()
+
 
 
 mycon.commit()
