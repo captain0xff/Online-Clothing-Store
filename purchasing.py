@@ -267,14 +267,18 @@ def Main(email):
             print('Line 261')
             break
         if event=='SB':
-            cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
-            FROM PRODUCTS
-            WHERE NAME LIKE \'{name}%\'
-            '''
-            cmd=cmd.format(name=values['SB'])
-            cursor.execute(cmd)
-            data=cursor.fetchall()
-            table.update(data)
+            new_data=[]
+            """cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
+                                                FROM PRODUCTS
+                                                WHERE NAME LIKE \'{name}%\'
+                                                '''
+                                                cmd=cmd.format(name=values['SB'])
+                                                cursor.execute(cmd)
+                                                data=cursor.fetchall()"""
+            for i in data:
+                if values['SB'] in i[1]:
+                    new_data.append(data)
+            table.update(new_data)
         if values['-TABLE1-']==[] and values['-IN-']=='':
             #print('Hello')
             atcButton.update(disabled = True)
