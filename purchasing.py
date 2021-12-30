@@ -380,7 +380,7 @@ def Main(email):
             gtcButton.update(disabled=True)
         else:
             gtcButton.update(disabled=False)
-
+            
         if event == 'Go to Cart' and len(cartDict)!=0:
             cartDataFinal = []
             #print(cartDict)
