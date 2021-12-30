@@ -4,7 +4,7 @@ import settings as st
 from datetime import date
 import csv
 import os
-import time
+
 current = os.getcwd()
 mycon = sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
@@ -24,10 +24,10 @@ def Main(email):
                   [buyButton, sg.Button('Go Back'),sg.Button('Clear',key='CLR'),sg.Button('Remove',key='RM')]]
         window1 = sg.Window('Your Cart', layout1, finalize=True)
         remove_from_cart=None
-        kl = 0
+        
         while True:
-            kl += 1
-            print('t',kl)
+           
+            print('t')
             #print(cartData)
             event1, values1 = window1.read()
             print(event1,values1)
@@ -118,13 +118,20 @@ def Main(email):
                     window1.close()
                     """----Beginning of CSV part----"""
                     def export(cd,mail):
+                        print(1, cd)
+                        #1 [[6, 'Chinos', 'Buffalo', 'M', 1, Decimal('399.99')]]
                         fname = f"Customer data//{mail}.csv"
                         with open(fname,'a',newline='') as fh:
                             write = csv.writer(fh)
                             for i in range(len(cd)):
                                 cd[i].append(pur_date)
-                                print(pur_date)
-                            cd = [['Prod_ID','Name','Brand','Size','Quantity','Cost','Pur Date']]+cd
+                                cursor.execute(f'SELECT Category FROM PRODUCTS WHERE ID = {cd[i][0]}')
+                                #print('cat',cursor.fetchone())
+                                category = cursor.fetchone()[0]
+                                cd[i].append(category)
+                                #print(pur_date)
+                            
+                            cd = [['Prod_ID','Name','Brand','Size','Quantity','Cost','Pur Date','category']]+cd
                             write.writerows(cd)
                     try:
                         os.mkdir("Customer data")
@@ -256,13 +263,13 @@ def Main(email):
     prod=None
     flag = False
     flag2 = False
-    ij = 0
+
     while True:
-        ij+=1
-        #print(ij)
+        
+        
         event, values = window.read()
         #print(event, values)
-        #time.sleep(1)
+        
         if event in (None, 'Exit'):
             print('Line 261')
             break
@@ -277,7 +284,7 @@ def Main(email):
                                                 data=cursor.fetchall()"""
             for i in data:
                 if values['SB'] in i[1]:
-                    new_data.append(i)
+                    new_data.append(data)
             table.update(new_data)
         if values['-TABLE1-']==[] and values['-IN-']=='':
             #print('Hello')
