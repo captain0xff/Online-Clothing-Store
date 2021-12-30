@@ -121,7 +121,7 @@ def Main(email):
                         print(1, cd)
                         #1 [[6, 'Chinos', 'Buffalo', 'M', 1, Decimal('399.99')]]
                         fname = f"Customer data//{mail}.csv"
-                        with open(fname,'a',newline='') as fh:
+                        with open(fname,'a+',newline='') as fh:
                             write = csv.writer(fh)
                             for i in range(len(cd)):
                                 cd[i].append(pur_date)
@@ -130,9 +130,12 @@ def Main(email):
                                 category = cursor.fetchone()[0]
                                 cd[i].append(category)
                                 #print(pur_date)
-                            
-                            cd = [['Prod_ID','Name','Brand','Size','Quantity','Cost','Pur Date','category']]+cd
+                            fh.seek(0)
+                            size = fh.read()
+                            if len(size) == 0:
+                                cd = [['Prod_ID','Name','Brand','Size','Quantity','Cost','Pur Date','category']]+cd
                             write.writerows(cd)
+                            
                     try:
                         os.mkdir("Customer data")
                         export(cartData1,email)
