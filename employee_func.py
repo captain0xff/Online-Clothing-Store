@@ -183,6 +183,7 @@ def update_data(ID):
     ]
     win = sg.Window('Update Data',layout,finalize=True)
     while True:
+        event,values=win.read()
         if event is None:
             break
         event,value = win.read()
