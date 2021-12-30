@@ -277,7 +277,7 @@ def Main(email):
                                                 data=cursor.fetchall()"""
             for i in data:
                 if values['SB'] in i[1]:
-                    new_data.append(data)
+                    new_data.append(i)
             table.update(new_data)
         if values['-TABLE1-']==[] and values['-IN-']=='':
             #print('Hello')
