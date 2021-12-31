@@ -51,7 +51,8 @@ sql_purchase = """create table PURCHASE(
     Purchase_Amount decimal(8,2),
     Customer_Email varchar(200),
     foreign key(Customer_Email) references CUSTOMERS(EMAIL_ID))"""
-
+"""INVOICE-NUMBER   EMAIL-ID   PRODUCT-ID     NAME   BRAND    SIZE   QUANTITY    CATEGORY    COST    PURCHASE-DATE 
+"""
 cursor.execute(sql_purchase)
 print("Relation purchase created successfully....")
 
