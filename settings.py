@@ -4,5 +4,5 @@ caption='Denim Destination'
 #Database information
 host='localhost'
 user='root'
-password='sayantan@sql'
+password='root'
 database='denim_destination_db'

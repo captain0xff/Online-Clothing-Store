@@ -12,7 +12,8 @@ def Main(email):
     def cart(cartData1):
         global price,data
         sg.theme('DarkAmber')
-        heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
+        print(cartData1)
+        heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
         table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',justification='center',enable_events=True)
         priceMsg = sg.Text('{:.2f}'.format(price))
         buyButton = sg.Button('Buy')
@@ -37,7 +38,7 @@ def Main(email):
                 table.update(cartData1)
                 price = 0.0
                 priceMsg.update('{}'.format(price))
-                cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
+                cursor.execute('SELECT ID,Name,Brand,Size,Category, Quantity,Selling_Price FROM PRODUCTS')
                 data = list(cursor.fetchall())
                 sg.popup_timed('The cart has been cleared!')
                 window1.close()
@@ -49,9 +50,10 @@ def Main(email):
             if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
                 print(cartData1)
                 dat = cartData1[remove_from_cart]
+                print(dat)
                 for i in data:
                     if i[0]==dat[0]:
-                        i[4]+=dat[4]
+                        i[5]+=dat[5]
                         break
                 else:
                     a = len(data)
@@ -60,11 +62,13 @@ def Main(email):
                         if data[i][0]>dat[0]:
                             a = i
                             break
+
                     tempList = list(dat)
-                    tempList[5] = round(dat[5]/dat[4], 2)
+                    print(tempList)
+                    tempList[5] = round(dat[6]/dat[5], 2)
                     data.insert(a, tempList)
                     print(data)
-                price-=float(dat[5])
+                price-=float(dat[6])
                 price = round(price,2)
                 var = 0
                 for i in cartDict:
@@ -89,7 +93,7 @@ def Main(email):
                         cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %id1)
                         quantity = cursor.fetchall()
                         #print(id1, quantity)
-                        quantity = quantity[0][4]-i[4]
+                        quantity = quantity[0][4]-i[5]
                         if quantity>1:
                             cursor.execute('UPDATE Products SET Quantity = {} WHERE ID = {}'.format(quantity, id1))
                         else: 
@@ -119,14 +123,16 @@ def Main(email):
         window1.close()
 
     def filter_menu(data):
-        cursor.execute('select distinct category from products')
+        #cursor.execute('select distinct category from products')
         categories=[]
-        for i in cursor.fetchall():
-            categories.append(i[0])
-        cursor.execute('select distinct brand from products')
+        for i in data:
+            if i[4] not in categories:
+                categories.append(i[4])
+        #cursor.execute('select distinct brand from products')
         brands=[]
-        for i in cursor.fetchall():
-                brands.append(i[0])
+        for i in data:
+            if i[2] not in brands:
+                brands.append(i[2])
         txt=sg.Text('Filter or sort the data..',size=(35,1))
         layout=[[txt]]
         layout.append([sg.Text('Sort')])
@@ -144,7 +150,7 @@ def Main(email):
             layout.append([elem])
         layout2=[[sg.Column(layout,scrollable=True)]]
         layout2.append([sg.Btn('Apply Filters',key='AP')])
-
+        print(categories)
         window2=sg.Window('Filters',layout2)
         rng=True
         filters_applied=False
@@ -216,7 +222,7 @@ def Main(email):
     global cartDict
     global data
     sg.theme('DarkAmber')
-    heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Quantity', 'Price']
+    heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
     msg = sg.Text('',size=(20,0))
     inp=sg.Input(key='-IN-', enable_events = True)
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
@@ -239,13 +245,13 @@ def Main(email):
     prod=None
     flag = False
     flag2 = False
-
+    searchFlag = False
     while True:
         
         
         event, values = window.read()
         #print(event, values)
-        
+        print(data)
         if event in (None, 'Exit'):
             print('Line 261')
             break
@@ -262,6 +268,7 @@ def Main(email):
                 if values['SB'] in i[1]:
                     new_data.append(i)
             table.update(new_data)
+            searchFlag = True
         if values['-TABLE1-']==[] and values['-IN-']=='':
             #print('Hello')
             atcButton.update(disabled = True)
@@ -269,13 +276,19 @@ def Main(email):
             #time.sleep(5)
             #print(2)
         if event=='-TABLE1-' and values['-TABLE1-'] != []:
+            if searchFlag:
+                dataUsing = new_data
+            else:
+                dataUsing = data
+            print(dataUsing)
             idSelected = values['-TABLE1-'][0]
-            prod=str(data[idSelected][0])
+            prod=str(dataUsing[idSelected][0])
             inp.update(prod)
-            quantity1 = data[idSelected][4]
+            quantity1 = dataUsing[idSelected][5]
             spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
             atcButton.update(disabled = False)
             flag = True
+            searchFlag = False
         if event=='-IN-' and values['-IN-']!='':
             #atcButton.update(disabled=True)
             flag = False
@@ -313,7 +326,7 @@ def Main(email):
             cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %(prod_ID_selected))
             proData = cursor.fetchall()
             #print(proData)
-            temp = (proData[0][0], proData[0][1], proData[0][2], proData[0][3], proData[0][6])
+            temp = (proData[0][0], proData[0][1], proData[0][2], proData[0][3], proData[0][7], proData[0][6])
             cartData.append(temp)
             q = str(values['Spin'])
             if  (q.isdigit()==False) or ('.' in q) or (int(q)>proData[0][4]) or (int(q)<=0) or ((temp in cartDict) and (proData[0][4]-cartDict[temp][0]-int(q)<0)):
@@ -321,11 +334,11 @@ def Main(email):
             else:
                 q = int(q)
                 if temp not in cartDict:
-                    cartDict[temp] = [q, temp[4]*q]
+                    cartDict[temp] = [q, temp[5]*q]
                 else:
                     cartDict[temp][0] += q
-                    cartDict[temp][1] += temp[4]*q
-                price+=float(temp[4]*q)
+                    cartDict[temp][1] += temp[5]*q
+                price+=float(temp[5]*q)
                 price = round(price, 2)
                 #print(cartDict)
                 # This part of the code is responsible for updating the table as we add items to cart
@@ -334,9 +347,9 @@ def Main(email):
                 #print(cartDict)
                 for i in range(len(data)):
                     prod_searched = list(data[i])
-                    prod_searched.pop(4)
+                    prod_searched.pop(5)
                     if prod_searched[0] == prod_ID_selected:
-                        data[i][4] = quantity-cartDict[tuple(prod_searched)][0]
+                        data[i][5] = quantity-cartDict[tuple(prod_searched)][0]
                         #print(data)
                 msg.update('Added to Cart')
                 window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
@@ -344,7 +357,7 @@ def Main(email):
                 spin.update(1,disabled = True)
                 temp_table = []
                 for i in range(len(data)):
-                    if data[i][4] != 0:  #data[i][4] is the quantity
+                    if data[i][5] != 0:  #data[i][4] is the quantity
                         temp_table.append(data[i])
                 #print("Data",data)
                 table.update(temp_table)
@@ -361,7 +374,7 @@ def Main(email):
             cartDataFinal = []
             #print(cartDict)
             for i in cartDict:
-                cartDataFinal.append(list(i)[:4]+cartDict[i])
+                cartDataFinal.append(list(i)[:5]+cartDict[i])
             flag2 = True
             window.close()
             break
@@ -383,7 +396,7 @@ mycon.commit()
 price = 0
 cartData = []
 cartDict = {}
-cursor.execute('SELECT ID,Name,Brand,Size,Quantity,Selling_Price FROM PRODUCTS')
+cursor.execute('SELECT ID,Name,Brand,Size,Category,Quantity,Selling_Price FROM PRODUCTS')
 data = cursor.fetchall()
 if __name__=='__main__':
     Main('gauravchanda@gmail.com')
