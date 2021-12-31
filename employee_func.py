@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
+from mysql.connector import errors as mysql_errors
 import settings as st
 import csv
 
@@ -177,26 +178,27 @@ def update_data(ID):
     [sg.Text('Cost Price of Product',size = (18,1)),sg.Input(key = 'Cost_Price')],
     [sg.Text('Selling Price of Product',size = (18,1)),sg.Input(key ='Selling_Price')]
     ]
-    layout=[[sg.Text("Instructions: The data which is not to be updated shall be left blank")],
+    msg=sg.Text("Instructions: The data which is not to be updated shall be left blank")
+    layout=[[msg],
         [sg.Frame("Add New Stock",lay)],
     [sg.Button('Go Back'),sg.Button('Confirm')]
     ]
     win = sg.Window('Update Data',layout,finalize=True)
     while True:
-        event,values=win.read()
+        event,value=win.read()
         if event is None:
             break
-        event,value = win.read()
-        #print(event,value)
-        if event == 'Confirm':
-            for i in value:
-                if value[i] != '' and i!= 'ID':
-                    print(i,value[i])
-                    cursor.execute(f"""UPDATE PRODUCTS SET {i} = '{value[i]}'
-                    WHERE ID = {int(ID)}""")
-                    print('Meow Testing')
-            sg.popup('Data Updated')
-            win.close()
+        try: 
+            if event == 'Confirm':
+                for i in value:
+                    if value[i] != '' and i!= 'ID':
+                        print(i,value[i])
+                        cursor.execute(f"""UPDATE PRODUCTS SET {i} = '{value[i]}'
+                        WHERE ID = {int(ID)}""")
+                sg.popup('Data Updated')
+                win.close()
+        except mysql_errors.DatabaseError:
+            msg.update('Wrong data entered...')
         #print(event,value)
         
 
