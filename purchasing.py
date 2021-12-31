@@ -25,9 +25,6 @@ def Main(email):
         remove_from_cart=None
         
         while True:
-           
-            print('t')
-            #print(cartData)
             event1, values1 = window1.read()
             print(event1,values1)
             if event1 in (None, 'Go Back'):
@@ -123,16 +120,14 @@ def Main(email):
         window1.close()
 
     def filter_menu(data):
-        #cursor.execute('select distinct category from products')
+        cursor.execute('select distinct category from products')
         categories=[]
-        for i in data:
-            if i[4] not in categories:
-                categories.append(i[4])
-        #cursor.execute('select distinct brand from products')
+        for i in cursor.fetchall():
+            categories.append(i[0])
+        cursor.execute('select distinct brand from products')
         brands=[]
-        for i in data:
-            if i[2] not in brands:
-                brands.append(i[2])
+        for i in cursor.fetchall():
+                brands.append(i[0])
         txt=sg.Text('Filter or sort the data..',size=(35,1))
         layout=[[txt]]
         layout.append([sg.Text('Sort')])
@@ -150,7 +145,7 @@ def Main(email):
             layout.append([elem])
         layout2=[[sg.Column(layout,scrollable=True)]]
         layout2.append([sg.Btn('Apply Filters',key='AP')])
-        print(categories)
+
         window2=sg.Window('Filters',layout2)
         rng=True
         filters_applied=False
@@ -192,14 +187,11 @@ def Main(email):
                         sort_sel='Selling_Price DESC'
                     else:
                         sort_sel='Selling_Price'
-                    print(brands_sel)
-                    print(cats_sel)
-                    print(sort_sel)
                     if sort_sel in ('Name', 'Selling_Price DESC', 'Selling_Price'):
                         if len(brands_sel)==0:
                             brands_sel = tuple(brands)
                         print(brands_sel, cats_sel)
-                    cmd="""SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
+                    cmd="""SELECT ID,Name,Brand,Size, Category,Quantity,Selling_Price 
                     FROM PRODUCTS
                     WHERE Brand in {brand} and category in {category}
                     ORDER BY {sort}
@@ -307,14 +299,18 @@ def Main(email):
                 spin.update(disabled = True)
 
         if event=='FL':
-            window.Disable()
-            filtered_data=filter_menu(data)
-            window.Enable()
-            window.Hide()
-            window.UnHide()
-            if filtered_data:
-                data=filtered_data
-                table.update(data)
+            if cartDict:
+                msg.update('Cart is not empty...')
+                print('\a')
+            else:
+                window.Disable()
+                filtered_data=filter_menu(data)
+                window.Enable()
+                window.Hide()
+                window.UnHide()
+                if filtered_data:
+                    data=filtered_data
+                    table.update(data)
 
 
         if event =='Add to Cart' and flag:
