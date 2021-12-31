@@ -2,10 +2,8 @@ import PySimpleGUI as sg
 import mysql.connector as sqltor
 import settings as st
 from datetime import date
-import csv
-import os
 
-current = os.getcwd()
+
 mycon = sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 
@@ -116,32 +114,7 @@ def Main(email):
                     cursor.execute(f"UPDATE CUSTOMERS SET Total_Price = {pri} WHERE Email_ID = '{email}'")
                     sg.popup_ok('Purchase Successful. Total Amount Spent = {}'.format(price))
                     window1.close()
-                    """----Beginning of CSV part----"""
-                    def export(cd,mail):
-                        print(1, cd)
-                        #1 [[6, 'Chinos', 'Buffalo', 'M', 1, Decimal('399.99')]]
-                        fname = f"Customer data//{mail}.csv"
-                        with open(fname,'a+',newline='') as fh:
-                            write = csv.writer(fh)
-                            for i in range(len(cd)):
-                                cd[i].append(pur_date)
-                                cursor.execute(f'SELECT Category FROM PRODUCTS WHERE ID = {cd[i][0]}')
-                                #print('cat',cursor.fetchone())
-                                category = cursor.fetchone()[0]
-                                cd[i].append(category)
-                                #print(pur_date)
-                            fh.seek(0)
-                            size = fh.read()
-                            if len(size) == 0:
-                                cd = [['Prod_ID','Name','Brand','Size','Quantity','Cost','Pur Date','category']]+cd
-                            write.writerows(cd)
-                            
-                    try:
-                        os.mkdir("Customer data")
-                        export(cartData1,email)
-                    except FileExistsError:
-                        export(cartData1,email)
-                    """----End of CSV part----"""
+
                     return event1
         window1.close()
 
