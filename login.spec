@@ -4,10 +4,10 @@
 block_cipher = None
 
 
-a = Analysis(['login.py', 'employee_func.py', 'purchasing.py'],
+a = Analysis(['login.py'],
              pathex=[],
              binaries=[],
-             datas=[('Logo.gif','.')],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              hooksconfig={},
@@ -21,20 +21,24 @@ pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 
 exe = EXE(pyz,
-          a.scripts,
-          a.binaries,
-          a.zipfiles,
-          a.datas,  
+          a.scripts, 
           [],
+          exclude_binaries=True,
           name='login',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          upx_exclude=[],
-          runtime_tmpdir=None,
           console=True,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
           entitlements_file=None )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas, 
+               strip=False,
+               upx=True,
+               upx_exclude=[],
+               name='login')
