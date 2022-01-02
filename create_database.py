@@ -52,9 +52,9 @@ sql_purchase = """create table PURCHASE(
     Product_Name VARCHAR(50) REFERENCES PRODUCTS(NAME),
     Product_Brand VARCHAR(50) REFERENCES PRODUCTS(Brand),
     Product_Size VARCHAR(4) REFERENCES PRODUCTS(Size),
+    Product_Category VARCHAR(5) REFERENCES PRODUCTS(Category),
     Quantity_Purchased INTEGER,
-    Prod_Category VARCHAR(5) REFERENCES PRODUCTS(Category),
-    Purchase_Amount decimal(8,2),
+    Product_tot_cost decimal(8,2),
     Purchase_Date date,
     foreign key(Customer_Email) references CUSTOMERS(EMAIL_ID))"""
 
