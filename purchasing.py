@@ -92,9 +92,9 @@ def Main(email):
                         #print(id1, quantity)
                         quantity = quantity[0][4]-i[5]
                         if quantity>1:
-                            cursor.execute('UPDATE Products SET Quantity = {} WHERE ID = {}'.format(quantity, id1))
+                            cursor.execute(f'UPDATE Products SET Quantity = {quantity} WHERE ID = {id1}')
                         else: 
-                            cursor.execute('DELETE FROM Products WHERE ID = {}'.format(id1))
+                            cursor.execute(f'DELETE FROM Products WHERE ID = {id1}')
                     print(cartData1)
                     
                     """INVOICE NUMBER GENERATION"""
@@ -105,15 +105,27 @@ def Main(email):
                     today = pur_date.replace('-','') #changing 2021-10-31 to 20211031
                     c = str(result[0]+1).zfill(6)
                     inv_num = today+'-'+c#format is %d%m%Y-N where N is cardinality of purchase
-                    #print(inv_num)
-                    query = f"""INSERT INTO PURCHASE VALUES('{inv_num}','{pur_date}',{price},'{email}')"""
+                    print(inv_num)
+                    
                     #print(query)
-                    cursor.execute(query)
+                    query = """INSERT INTO PURCHASE
+                    VALUES(%s, %s, %s,%s,%s,%s,%s,%s,%s,%s)
+                    """
+                    final_data = cartData1
+
+                    #modifying list final_data as per the format of purchase table in sql
+                    for i in range(len(final_data)): 
+                        final_data[i].insert(0,inv_num) #Inserted Invoice number in  index 0
+                        final_data[i].insert(1,email) #Inserted cust email in index 1
+                        final_data[i].append(pur_date) #Inserted purchase date in last
+                    cursor.executemany(query,final_data)
                     cursor.execute(f"SELECT Total_Price FROM CUSTOMERS WHERE Email_ID = '{email}'")
                     pri = cursor.fetchone()[0]
                     pri = int(pri)+price
                     cursor.execute(f"UPDATE CUSTOMERS SET Total_Price = {pri} WHERE Email_ID = '{email}'")
-                    sg.popup_ok('Purchase Successful. Total Amount Spent = {}'.format(price))
+
+
+                    sg.popup_ok(f'Purchase Successful. Total Amount Spent = {price}')
                     window1.close()
 
                     return event1
@@ -243,7 +255,7 @@ def Main(email):
         
         event, values = window.read()
         #print(event, values)
-        print(data)
+        #print(data)
         if event in (None, 'Exit'):
             print('Line 261')
             break
@@ -272,7 +284,7 @@ def Main(email):
                 dataUsing = new_data
             else:
                 dataUsing = data
-            print(dataUsing)
+            #print(dataUsing)
             idSelected = values['-TABLE1-'][0]
             prod=str(dataUsing[idSelected][0])
             inp.update(prod)
