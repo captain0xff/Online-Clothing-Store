@@ -12,6 +12,7 @@ mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.d
 cursor = mycon.cursor()
 def Main(emp = ''):
     global data
+    global data_product
     """This Function is responsible for the display of Employee Screen"""
     #global data
     sg.theme('DarkAmber')
@@ -30,7 +31,9 @@ def Main(emp = ''):
     ]
     win = sg.Window('Welcome',layout)
     while True:
-        event,value = win.read() #Values variable was getting wasted
+        event,value = win.read() 
+        print(event,value)
+
         if event == 'Delete':
             #prod_id = 
             pass
@@ -45,7 +48,9 @@ def Main(emp = ''):
         
         if event == 'Update':
             try:
-                update_data(value['Table'][0]+1)
+                prod_clicked = value['Table'][0]
+                prod_click_id = int(data_product[prod_clicked][0])
+                update_data(prod_click_id)
                 cursor.execute("SELECT * FROM PRODUCTS")
                 data = cursor.fetchall()
                 win['Table'].update(data)
@@ -84,6 +89,15 @@ def Main(emp = ''):
             data =  cursor.fetchall()
             #print(data)
             win['cust_Table'].update(data)
+        if event == 'Delete':
+            prod_clicked = value['Table'][0]
+            prod_click_id = int(data_product[prod_clicked][0])
+            #print(prod_click_id)
+            cursor.execute(f"DELETE FROM PRODUCTS WHERE ID = {prod_click_id}")
+            mycon.commit()
+            cursor.execute("SELECT * FROM PRODUCTS")
+            data_product = cursor.fetchall()
+            win['Table'].update(data_product)
         if event == 'cust_Table':
             #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
             #data = cursor.fetchall()
@@ -102,15 +116,16 @@ def Main(emp = ''):
 def display_stock():
     """This displays the products"""
     cursor.execute("SELECT * FROM PRODUCTS")
-    data = cursor.fetchall()
-    for i in range(len(data)):
-        data[i] = list(data[i])
-        for j in range(len(data[i])):
-            if isinstance(data[i][j],int):
-                data[i][j] = str(data[i][j])
+    global data_product
+    data_product = cursor.fetchall()
+    for i in range(len(data_product)):
+        data_product[i] = list(data_product[i])
+        for j in range(len(data_product[i])):
+            if isinstance(data_product[i][j],int):
+                data_product[i][j] = str(data_product[i][j])
     heading = ['Prod ID','Name','Brand','Size','Quantity','Cost_Price','Selling_Price']
     layout1 = [[sg.Text('Product List')],
-    [sg.Table(data,headings = heading,key = 'Table',justification='left'
+    [sg.Table(data_product,headings = heading,key = 'Table',justification='left'
     ,auto_size_columns=True,expand_y = True)],
     [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update'),sg.Button('Delete',key = 'Delete')],
     ]
@@ -169,8 +184,8 @@ def add_stock():
 
 def update_data(ID):
     """This function allows employee to modify the details of existing stock"""
-    lay = [[sg.Text('Product ID',size = (18,1)),
-        sg.Input(default_text = ID, key = 'ID',readonly=True,tooltip = "It's Read Only")],
+    lay = [[sg.Text('Product ID',size = (18,1),),
+        sg.Input(default_text = ID, key = 'ID',readonly=True,tooltip = "It's Read Only",disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black')],
     [sg.Text('Product Name',size = (18,1)),sg.Input(key = 'Name')],
     [sg.Text('Product Brand',size = (18,1)),sg.Input(key = 'Brand')],
     [sg.Text('Product Size',size = (18,1)),sg.Input(key = 'Size')],
@@ -223,35 +238,30 @@ def cust_details():
     #print('layout',list(layout[4]))
     return layout
 
-def show_details(dat):
-    try: 
-        with open(f'Customer data//{dat[2]}.csv') as f: #Opens the csv file 
-            rdr = csv.reader(f)
-            heading = next(rdr) 
-            #print(heading)
-            purchase_data = list(rdr)
-            #print("DATA",dat)
-            #print('pur data',purchase_data)
-            table = sg.Table(purchase_data,headings=heading)
-        layout = [
-            [sg.Text(f'Name: {dat[0]}')],
-            [sg.Text(f'Mobile Number: {dat[1]}')],
-            [sg.Text(f'Email: {dat[2]}')],
-            [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
-            [table],
-            [sg.Button('Exit',key = 'Exit')] 
-        ]
-        win = sg.Window(f'{dat[2]}',layout)
-        while True:
-            #print("Lol")
-            
-            event1,value = win.read()
-            #print(event1,value)
-            if event1  in ('Exit',None):
-                win.close()
-                break
-    except FileNotFoundError:
-        sg.popup("NO RECORDS FOUND")
+def show_details(dat): #dat is a tuple containing name, mob, email, pur_amount
+    #print(dat)
+    heading = ['Invoice Number', 'Total Cost', 'Purchase date']
+    cursor.execute(f"""SELECT Invoice_Number, SUM(Product_tot_cost), Purchase_date FROM PURCHASE
+    GROUP BY Invoice_Number HAVING Customer_Email = '{dat[2]}'""")
+    purchase_data = cursor.fetchall()
+    table = sg.Table(purchase_data,headings=heading)
+    layout = [
+    [sg.Text(f'Name: {dat[0]}')],
+    [sg.Text(f'Mobile Number: {dat[1]}')],
+    [sg.Text(f'Email: {dat[2]}')],
+    [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
+    [table],
+    [sg.Button('Exit',key = 'Exit')] 
+    ]
+    win = sg.Window(f'{dat[2]}',layout)
+    while True:
+    #print("Lol")
+        event1,value = win.read()
+        #print(event1,value)
+        if event1  in ('Exit',None):
+            win.close()
+            break
+    
 def profit_analysis():
     cursor.execute("SELECT Purchase_Date,SUM(Purchase_Amount) FROM PURCHASE GROUP BY Purchase_Date")
     data = cursor.fetchall()
@@ -279,7 +289,6 @@ def string_float(s):
 
 if __name__=='__main__':
     Main()
-
 
 
 mycon.commit()
