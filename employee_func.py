@@ -6,14 +6,14 @@ import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
 import settings as st
-import csv
+
 
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 def Main(emp = ''):
+    """This Function is responsible for the display of Employee Screen"""
     global data
     global data_product
-    """This Function is responsible for the display of Employee Screen"""
     #global data
     sg.theme('DarkAmber')
     font = ("Arial", 11)
@@ -241,26 +241,31 @@ def cust_details():
 def show_details(dat): #dat is a tuple containing name, mob, email, pur_amount
     #print(dat)
     heading = ['Invoice Number', 'Total Cost', 'Purchase date']
-    cursor.execute(f"""SELECT Invoice_Number, SUM(Product_tot_cost), Purchase_date FROM PURCHASE
-    GROUP BY Invoice_Number HAVING Customer_Email = '{dat[2]}'""")
+    cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE 
+    WHERE CUSTOMER_EMAIL = '{dat[2]}'
+    GROUP BY INVOICE_NUMBER""")
     purchase_data = cursor.fetchall()
-    table = sg.Table(purchase_data,headings=heading)
-    layout = [
-    [sg.Text(f'Name: {dat[0]}')],
-    [sg.Text(f'Mobile Number: {dat[1]}')],
-    [sg.Text(f'Email: {dat[2]}')],
-    [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
-    [table],
-    [sg.Button('Exit',key = 'Exit')] 
-    ]
-    win = sg.Window(f'{dat[2]}',layout)
-    while True:
-    #print("Lol")
-        event1,value = win.read()
-        #print(event1,value)
-        if event1  in ('Exit',None):
-            win.close()
-            break
+    print(purchase_data)
+    if not purchase_data:
+        sg.popup('NO DATA FOUND')  
+    else:
+        table = sg.Table(purchase_data,headings=heading)
+        layout = [
+        [sg.Text(f'Name: {dat[0]}')],
+        [sg.Text(f'Mobile Number: {dat[1]}')],
+        [sg.Text(f'Email: {dat[2]}')],
+        [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
+        [table],
+        [sg.Button('Exit',key = 'Exit')] 
+        ]
+        win = sg.Window(f'{dat[2]}',layout)
+        while True:
+        #print("Lol")
+            event1,value = win.read()
+            #print(event1,value)
+            if event1  in ('Exit',None):
+                win.close()
+                break
     
 def profit_analysis():
     cursor.execute("SELECT Purchase_Date,SUM(Purchase_Amount) FROM PURCHASE GROUP BY Purchase_Date")

@@ -100,7 +100,7 @@ def Main(email):
                     """INVOICE NUMBER GENERATION"""
                     today = date.today()
                     pur_date = today.strftime("%Y-%m-%d") #Changing format to YYYY-MM-DD (i.e 2021-10-31)
-                    cursor.execute(f"SELECT COUNT(*) FROM PURCHASE WHERE Purchase_Date = '{pur_date}'")
+                    cursor.execute(f"SELECT COUNT(DISTINCT  Invoice_Number) FROM PURCHASE WHERE Purchase_Date = '{pur_date}'")
                     result = cursor.fetchone() #Basically returns number of entries in purchase table
                     today = pur_date.replace('-','') #changing 2021-10-31 to 20211031
                     c = str(result[0]+1).zfill(6)
