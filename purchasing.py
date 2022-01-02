@@ -221,10 +221,7 @@ def Main(email):
                     txt.update('No category or brand selected',text_color='red')
                     print('\a')
         window2.close()
-    global price
-    global cartData
-    global cartDict
-    global data
+    global price, cartData, cartDict, data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
     msg = sg.Text('',size=(20,0))
@@ -234,7 +231,8 @@ def Main(email):
     atcButton = sg.Button('Add to Cart', disabled = True)
     gtcButton = sg.Button('Go to Cart', disabled = True)
     search=sg.Input(key='SB',enable_events=True)
-    layout = [[sg.Text('Search'),search,sg.Btn('Filters',key='FL')],
+    filterBtn = sg.Btn('Filters',key='FL')
+    layout = [[sg.Text('Search'),search, filterBtn],
               [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
@@ -245,14 +243,12 @@ def Main(email):
 
     if len(cartDict) != 0:
         gtcButton.update(disabled=False)
-
+        filterBtn.update(disabled = True)
     prod=None
     flag = False
     flag2 = False
     searchFlag = False
     while True:
-        
-        
         event, values = window.read()
         #print(event, values)
         #print(data)
@@ -274,11 +270,8 @@ def Main(email):
             table.update(new_data)
             searchFlag = True
         if values['-TABLE1-']==[] and values['-IN-']=='':
-            #print('Hello')
             atcButton.update(disabled = True)
-            #print(1)
-            #time.sleep(5)
-            #print(2)
+
         if event=='-TABLE1-' and values['-TABLE1-'] != []:
             if searchFlag:
                 dataUsing = new_data
@@ -293,6 +286,7 @@ def Main(email):
             atcButton.update(disabled = False)
             flag = True
             searchFlag = False
+
         if event=='-IN-' and values['-IN-']!='':
             #atcButton.update(disabled=True)
             flag = False
@@ -375,10 +369,13 @@ def Main(email):
                 #print(358)
         if len(cartDict)==0:
             gtcButton.update(disabled=True)
+            filterBtn.update(disabled = False)
         else:
             gtcButton.update(disabled=False)
-            
+            filterBtn.update(disabled=True)
+
         if event == 'Go to Cart' and len(cartDict)!=0:
+            filterBtn.update(disabled = True)
             cartDataFinal = []
             #print(cartDict)
             for i in cartDict:
