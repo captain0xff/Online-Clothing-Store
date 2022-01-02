@@ -5,7 +5,6 @@ import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
-#from datetime import datetime
 import settings as st
 
 
@@ -113,6 +112,8 @@ def Main(emp = ''):
         
         if event == 'GO' and value['profit'] == 'Daily Profit':
             daily_profit()
+        if event == 'GO' and value['profit'] == 'Monthly Profit':
+            monthly()
         if event == 'cat_pie':
             categ_chart()
         if event == 'item_sold':
@@ -292,6 +293,15 @@ def daily_profit():
     plt.xlabel('Date')
     plt.show()
 
+def monthly():
+    cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased) from purchase 
+    group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
+    monthly_data = cursor.fetchall()
+    month = [monthly_data[i][0] for i in range(len(monthly_data))]
+    sale = [monthly_data[i][1] for i in range(len(monthly_data))]
+    #print(monthly_data)
+    plt.bar(month,sale)
+    plt.show()
 def categ_chart():
     cursor.execute("select sum(quantity_purchased), product_category from purchase group by product_category;")
     cat_data = cursor.fetchall()
@@ -311,6 +321,7 @@ def brand_item():
     plt.bar(brand_name,no_item)
     plt.tight_layout()
     plt.show()
+
 
 def string_float(s):
     try:
