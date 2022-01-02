@@ -5,7 +5,7 @@ import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
-from datetime import datetime
+#from datetime import datetime
 import settings as st
 
 
@@ -20,7 +20,9 @@ def Main(emp = ''):
     font = ("Arial", 11)
     stck_data = display_stock()
     stats = [[sg.Combo(default_value='Monthly Profit',
-    values=['Daily Profit','Monthly Profit'],readonly=True,key = 'profit'),sg.Button('GO')]]
+        values=['Daily Profit','Monthly Profit'],readonly=True,key = 'profit'),sg.Button('GO')],
+        [sg.Button('Popularity of Categories',key = 'cat_pie')],
+        [sg.Button('Total Items sold per Brand', key = 'item_sold')]]
     customer_det = cust_details()
     layout = [
         [sg.Text(f"Welcome {emp}",font=font)],
@@ -109,8 +111,12 @@ def Main(emp = ''):
             win['show_det'].update(em)
             win['show'].update(disabled = False)
         
-        if event == 'GO':
-            profit_analysis()
+        if event == 'GO' and value['profit'] == 'Daily Profit':
+            daily_profit()
+        if event == 'cat_pie':
+            categ_chart()
+        if event == 'item_sold':
+            brand_item()
         if event is None:
             break
         
@@ -269,9 +275,10 @@ def show_details(dat): #dat is a tuple containing name, mob, email, pur_amount
                 win.close()
                 break
     
-def profit_analysis():
-    cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE 
-    GROUP BY PURCHASE_DATE""")
+def daily_profit():
+    cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE  
+    GROUP BY PURCHASE_DATE 
+    ORDER BY PURCHASE_DATE DESC LIMIT 7""")
     prof_day = cursor.fetchall()
     dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
     amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
@@ -280,11 +287,31 @@ def profit_analysis():
     plt.gcf().autofmt_xdate()
     date_format = mpl_dates.DateFormatter('%b, %d %Y')
     plt.gca().xaxis.set_major_formatter(date_format)
+    plt.title('Daily Profit (Last 7 days)')
+    plt.ylabel('Profit in rupees')
+    plt.xlabel('Date')
+    plt.show()
+
+def categ_chart():
+    cursor.execute("select sum(quantity_purchased), product_category from purchase group by product_category;")
+    cat_data = cursor.fetchall()
+    #print(cat_data)
+    sale_data = [cat_data[i][0] for i in range(len(cat_data))]
+    label = [cat_data[i][1] for i in range(len(cat_data))]
+    print(sale_data,label)
+    plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',wedgeprops={'edgecolor':'black'})
     plt.show()
 
 
-    
-    
+def brand_item():
+    cursor.execute("select sum(quantity_purchased), product_brand from purchase group by Product_brand;")
+    sold_data = cursor.fetchall()
+    no_item = [sold_data[i][0] for i in  range(len(sold_data))] #y-axis
+    brand_name = [sold_data[i][1] for i in range(len(sold_data))] #x-axis
+    plt.bar(brand_name,no_item)
+    plt.tight_layout()
+    plt.show()
+
 def string_float(s):
     try:
         float(s)
