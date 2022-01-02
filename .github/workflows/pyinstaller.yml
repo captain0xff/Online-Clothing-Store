@@ -1,9 +1,9 @@
 name: Create debug executable for windows.
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ dev ]
   workflow_dispatch:
 
 jobs:
