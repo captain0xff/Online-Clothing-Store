@@ -1,0 +1,25 @@
+name: Create debug executable for windows.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Package Application
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: .
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: MyDoc
+        path: dist/windows
