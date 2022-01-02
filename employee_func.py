@@ -1,10 +1,11 @@
 #Broke many lines in two parts cuz pylint loves it
 """This module will be used for functionalities of the employee"""
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
+from datetime import datetime
 import settings as st
 
 
@@ -18,7 +19,8 @@ def Main(emp = ''):
     sg.theme('DarkAmber')
     font = ("Arial", 11)
     stck_data = display_stock()
-    finance = [[sg.Button('Daily Profit',key = "Daily Profit")]]
+    stats = [[sg.Combo(default_value='Monthly Profit',
+    values=['Daily Profit','Monthly Profit'],readonly=True,key = 'profit'),sg.Button('GO')]]
     customer_det = cust_details()
     layout = [
         [sg.Text(f"Welcome {emp}",font=font)],
@@ -26,7 +28,7 @@ def Main(emp = ''):
         [sg.Text('Please choose the function')],
         [sg.TabGroup([
         [sg.Tab("Edit Stock Data",stck_data,key = 'Edit'),
-            sg.Tab("Show Profit Analysis",finance),sg.Tab("See Customer Details",customer_det)]],key='Tabs')],
+            sg.Tab("Statistics",stats),sg.Tab("See Customer Details",customer_det)]],key='Tabs')],
         [sg.Text("")]
     ]
     win = sg.Window('Welcome',layout)
@@ -107,7 +109,7 @@ def Main(emp = ''):
             win['show_det'].update(em)
             win['show'].update(disabled = False)
         
-        if event == 'Daily Profit':
+        if event == 'GO':
             profit_analysis()
         if event is None:
             break
@@ -268,23 +270,21 @@ def show_details(dat): #dat is a tuple containing name, mob, email, pur_amount
                 break
     
 def profit_analysis():
-    cursor.execute("SELECT Purchase_Date,SUM(Purchase_Amount) FROM PURCHASE GROUP BY Purchase_Date")
-    data = cursor.fetchall()
-    day = []
-    sale = []
-    for i in range(len(data)):
-        day.append(data[i][0])
-        sale.append(data[i][1])
-    print(day)
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator())
-    plt.plot(day, sale, color='red', marker='o')
-    plt.title('Sale per Day', fontsize=14)
-    plt.xlabel('Date', fontsize=14)
-    plt.ylabel('Total Sale Amount', fontsize=14)
-    plt.grid(True)
+    cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE 
+    GROUP BY PURCHASE_DATE""")
+    prof_day = cursor.fetchall()
+    dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
+    amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
+    print(dates)
+    plt.plot_date(dates,amt,linestyle='solid')
+    plt.gcf().autofmt_xdate()
+    date_format = mpl_dates.DateFormatter('%b, %d %Y')
+    plt.gca().xaxis.set_major_formatter(date_format)
     plt.show()
 
+
+    
+    
 def string_float(s):
     try:
         float(s)
