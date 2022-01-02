@@ -270,11 +270,8 @@ def Main(email):
             table.update(new_data)
             searchFlag = True
         if values['-TABLE1-']==[] and values['-IN-']=='':
-            #print('Hello')
             atcButton.update(disabled = True)
-            #print(1)
-            #time.sleep(5)
-            #print(2)
+
         if event=='-TABLE1-' and values['-TABLE1-'] != []:
             if searchFlag:
                 dataUsing = new_data
@@ -289,6 +286,7 @@ def Main(email):
             atcButton.update(disabled = False)
             flag = True
             searchFlag = False
+
         if event=='-IN-' and values['-IN-']!='':
             #atcButton.update(disabled=True)
             flag = False
