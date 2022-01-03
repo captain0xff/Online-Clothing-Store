@@ -91,7 +91,7 @@ def main(emp = ''):
             data =  cursor.fetchall()
             #print(data)
             win['cust_Table'].update(data)
-        if event == 'cust_Table':
+        if event == 'cust_Table' and value['cust_Table']!=[]:
             em = data[value['cust_Table'][0]][2] #Basically extracting email
             win['show_det'].update(em)
             win['show'].update(disabled = False)
