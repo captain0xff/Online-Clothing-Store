@@ -54,12 +54,10 @@ def Main(email):
                         break
                 else:
                     a = len(data)
-                    tempList = []
                     for i in range(len(data)):
                         if data[i][0]>dat[0]:
                             a = i
                             break
-
                     tempList = list(dat)
                     print(tempList)
                     tempList[5] = round(dat[6]/dat[5], 2)
@@ -297,7 +295,7 @@ def Main(email):
                         flag = True
                         break
             if flag:
-                quantity1 = data[idSelected-1][4]
+                quantity1 = data[idSelected-1][5]
                 atcButton.update(disabled = False)
                 spin.update(values=tuple(range(1, quantity1+1)), disabled=False)
             else:
