@@ -98,7 +98,5 @@ def get_date(y,m,d):
 		ds='0'+ds
 	return '{year}-{month}-{day}'.format(year=ys,month=ms,day=ds),ys+ms+ds,y,m,d
 
-
 if __name__ == '__main__':
-	generate_customer()
-	generate_purchase()
+	print('This file is not meant to to run alone. Run login.py or create_database.py')

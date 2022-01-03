@@ -319,7 +319,7 @@ def brand_item():
     sold_data = cursor.fetchall()
     no_item = [sold_data[i][0] for i in  range(len(sold_data))] #y-axis
     brand_name = [sold_data[i][1] for i in range(len(sold_data))] #x-axis
-    plt.bar(brand_name,no_item)
+    plt.barh(brand_name,no_item)
     plt.tight_layout()
     plt.show()
 
