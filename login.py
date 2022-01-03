@@ -127,30 +127,15 @@ def Employee_sign_in_menu():
             break
         elif event == "Login":
             if values["id"] and values["uname"] and values["password"]:
-                if values["id"][-1] in "0123456789":
-                    cursor.execute(
-                        "SELECT * FROM EMPLOYEES WHERE ID = %d;" % (int(values["id"]))
-                    )
-                    data = cursor.fetchall()
-                    print(data)
-                    if data:
-                        # Checks if an employee with the given credentials exists of not
-                        if (
-                            data[0][2] == values["uname"]
-                            and data[0][3] == values["password"]
-                        ):
-                            option_choosen = 1
-                            break
-                    msg.update(
-                        value="Invalid employee ID, username or password...",
-                        text_color="red",
-                    )
-                    print("\a")
+                cmd="Select * from employees"
+                cursor.execute(cmd)
+                data=cursor.fetchall()
+                for i in data:
+                    if str(i[0])==values['id'] and i[2]==values['uname'] and i[3]==values['password']:
+                        employee_func.main()
+                        break
                 else:
-                    msg.update(
-                        "Please enter positive integer in employee ID...",
-                        text_color="red",
-                    )
+                    msg.update(value='Invalid employee id, user, password',text_color='red')
                     print("\a")
             else:
                 # If the user doesn't input any ID and clicks Login
