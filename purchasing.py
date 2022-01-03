@@ -1,10 +1,14 @@
 import PySimpleGUI as sg
 import mysql.connector as sqltor
-import settings as st
 from datetime import date
 
+file=open('settings.txt')
+data=file.readlines()
+file.close()
+for i in range(len(data)):
+    data[i]=data[i][:-1]
+mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
 
-mycon = sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 
 
@@ -290,12 +294,13 @@ def Main(email):
             flag = False
             if values['-IN-'].isdigit():
                 idSelected = int(values['-IN-'])
-                for i in data:
-                    if i[0]==idSelected:
+                for i in range(len(data)):
+                    if data[i][0]==idSelected:
+                        idSelected = i
                         flag = True
                         break
             if flag:
-                quantity1 = data[idSelected-1][5]
+                quantity1 = data[idSelected][5]
                 atcButton.update(disabled = False)
                 spin.update(values=tuple(range(1, quantity1+1)), disabled=False)
             else:

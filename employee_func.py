@@ -4,9 +4,17 @@ import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
-import settings as st
 
+<<<<<<< HEAD
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
+=======
+file=open('settings.txt')
+data=file.readlines()
+file.close()
+for i in range(len(data)):
+    data[i]=data[i][:-1]
+mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
+>>>>>>> 755de16c846bf10ad2c85364b1a7e385f85cbc8c
 cursor = mycon.cursor()
 def main(emp = ''):
     """This Function is responsible for the display of Employee Screen"""

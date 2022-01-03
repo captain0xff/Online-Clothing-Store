@@ -1,0 +1,4 @@
+localhost
+root
+sayantan@sql
+denim_destination_db

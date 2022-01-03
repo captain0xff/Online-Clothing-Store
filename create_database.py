@@ -1,9 +1,14 @@
 '''Create the database if not created'''
-
 import mysql.connector as sqltor
+import sample_data
+
 #establishing the connection
-psswd = input("Enter the password of ur db: ")
-mycon = sqltor.connect(user='root', password=psswd, host='localhost')
+file=open('settings.txt')
+data=file.readlines()
+file.close()
+for i in range(len(data)):
+    data[i]=data[i][:-1]
+mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2])
 cursor = mycon.cursor()
 
 cursor.execute("DROP database IF EXISTS denim_destination_db")
@@ -73,7 +78,9 @@ cursor.execute("""INSERT INTO CUSTOMERS
 VALUES('Gaurav Chanda', 1123978046, 'gauravchanda@gmail.com', 'gauravchanda', 10000),
 ('Arunansh Barai', 9833965591, 'arunanshbarai@gmail.com', 'phtkknhs', 9000),
 ('Devarshi Ray', 1110010993, 'devarshiray@gmail.com', 'ilovemanga', 100000);""")
+sample_data.generate_customer()
 print("Data of Customers added...")
+
 
 cursor.execute('''insert into products
 values('1','Jeans','Wrangler','XL','23','425.23','699.56','Men'),
