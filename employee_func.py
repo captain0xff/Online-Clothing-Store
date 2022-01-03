@@ -4,6 +4,7 @@ import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
+from mysql.connector.locales.eng import client_error
 
 file=open('settings.txt')
 data=file.readlines()

@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import mysql.connector as sqltor
+from mysql.connector.locales.eng import client_error
 from datetime import date
 
 file=open('settings.txt')
@@ -323,6 +324,7 @@ def Main(email):
 
 
         if event =='Add to Cart' and flag:
+            #search.update('')
             #print('312')
             for i in range(len(data)):
                 data[i] = list(data[i])

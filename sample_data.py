@@ -1,6 +1,7 @@
 from datetime import date as dt
 import random as rm
 import mysql.connector as sql
+from mysql.connector.locales.eng import client_error
 
 file=open('settings.txt')
 data=file.readlines()

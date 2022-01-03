@@ -4,6 +4,7 @@ import PySimpleGUI as sg
 import sys
 import warnings
 import mysql.connector as sqltor
+from mysql.connector.locales.eng import client_error
 import time
 import os
 
@@ -117,14 +118,15 @@ def Employee_sign_in_menu():
     # password_char parameter masks the given password with *
     window = sg.Window("Login - Employee", layout)
     option_choosen = None
-    while True:
+    rng=True
+    while rng:
         event, values = window.read()
         # values variable points at a dictionary with id, uname and password
         if event == sg.WIN_CLOSED:
-            break
+            rng=False
         if event == "Go Back":
             option_choosen = 2
-            break
+            rng=False
         elif event == "Login":
             if values["id"] and values["uname"] and values["password"]:
                 cmd="Select * from employees"
@@ -132,8 +134,8 @@ def Employee_sign_in_menu():
                 data=cursor.fetchall()
                 for i in data:
                     if str(i[0])==values['id'] and i[2]==values['uname'] and i[3]==values['password']:
-                        employee_func.main()
-                        break
+                        option_choosen=1
+                        rng=False
                 else:
                     msg.update(value='Invalid employee id, user, password',text_color='red')
                     print("\a")
@@ -145,7 +147,7 @@ def Employee_sign_in_menu():
     window.close()
 
     if option_choosen == 1:
-        employee_func.Main()
+        employee_func.main()
     elif option_choosen == 2:
         Main_menu()
 

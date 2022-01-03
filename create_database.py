@@ -1,5 +1,6 @@
 '''Create the database if not created'''
 import mysql.connector as sqltor
+from mysql.connector.locales.eng import client_error
 import sample_data
 
 #establishing the connection
