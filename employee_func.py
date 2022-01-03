@@ -1,4 +1,3 @@
-#Broke many lines in two parts cuz pylint loves it
 """This module will be used for functionalities of the employee"""
 import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
