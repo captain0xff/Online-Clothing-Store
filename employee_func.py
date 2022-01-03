@@ -5,7 +5,6 @@ import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
 
-mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 file=open('settings.txt')
 data=file.readlines()
 file.close()
