@@ -296,7 +296,6 @@ def Main(email):
                         flag = True
                         break
             if flag:
-                print(data)
                 quantity1 = data[idSelected][5]
                 atcButton.update(disabled = False)
                 spin.update(values=tuple(range(1, quantity1+1)), disabled=False)
