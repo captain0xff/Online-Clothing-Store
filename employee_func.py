@@ -158,7 +158,6 @@ def add_stock():
                 break
         except mysql_errors.DatabaseError:
             msg.update("WRONG DATA ENTERED",text_color='Red')
-
 def update_data(ID):
     """This function allows employee to modify the details of existing stock"""
     lay = [[sg.Text('Product ID',size = (18,1),),
@@ -223,26 +222,54 @@ def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
     WHERE CUSTOMER_EMAIL = '{dat[2]}'
     GROUP BY INVOICE_NUMBER""")
     purchase_data = cursor.fetchall()
-    print(purchase_data)
+    print(1,purchase_data)
     if not purchase_data:
         sg.popup('NO DATA FOUND')
     
     else:
-        table = sg.Table(purchase_data,headings=heading)
+        table = sg.Table(purchase_data,headings=heading,key='pur_table',enable_events=True)
         layout = [
         [sg.Text(f'Name: {dat[0]}')],
         [sg.Text(f'Mobile Number: {dat[1]}')],
         [sg.Text(f'Email: {dat[2]}')],
         [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
         [table],
-        [sg.Button('Exit',key = 'Exit')]
+        [sg.Button('Exit',key = 'Exit'),sg.Button('Show More',disabled = True,key='show_more')]
         ]
         win = sg.Window(f'{dat[2]}',layout)
         while True:
-            event1 = win.read()[0]  #Extracting only event
+            event1,value = win.read()  #Extracting only event
+            print(event1, value)
             if event1  in ('Exit',None):
                 win.close()
                 break
+            if event1 == 'pur_table' and value['pur_table'] != []:
+                win['show_more'].update(disabled=False)
+            if event1 == 'show_more' and value['pur_table'] != []:
+                ind_select = value['pur_table'][0]
+                inv_num = purchase_data[ind_select][0]
+                date = purchase_data[ind_select][1]
+                more_details(inv_num,date)
+                
+def more_details(invoice,date):
+    print(254,invoice)
+    cursor.execute(f"""SELECT Product_ID ,Product_Name ,Product_Brand ,Product_Size ,
+            Product_Category ,Quantity_Purchased ,Product_tot_cost FROM PURCHASE
+            WHERE Invoice_Number = '{invoice}'""")
+    specific_info = cursor.fetchall()
+    heading = ['Product_ID' ,'Product_Name' ,'Product_Brand' ,'Product_Size' ,
+            'Product_Category' ,'Quantity_Purchased' ,'Product_tot_cost']
+    table = sg.Table(headings=heading,values = specific_info)
+    layout = [[sg.Text(f'INVOICE NUMBER: {invoice}')],[sg.Text(f'DATE OF PURCHASE: {date}')],
+    [table]]
+    prod_win = sg.Window(title = 'More Information', layout=layout)
+    while True:
+        event,value = prod_win.read()
+        print(event,value)
+        if event is None:
+            break
+    
+    
 def daily_profit():
     """This function plots daily profit"""
     cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
