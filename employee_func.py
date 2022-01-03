@@ -10,11 +10,10 @@ import settings as st
 
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
-def Main(emp = ''):
+def main(emp = ''):
     """This Function is responsible for the display of Employee Screen"""
     global data
     global data_product
-    #global data
     sg.theme('DarkAmber')
     font = ("Arial", 11)
     stck_data = display_stock()
@@ -34,22 +33,17 @@ def Main(emp = ''):
     ]
     win = sg.Window('Welcome',layout)
     while True:
-        event,value = win.read() 
-        print(event,value)
-
-        if event == 'Delete':
-            #prod_id = 
-            pass
+        event,value = win.read()
+        if event in (None, 'Exit'):
+            break
         if event == 'show':
-            #print(value)
             show_details(data[value['cust_Table'][0]])
         if event == 'Add':
             add_stock()
             cursor.execute("SELECT * FROM PRODUCTS")
             data = cursor.fetchall()
             win['Table'].update(data)
-        
-        if event == 'Update':
+        elif event == 'Update':
             try:
                 prod_clicked = value['Table'][0]
                 prod_click_id = int(data_product[prod_clicked][0])
@@ -59,30 +53,35 @@ def Main(emp = ''):
                 win['Table'].update(data)
             except IndexError:
                 sg.popup( "Warning: No Product Selected",title = "WARNING")
+        elif event == 'Delete' :
+            try:
+                prod_clicked = value['Table'][0]
+                prod_click_id = int(data_product[prod_clicked][0])
+                #print(prod_click_id)
+                cursor.execute(f"DELETE FROM PRODUCTS WHERE ID = {prod_click_id}")
+                mycon.commit()
+                cursor.execute("SELECT * FROM PRODUCTS")
+                data_product = cursor.fetchall()
+                win['Table'].update(data_product)
+            except IndexError:
+                sg.popup('NO PRODUCTS SELECTED')
         if event == "sort_amt":
-            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
+            query = """SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             ORDER BY Total_Price DESC"""
             cursor.execute(query)
-            
             data =  cursor.fetchall()
-            #sg.Print(data1)
             win['cust_Table'].update(data)
-            #print('Meow')
         if event in ('search_name','Name') and value:
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             WHERE Name LIKE '{value['Name']}%'"""
             cursor.execute(query)
             data =  cursor.fetchall()
-            #print(data)
             win['cust_Table'].update(data)
-            #break
         elif event in ('search_email','email'):
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             WHERE Email_ID LIKE '{value['email']}%'"""
-            #print(query)
             cursor.execute(query)
             data =  cursor.fetchall()
-            #print(data)
             win['cust_Table'].update(data)
         elif event in('search_phn','mob'):
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
@@ -92,36 +91,18 @@ def Main(emp = ''):
             data =  cursor.fetchall()
             #print(data)
             win['cust_Table'].update(data)
-        if event == 'Delete':
-            prod_clicked = value['Table'][0]
-            prod_click_id = int(data_product[prod_clicked][0])
-            #print(prod_click_id)
-            cursor.execute(f"DELETE FROM PRODUCTS WHERE ID = {prod_click_id}")
-            mycon.commit()
-            cursor.execute("SELECT * FROM PRODUCTS")
-            data_product = cursor.fetchall()
-            win['Table'].update(data_product)
         if event == 'cust_Table':
-            #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
-            #data = cursor.fetchall()
-            #print(data)
             em = data[value['cust_Table'][0]][2] #Basically extracting email
-            #print(data[value['Table'][0]])
             win['show_det'].update(em)
             win['show'].update(disabled = False)
-        
         if event == 'GO' and value['profit'] == 'Daily Profit':
             daily_profit()
-        if event == 'GO' and value['profit'] == 'Monthly Profit':
+        elif event == 'GO' and value['profit'] == 'Monthly Profit':
             monthly()
-        if event == 'cat_pie':
+        elif event == 'cat_pie':
             categ_chart()
-        if event == 'item_sold':
+        elif event == 'item_sold':
             brand_item()
-        if event in (None, 'Exit'):
-            break
-        
-
 def display_stock():
     """This displays the products"""
     cursor.execute("SELECT * FROM PRODUCTS")
@@ -136,65 +117,51 @@ def display_stock():
     layout1 = [[sg.Text('Product List')],
     [sg.Table(data_product,headings = heading,key = 'Table',justification='left'
     ,auto_size_columns=True,expand_y = True)],
-    [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update'),sg.Button('Delete',key = 'Delete')],
-    ]
+    [sg.Button('Add',key = 'Add'),sg.Button('Update Stock',key = 'Update'),
+        sg.Button('Delete',key = 'Delete')]]
     return layout1
-#check
 def add_stock():
     """This function enables the employee to add new products in stock"""
-    lay = [[sg.Text('Enter Product ID',size = (18,1)),sg.Input(key = 'id',enable_events=True)],
+    msg = sg.Text('Enter appropriate data')
+    lay = [[msg],[sg.Text('Enter Product ID',size = (18,1)),
+            sg.Input(key = 'id',enable_events=True)],
     [sg.Text('Product Name',size = (18,1)),sg.Input(key = 'name',enable_events=True)],
     [sg.Text('Product Brand',size = (18,1)),sg.Input(key = 'brand',enable_events=True)],
     [sg.Text('Product Size',size = (18,1)),sg.Input(key = 'size',enable_events=True)],
     [sg.Text('Product Quantity',size = (18,1)),sg.Input(key = 'quantity',enable_events=True)],
     [sg.Text('Product Cost Price',size = (18,1)),sg.Input(key = 'cost_price',enable_events=True)],
-    [sg.Text('Product Selling Price',size = (18,1)),sg.Input(key ='selling_price',enable_events=True)],
+    [sg.Text('Product Sell Price',size=(18,1)),sg.Input(key ='selling_price',enable_events=True)],
     [sg.Text('Product Category',size = (18,1)),sg.Input(key ='category',enable_events=True)]]
     layout = [[sg.Frame("Add New Stock",lay)],
-    [sg.Button('Go Back'),sg.Button('Confirm',key = 'Confirm',disabled=True)]
+    [sg.Button('Go Back'),sg.Button('Confirm',key = 'Confirm')]
     ]
     window = sg.Window("New Product",layout=layout)
     while True:
         event,value = window.read()
-        print(event,value)
+        #print(event,value)
         if event in (None, "Go Back"):
             window.close()
             break
-        cursor.execute(f"SELECT * from products where ID  = '{value['id']}'")
-        """CHECKING CONSTRAINTS"""
-        prod_id = cursor.fetchone() is None
-        print('141',prod_id)
-        con2 = len(value['name']) <= 50
-        con3 = len(value['brand']) <= 50
-        con4 = value['size'] in ('S','M','L','XL', 'XXL', 'XXXL','NA')
-        con5 = value['quantity'].isnumeric()
-        con6 = string_float(value['cost_price'])  #Checks if valid float
-        con7 = string_float(value['selling_price'])
-        con8 = value['category'] in ('Kids','Men','Women')
-        check = [value['id'],value['name'],value['brand'],value['size'],value['quantity'],
-        value['cost_price'],value['selling_price'],value['category'],con8,con7,con6,con5,con4,con3,con2,prod_id]
-        if all(check):
-            window['Confirm'].update(disabled = False)
-        else:
-            window['Confirm'].update(disabled = True)
-        if event == 'Confirm':
-            insert_prod = """INSERT INTO PRODUCTS
-            (ID,Name,Brand,Size,Quantity,Cost_Price,Selling_Price, Category)
-            Values(%s,%s,%s,%s,%s,%s,%s,%s)"""
-            upd_value = [list(value.values())] 
-            cursor.executemany(insert_prod,upd_value)
-            mycon.commit()
-            sg.popup('Stock Added to Database')
-            window.close()
-            #print(upd_value)
-            break
-        
-
+        try:
+            if event == 'Confirm':
+                insert_prod = """INSERT INTO PRODUCTS
+                (ID,Name,Brand,Size,Quantity,Cost_Price,Selling_Price, Category)
+                Values(%s,%s,%s,%s,%s,%s,%s,%s)"""
+                upd_value = [list(value.values())]
+                cursor.executemany(insert_prod,upd_value)
+                mycon.commit()
+                sg.popup('Stock Added to Database')
+                window.close()
+                #print(upd_value)
+                break
+        except mysql_errors.DatabaseError:
+            msg.update("WRONG DATA ENTERED",text_color='Red')
 
 def update_data(ID):
     """This function allows employee to modify the details of existing stock"""
     lay = [[sg.Text('Product ID',size = (18,1),),
-        sg.Input(default_text = ID, key = 'ID',readonly=True,tooltip = "It's Read Only",disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black')],
+        sg.Input(default_text = ID, key = 'ID',readonly=True,tooltip = "It's Read Only",
+            disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black')],
     [sg.Text('Product Name',size = (18,1)),sg.Input(key = 'Name')],
     [sg.Text('Product Brand',size = (18,1)),sg.Input(key = 'Brand')],
     [sg.Text('Product Size',size = (18,1)),sg.Input(key = 'Size')],
@@ -212,7 +179,7 @@ def update_data(ID):
         event,value=win.read()
         if event is None:
             break
-        try: 
+        try:
             if event == 'Confirm':
                 for i in value:
                     if value[i] != '' and i!= 'ID':
@@ -224,39 +191,39 @@ def update_data(ID):
         except mysql_errors.DatabaseError:
             msg.update('Wrong data entered...')
         #print(event,value)
-        
-
 
 cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
 data = cursor.fetchall()
 def cust_details():
+    """This function shows the list of customers"""
     global data
-    #cursor.execute('SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS')
-    #d = cursor.fetchall()
-    #print('data',data)
     heading = ['Name','Phone_Number','Email_ID','Total_Purchase_Amt']
     table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
-    layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',enable_events=True),sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
-    [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),sg.Button('Search',key = 'search_name')],
-    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True),sg.Button('Search',key = 'search_email')],
-    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob',enable_events=True),sg.Button('Search',key = 'search_phn')],
+    layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',
+        enable_events=True),
+        sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
+    [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),
+        sg.Button('Search',key = 'search_name')],
+    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True),
+        sg.Button('Search',key = 'search_email')],
+    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob',enable_events=True),
+        sg.Button('Search',key = 'search_phn')],
     [table],
     [sg.Input(key = 'show_det'),sg.Button('Show Details', disabled=True,key = 'show')],
     [sg.Button('Exit')]
     ]
-    #print('layout',list(layout[4]))
     return layout
 
-def show_details(dat): #dat is a tuple containing name, mob, email, pur_amount
-    #print(dat)
+def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
+    """This function shows the details of the customer"""
     heading = ['Invoice Number', 'Total Cost', 'Purchase date']
-    cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE 
+    cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
     WHERE CUSTOMER_EMAIL = '{dat[2]}'
     GROUP BY INVOICE_NUMBER""")
     purchase_data = cursor.fetchall()
     print(purchase_data)
     if not purchase_data:
-        sg.popup('NO DATA FOUND')  
+        sg.popup('NO DATA FOUND')
     else:
         table = sg.Table(purchase_data,headings=heading)
         layout = [
@@ -265,19 +232,17 @@ def show_details(dat): #dat is a tuple containing name, mob, email, pur_amount
         [sg.Text(f'Email: {dat[2]}')],
         [sg.Text(f'Total Amount Purchased: {round(dat[3],2)}')],
         [table],
-        [sg.Button('Exit',key = 'Exit')] 
+        [sg.Button('Exit',key = 'Exit')]
         ]
         win = sg.Window(f'{dat[2]}',layout)
         while True:
-        #print("Lol")
-            event1,value = win.read()
-            #print(event1,value)
+            event1 = win.read()[0]  #Extracting only event
             if event1  in ('Exit',None):
                 win.close()
                 break
-    
 def daily_profit():
-    cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE  
+    """This function plots daily profit"""
+    cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
     GROUP BY PURCHASE_DATE 
     ORDER BY PURCHASE_DATE DESC LIMIT 7""")
     prof_day = cursor.fetchall()
@@ -292,10 +257,11 @@ def daily_profit():
     plt.ylabel('Profit in rupees')
     plt.xlabel('Date')
     plt.show()
-
 def monthly():
-    cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased) from purchase 
-    group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
+    """This function plots monthly sale"""
+    cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased)
+        from purchase
+        group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
     monthly_data = cursor.fetchall()
     month = [monthly_data[i][0] for i in range(len(monthly_data))]
     sale = [monthly_data[i][1] for i in range(len(monthly_data))]
@@ -303,18 +269,23 @@ def monthly():
     plt.bar(month,sale)
     plt.show()
 def categ_chart():
-    cursor.execute("select sum(quantity_purchased), product_category from purchase group by product_category;")
+    """This function plots the categorical popularity chart"""
+    cursor.execute("""select sum(quantity_purchased), product_category from purchase
+        group by product_category;""")
     cat_data = cursor.fetchall()
     #print(cat_data)
     sale_data = [cat_data[i][0] for i in range(len(cat_data))]
     label = [cat_data[i][1] for i in range(len(cat_data))]
     print(sale_data,label)
-    plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',wedgeprops={'edgecolor':'black'})
+    plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',
+        wedgeprops={'edgecolor':'black'})
     plt.show()
 
 
 def brand_item():
-    cursor.execute("select sum(quantity_purchased), product_brand from purchase group by Product_brand;")
+    """This function plots brand popularity graph"""
+    cursor.execute("""select sum(quantity_purchased), product_brand from purchase
+        group by Product_brand;""")
     sold_data = cursor.fetchall()
     no_item = [sold_data[i][0] for i in  range(len(sold_data))] #y-axis
     brand_name = [sold_data[i][1] for i in range(len(sold_data))] #x-axis
@@ -322,16 +293,6 @@ def brand_item():
     plt.tight_layout()
     plt.show()
 
-
-def string_float(s):
-    try:
-        float(s)
-        return True
-    except:
-        return False
-
 if __name__=='__main__':
-    Main()
-
-
+    main()
 mycon.commit()
