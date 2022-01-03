@@ -290,12 +290,14 @@ def Main(email):
             flag = False
             if values['-IN-'].isdigit():
                 idSelected = int(values['-IN-'])
-                for i in data:
-                    if i[0]==idSelected:
+                for i in range(len(data)):
+                    if data[i][0]==idSelected:
+                        idSelected = i
                         flag = True
                         break
             if flag:
-                quantity1 = data[idSelected-1][5]
+                print(data)
+                quantity1 = data[idSelected][5]
                 atcButton.update(disabled = False)
                 spin.update(values=tuple(range(1, quantity1+1)), disabled=False)
             else:
