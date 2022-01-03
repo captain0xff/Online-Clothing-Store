@@ -75,9 +75,9 @@ VALUES(1,'Pratyush Prashob', 'pratyushprashob27', 'arandompassword'),
 print("Data of Employees added...")
 
 cursor.execute("""INSERT INTO CUSTOMERS
-VALUES('Gaurav Chanda', 1123978046, 'gauravchanda@gmail.com', 'gauravchanda', 10000),
-('Arunansh Barai', 9833965591, 'arunanshbarai@gmail.com', 'phtkknhs', 9000),
-('Devarshi Ray', 1110010993, 'devarshiray@gmail.com', 'ilovemanga', 100000);""")
+VALUES('Gaurav Chanda', 1123978046, 'gauravchanda@gmail.com', 'gauravchanda', 0),
+('Arunansh Barai', 9833965591, 'arunanshbarai@gmail.com', 'phtkknhs', 0),
+('Devarshi Ray', 1110010993, 'devarshiray@gmail.com', 'ilovemanga', 0);""")
 sample_data.generate_customer()
 print("Data of Customers added...")
 
@@ -118,5 +118,8 @@ values('1','Jeans','Wrangler','XL','23','425.23','699.56','Men'),
 print('Products added...')
 
 mycon.commit()
+
+sample_data.generate_purchase(2018)
+
 mycon.close()
 print('Successful!!!')
