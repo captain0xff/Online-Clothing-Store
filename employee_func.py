@@ -1,4 +1,3 @@
-#Broke many lines in two parts cuz pylint loves it
 """This module will be used for functionalities of the employee"""
 import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
@@ -6,7 +5,6 @@ import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
 import settings as st
-
 
 mycon= sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
@@ -224,6 +222,7 @@ def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
     print(purchase_data)
     if not purchase_data:
         sg.popup('NO DATA FOUND')
+    
     else:
         table = sg.Table(purchase_data,headings=heading)
         layout = [
