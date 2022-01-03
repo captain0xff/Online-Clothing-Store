@@ -1,10 +1,14 @@
 import PySimpleGUI as sg
 import mysql.connector as sqltor
-import settings as st
 from datetime import date
 
+file=open('settings.txt')
+data=file.readlines()
+file.close()
+for i in range(len(data)):
+    data[i]=data[i][:-1]
+mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
 
-mycon = sqltor.connect(host=st.host,user=st.user,passwd=st.password,database=st.database)
 cursor = mycon.cursor()
 
 

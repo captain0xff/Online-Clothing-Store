@@ -1,9 +1,13 @@
 '''Create the database if not created'''
-
 import mysql.connector as sqltor
+
 #establishing the connection
-psswd = input("Enter the password of ur db: ")
-mycon = sqltor.connect(user='root', password=psswd, host='localhost')
+file=open('settings.txt')
+data=file.readlines()
+file.close()
+for i in range(len(data)):
+    data[i]=data[i][:-1]
+mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2])
 cursor = mycon.cursor()
 
 cursor.execute("DROP database IF EXISTS denim_destination_db")

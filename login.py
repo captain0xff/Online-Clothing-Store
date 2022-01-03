@@ -1,14 +1,15 @@
 """The code for the main login page"""
 # Import the needed modules
 import PySimpleGUI as sg
-import mysql.connector as sql
-import settings as st
-import employee_func
-import purchasing
 import sys
 import warnings
+import mysql.connector as sqltor
 import time
 import os
+
+
+# Set the PysimpleGUI theme
+sg.theme("DarkAmber")
 
 """Code for checking environment"""
 idle = True if "idlelib.run" in sys.modules else False  # Credit goes to stackexchange
@@ -18,14 +19,45 @@ if idle == True:
     current_dir = os.getcwd()
     os.system(f"{current_dir}/login.py")
 # Connect to the mysql database and create a cursor
-mycon = sql.connect(
-    host=st.host, user=st.user, passwd=st.password, database=st.database
-)
+try:
+    file=open('settings.txt')
+    data=file.readlines()
+    file.close()
+    for i in range(len(data)):
+        data[i]=data[i][:-1]
+    mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
+except sqltor.errors.ProgrammingError:
+    layout=[
+    [sg.Text('Host',size=(7,None)),sg.Input('localhost',key='H')],
+    [sg.Text('User',size=(7,None)),sg.Input('root',key='U')],
+    [sg.Text('Password',size=(7,None)),sg.Input('',key='P')],
+    [sg.Button('Done',key='DN')]
+    ]
+    window=sg.Window('Credentials',layout)
+    while True:
+        event,values=window.read()
+        if event==sg.WIN_CLOSED:
+            break
+        elif event=='DN':
+            hostname=values['H']
+            username=values['U']
+            password=values['P']
+            break
+    window.close()
+    settings_data="""{}
+{}
+{}
+denim_destination_db
+""".format(hostname,username,password)
+    file=open('settings.txt','w')
+    file.write(settings_data)
+    file.close()
+    import create_database
+    mycon = sqltor.connect(host=hostname, user=username, passwd=password, database='denim_destination_db')
+import employee_func
+import purchasing
+
 cursor = mycon.cursor()
-
-# Set the PysimpleGUI theme
-sg.theme("DarkAmber")
-
 
 def Main_menu():
     # The welcome menu
@@ -40,7 +72,7 @@ def Main_menu():
 
     # Create the main menu window
     window = sg.Window(
-        st.caption, layout, finalize=True, element_justification="center"
+        'Denim Destination', layout, finalize=True, element_justification="center"
     )
     img = window["IMG"]
     option_choosen = None
