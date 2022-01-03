@@ -76,17 +76,17 @@ def Main(emp = ''):
             #print(data)
             win['cust_Table'].update(data)
             #break
-        elif event == 'search_email':
+        elif event in ('search_email','email'):
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
-            WHERE Email_ID = '{value['email']}'"""
+            WHERE Email_ID LIKE '{value['email']}%'"""
             #print(query)
             cursor.execute(query)
             data =  cursor.fetchall()
             #print(data)
             win['cust_Table'].update(data)
-        elif event == 'search_phn':
+        elif event in('search_phn','mob'):
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
-            WHERE Phone_Number = '{value['mob']}'"""
+            WHERE Phone_Number LIKE '{value['mob']}%'"""
             #print(query)
             cursor.execute(query)
             data =  cursor.fetchall()
@@ -238,8 +238,8 @@ def cust_details():
     table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',enable_events=True),sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
     [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),sg.Button('Search',key = 'search_name')],
-    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email'),sg.Button('Search',key = 'search_email')],
-    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob'),sg.Button('Search',key = 'search_phn')],
+    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True),sg.Button('Search',key = 'search_email')],
+    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob',enable_events=True),sg.Button('Search',key = 'search_phn')],
     [table],
     [sg.Input(key = 'show_det'),sg.Button('Show Details', disabled=True,key = 'show')],
     [sg.Button('Exit')]
