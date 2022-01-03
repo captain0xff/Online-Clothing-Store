@@ -118,7 +118,7 @@ def Main(emp = ''):
             categ_chart()
         if event == 'item_sold':
             brand_item()
-        if event is None:
+        if event in (None, 'Exit'):
             break
         
 
