@@ -211,7 +211,7 @@ def cust_details():
     table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',
         enable_events=True),
-        sg.Radio("Sort by Name",group_id='sort',key = 'sort_name',enable_events=True)],
+        sg.Radio("Sort by Name",default=True,group_id='sort',key = 'sort_name',enable_events=True)],
     [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),
         sg.Button('Search',key = 'search_name')],
     [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True),
