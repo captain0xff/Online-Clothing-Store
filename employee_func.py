@@ -76,6 +76,12 @@ def main(emp = ''):
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
+        if event=='sort_name':
+            query="""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
+            ORDER BY Name"""
+            cursor.execute(query)
+            data=cursor.fetchall()
+            win['cust_Table'].update(data)
         if event in ('search_name','Name') and value:
             query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             WHERE Name LIKE '{value['Name']}%'"""
@@ -205,7 +211,7 @@ def cust_details():
     table = sg.Table(data,headings=heading,key = 'cust_Table',enable_events=True)
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',
         enable_events=True),
-        sg.Radio("Sort by Purchse Date",group_id='sort',key = 'sort_date',enable_events=True)],
+        sg.Radio("Sort by Name",group_id='sort',key = 'sort_name',enable_events=True)],
     [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),
         sg.Button('Search',key = 'search_name')],
     [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True),
