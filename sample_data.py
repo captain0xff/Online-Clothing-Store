@@ -8,9 +8,12 @@ data=file.readlines()
 file.close()
 for i in range(len(data)):
     data[i]=data[i][:-1]
-mycon = sql.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
+mycon = sql.connect(host=data[0], user=data[1], passwd=data[2])
 cursor=mycon.cursor()
-
+cursor.execute("DROP database IF EXISTS denim_destination_db")
+sql_create = "CREATE database denim_destination_db"
+cursor.execute(sql_create)
+cursor.execute("USE denim_destination_db")
 def generate_customer():
 	file=open('name.txt')
 	data=file.readlines()
