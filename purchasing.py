@@ -253,7 +253,7 @@ def Main(email):
     searchFlag = False
     while True:
         event, values = window.read()
-        #print(event, values)
+        print(event, values)
         #print(data)
         if event in (None, 'Exit'):
             print('Line 261')
@@ -288,7 +288,6 @@ def Main(email):
             spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
             atcButton.update(disabled = False)
             flag = True
-            searchFlag = False
 
         if event=='-IN-' and values['-IN-']!='':
             #atcButton.update(disabled=True)
@@ -326,6 +325,8 @@ def Main(email):
         if event =='Add to Cart' and flag:
             #search.update('')
             #print('312')
+            search.update('')
+            searchFlag = False
             for i in range(len(data)):
                 data[i] = list(data[i])
             # Declared the variable for my convenience and ease of understanding
