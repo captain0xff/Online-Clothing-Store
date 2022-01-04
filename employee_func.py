@@ -291,14 +291,26 @@ def daily_profit():
     plt.show()
 def monthly():
     """This function plots monthly sale"""
-    months = Counter(['January', 'February', 'March', 'April', 'May', 'June', 'July',
-         'August', 'September', 'October', 'November', 'December'])
+    months = Counter({'January': 0, 'February': 0, 'March': 0, 'April': 0, 'May': 0, 'June': 0,
+         'July': 0,'August': 0, 'September': 0, 'October': 0, 'November': 0, 'December': 0})
     cursor.execute("SELECT DISTINCT YEAR(Purchase_Date) FROM PURCHASE;")
     years = cursor.fetchall()
-    year1 = min(years)[0]
-    years.remove(year1)
-    year2 = min(years)[0]
+    year1 = max(years)[0]
+    years.remove(max(years))
+    year2 = max(years)[0]
     print(year1,year2)
+
+    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(Product_tot_cost)
+     FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year1}
+     GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
+    year_1data = cursor.fetchall()
+    print(year_1data)
+    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(Product_tot_cost)
+     FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year2}
+     GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
+    year_2data = cursor.fetchall()
+    print(year_2data)
+    
     #cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased)
     #    from purchase
     #    group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
@@ -331,6 +343,7 @@ def brand_item():
     brand_name = [sold_data[i][1] for i in range(len(sold_data))] #x-axis
     plt.barh(brand_name,no_item)
     plt.tight_layout()
+    plt.grid()
     plt.show()
 
 if __name__=='__main__':
