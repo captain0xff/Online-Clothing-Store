@@ -76,27 +76,36 @@ def main(emp = ''):
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
+            win['email'].update('')
+            win['name'].update('')
+            win['mob'].update('')
         if event=='sort_name':
             query="""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             ORDER BY Name"""
             cursor.execute(query)
             data=cursor.fetchall()
             win['cust_Table'].update(data)
-        if event in ('search_name','Name') and value:
-            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
-            WHERE Name LIKE '{value['Name']}%'"""
+            win['email'].update('')
+            win['name'].update('')
+            win['mob'].update('')
+        if event=='name' and value:
+            query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
+            where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
+            """.format(value['name'],value['email'],value['mob'])
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
-        elif event in ('search_email','email'):
-            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
-            WHERE Email_ID LIKE '{value['email']}%'"""
+        elif event=='email':
+            query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
+            where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
+            """.format(value['name'],value['email'],value['mob'])
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
-        elif event in('search_phn','mob'):
-            query = f"""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
-            WHERE Phone_Number LIKE '{value['mob']}%'"""
+        elif event=='mob':
+            query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
+            where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
+            """.format(value['name'],value['email'],value['mob'])
             #print(query)
             cursor.execute(query)
             data =  cursor.fetchall()
@@ -212,12 +221,9 @@ def cust_details():
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',
         enable_events=True),
         sg.Radio("Sort by Name",default=True,group_id='sort',key = 'sort_name',enable_events=True)],
-    [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'Name',enable_events=True),
-        sg.Button('Search',key = 'search_name')],
-    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True),
-        sg.Button('Search',key = 'search_email')],
-    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob',enable_events=True),
-        sg.Button('Search',key = 'search_phn')],
+    [sg.Text('Search by Name',size = (14,1)),sg.Input(key = 'name',enable_events=True)],
+    [sg.Text('Search by Email ID',size = (14,1)),sg.Input(key = 'email',enable_events=True)],
+    [sg.Text('Search by Mobile',size = (14,1)),sg.Input(key = 'mob',enable_events=True)],
     [table],
     [sg.Input(key = 'show_det'),sg.Button('Show Details', disabled=True,key = 'show')],
     [sg.Button('Exit')]
