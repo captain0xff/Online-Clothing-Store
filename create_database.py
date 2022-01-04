@@ -120,7 +120,7 @@ print('Products added...')
 
 mycon.commit()
 
-sample_data.generate_purchase(2020)
+sample_data.generate_purchase(2018)
 
 mycon.close()
 print('Successful!!!')

@@ -54,7 +54,7 @@ def generate_purchase(y):
 			full_invoice=invoice_date+invoice_str
 			customer_email=rm.choice(customers)[0]
 			product_bought=rm.choice(products)
-			quantity=rm.randint(1,30)
+			quantity=rm.randint(1,5)
 			total_price=quantity*product_bought[6]
 			if customer_email in customer_sale_dict:
 				customer_sale_dict[customer_email]+=total_price
