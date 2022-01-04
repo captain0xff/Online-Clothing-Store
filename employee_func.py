@@ -1,6 +1,7 @@
 """This module will be used for functionalities of the employee"""
 import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
+from collections import Counter
 import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
@@ -290,15 +291,23 @@ def daily_profit():
     plt.show()
 def monthly():
     """This function plots monthly sale"""
-    cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased)
-        from purchase
-        group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
-    monthly_data = cursor.fetchall()
-    month = [monthly_data[i][0] for i in range(len(monthly_data))]
-    sale = [monthly_data[i][1] for i in range(len(monthly_data))]
-    #print(monthly_data)
-    plt.bar(month,sale)
-    plt.show()
+    months = Counter(['January', 'February', 'March', 'April', 'May', 'June', 'July',
+         'August', 'September', 'October', 'November', 'December'])
+    cursor.execute("SELECT DISTINCT YEAR(Purchase_Date) FROM PURCHASE;")
+    years = cursor.fetchall()
+    year1 = min(years)[0]
+    years.remove(year1)
+    year2 = min(years)[0]
+    print(year1,year2)
+    #cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased)
+    #    from purchase
+    #    group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
+    #monthly_data = cursor.fetchall()
+    #month = [monthly_data[i][0] for i in range(len(monthly_data))]
+    #sale = [monthly_data[i][1] for i in range(len(monthly_data))]
+    ##print(monthly_data)
+    #plt.bar(month,sale)
+    #plt.show()
 def categ_chart():
     """This function plots the categorical popularity chart"""
     cursor.execute("""select sum(quantity_purchased), product_category from purchase
