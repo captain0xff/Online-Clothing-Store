@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
 from collections import Counter
 import PySimpleGUI as sg
+import numpy as np
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
 from mysql.connector.locales.eng import client_error
@@ -291,35 +292,38 @@ def daily_profit():
     plt.show()
 def monthly():
     """This function plots monthly sale"""
-    months = Counter({'January': 0, 'February': 0, 'March': 0, 'April': 0, 'May': 0, 'June': 0,
-         'July': 0,'August': 0, 'September': 0, 'October': 0, 'November': 0, 'December': 0})
+    #months_1 = Counter({'January': 0, 'February': 0, 'March': 0, 'April': 0, 'May': 0, 'June': 0,
+    #     'July': 0,'August': 0, 'September': 0, 'October': 0, 'November': 0, 'December': 0})
     cursor.execute("SELECT DISTINCT YEAR(Purchase_Date) FROM PURCHASE;")
     years = cursor.fetchall()
+    print(years)
+    try:
+        years.remove((2022,))
+    except ValueError: pass
     year1 = max(years)[0]
     years.remove(max(years))
     year2 = max(years)[0]
-    print(year1,year2)
-
-    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(Product_tot_cost)
+    #print(year1,year2)
+    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M'), sum(Product_tot_cost)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year1}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_1data = cursor.fetchall()
-    print(year_1data)
+    months = [i[0] for i in year_1data]
+    profit_1 = [i[1] for i in year_1data]
+    x_axis = np.arange(len(months))
+    width = 0.4
+    plt.bar(x_axis,profit_1,width=width,label = year1)
+    
     cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(Product_tot_cost)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year2}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_2data = cursor.fetchall()
-    print(year_2data)
     
-    #cursor.execute("""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(quantity_purchased)
-    #    from purchase
-    #    group by monthname(purchase_date) ORDER BY PURCHASE_DATE;""")
-    #monthly_data = cursor.fetchall()
-    #month = [monthly_data[i][0] for i in range(len(monthly_data))]
-    #sale = [monthly_data[i][1] for i in range(len(monthly_data))]
-    ##print(monthly_data)
-    #plt.bar(month,sale)
-    #plt.show()
+    profit2 = [i[1] for i in year_2data]
+    plt.bar(x_axis+width,profit2,width=width,label = year2)
+    plt.legend()
+    plt.xticks(ticks = x_axis,labels=months,rotation = 45)
+    plt.show()
 def categ_chart():
     """This function plots the categorical popularity chart"""
     cursor.execute("""select sum(quantity_purchased), product_category from purchase
