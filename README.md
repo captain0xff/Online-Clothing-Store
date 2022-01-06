@@ -12,19 +12,5 @@ They will be able to make an account on the website and sign in later to make pu
 They can select multiple products and add them to cart and make purchases.
 
 
-#Category
-1. Men
-2. Women
-3. Kid
-
-#Pie Chart
-Category
-
-#Bar Graph
-Brand
-
-#Todo
-Slider
-
 #Synopsis
 https://docs.google.com/document/d/1r9DZN59mxrZVFsoo1HH7hSGWUhkXhKXFZiB1FXE2g64/edit#
