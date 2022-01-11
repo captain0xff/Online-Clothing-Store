@@ -1,7 +1,6 @@
 """This module will be used for functionalities of the employee"""
 import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
-from collections import Counter
 import PySimpleGUI as sg
 import numpy as np
 import mysql.connector as sqltor
@@ -22,8 +21,14 @@ def main(emp = ''):
     sg.theme('DarkAmber')
     font = ("Arial", 11)
     stck_data = display_stock()
-    stats = [[sg.Combo(default_value='Monthly Profit',
-        values=['Daily Profit','Monthly Profit'],readonly=True,key = 'profit'),sg.Button('GO')],
+    f = ("Arial",15)
+    cursor.execute("select DISTINCT YEAR(Purchase_Date) from purchase order by year(purchase_date)")
+    year = cursor.fetchall()
+    stats = [[sg.Text('Finance',font = f)],
+            [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = '7',values =
+        [str(i) for i in range(1,31)],key = 'daily_profit',readonly = True,size=(7,1)),sg.Button('GO',k='Go1')],
+        [sg.Text('Monthly Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = year[-1],values = year,k = 'y1'),
+        sg.Combo(default_value = year[-2],values = year,key = 'y2'),sg.Button('GO',k='Go2')],
         [sg.Button('Popularity of Categories',key = 'cat_pie')],
         [sg.Button('Total Items sold per Brand', key = 'item_sold')]]
     customer_det = cust_details()
@@ -115,10 +120,15 @@ def main(emp = ''):
             em = data[value['cust_Table'][0]][2] #Basically extracting email
             win['show_det'].update(em)
             win['show'].update(disabled = False)
-        if event == 'GO' and value['profit'] == 'Daily Profit':
-            daily_profit()
-        elif event == 'GO' and value['profit'] == 'Monthly Profit':
-            monthly()
+        if event == 'Go1':
+            print(value['daily_profit'])
+            daily_profit(value['daily_profit'])
+            
+        elif event == 'Go2':
+            year1 = value['y1'][0]
+            year2 = value['y2'][0]
+            monthly(year1,year2)
+            #print(year1,year2)
         elif event == 'cat_pie':
             categ_chart()
         elif event == 'item_sold':
@@ -267,7 +277,7 @@ def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
                 more_details(inv_num,date)
                 
 def more_details(invoice,date):
-    print(254,invoice)
+    #print(254,invoice)
     cursor.execute(f"""SELECT Product_ID ,Product_Name ,Product_Brand ,Product_Size ,
             Product_Category ,Quantity_Purchased ,Product_tot_cost FROM PURCHASE
             WHERE Invoice_Number = '{invoice}'""")
@@ -285,11 +295,11 @@ def more_details(invoice,date):
             break
     
     
-def daily_profit():
+def daily_profit(days):
     """This function plots daily profit"""
-    cursor.execute("""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
+    cursor.execute(f"""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
     GROUP BY PURCHASE_DATE 
-    ORDER BY PURCHASE_DATE DESC LIMIT 7""")
+    ORDER BY PURCHASE_DATE DESC LIMIT {days}""")
     prof_day = cursor.fetchall()
     dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
     amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
@@ -301,21 +311,10 @@ def daily_profit():
     plt.title('Daily Profit (Last 7 days)')
     plt.ylabel('Profit in rupees')
     plt.xlabel('Date')
+    plt.grid()
     plt.show()
-def monthly():
+def monthly(year1,year2):
     """This function plots monthly sale"""
-    #months_1 = Counter({'January': 0, 'February': 0, 'March': 0, 'April': 0, 'May': 0, 'June': 0,
-    #     'July': 0,'August': 0, 'September': 0, 'October': 0, 'November': 0, 'December': 0})
-    cursor.execute("SELECT DISTINCT YEAR(Purchase_Date) FROM PURCHASE;")
-    years = cursor.fetchall()
-    print(years)
-    try:
-        years.remove((2022,))
-    except ValueError: pass
-    year1 = max(years)[0]
-    years.remove(max(years))
-    year2 = max(years)[0]
-    #print(year1,year2)
     cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M'), sum(Product_tot_cost)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year1}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
@@ -324,7 +323,7 @@ def monthly():
     profit_1 = [i[1] for i in year_1data]
     x_axis = np.arange(len(months))
     width = 0.4
-    plt.bar(x_axis,profit_1,width=width,label = year1)
+    plt.bar(x_axis,profit_1,width=width,label = year1,align = 'center')
     
     cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(Product_tot_cost)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year2}
@@ -335,6 +334,9 @@ def monthly():
     plt.bar(x_axis+width,profit2,width=width,label = year2)
     plt.legend()
     plt.xticks(ticks = x_axis,labels=months,rotation = 45)
+    plt.xlabel("Month")
+    plt.ylabel("Profit")
+    plt.grid()
     plt.show()
 def categ_chart():
     """This function plots the categorical popularity chart"""
@@ -349,7 +351,6 @@ def categ_chart():
         wedgeprops={'edgecolor':'black'})
     plt.show()
 
-
 def brand_item():
     """This function plots brand popularity graph"""
     cursor.execute("""select sum(quantity_purchased), product_brand from purchase
@@ -359,7 +360,8 @@ def brand_item():
     brand_name = [sold_data[i][1] for i in range(len(sold_data))] #x-axis
     plt.barh(brand_name,no_item)
     plt.tight_layout()
-    plt.grid()
+    plt.ylabel("Brand Name")
+    plt.xlabel("Quantity Purchased")
     plt.show()
 
 if __name__=='__main__':
