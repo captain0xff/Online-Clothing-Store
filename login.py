@@ -4,6 +4,7 @@ import PySimpleGUI as sg
 import sys
 import warnings
 import mysql.connector as sqltor
+from mysql.connector.locales.eng import client_error
 import time
 import os
 
@@ -117,40 +118,26 @@ def Employee_sign_in_menu():
     # password_char parameter masks the given password with *
     window = sg.Window("Login - Employee", layout)
     option_choosen = None
-    while True:
+    rng=True
+    while rng:
         event, values = window.read()
         # values variable points at a dictionary with id, uname and password
         if event == sg.WIN_CLOSED:
-            break
+            rng=False
         if event == "Go Back":
             option_choosen = 2
-            break
+            rng=False
         elif event == "Login":
             if values["id"] and values["uname"] and values["password"]:
-                if values["id"][-1] in "0123456789":
-                    cursor.execute(
-                        "SELECT * FROM EMPLOYEES WHERE ID = %d;" % (int(values["id"]))
-                    )
-                    data = cursor.fetchall()
-                    print(data)
-                    if data:
-                        # Checks if an employee with the given credentials exists of not
-                        if (
-                            data[0][2] == values["uname"]
-                            and data[0][3] == values["password"]
-                        ):
-                            option_choosen = 1
-                            break
-                    msg.update(
-                        value="Invalid employee ID, username or password...",
-                        text_color="red",
-                    )
-                    print("\a")
+                cmd="Select * from employees"
+                cursor.execute(cmd)
+                data=cursor.fetchall()
+                for i in data:
+                    if str(i[0])==values['id'] and i[2]==values['uname'] and i[3]==values['password']:
+                        option_choosen=1
+                        rng=False
                 else:
-                    msg.update(
-                        "Please enter positive integer in employee ID...",
-                        text_color="red",
-                    )
+                    msg.update(value='Invalid employee id, user, password',text_color='red')
                     print("\a")
             else:
                 # If the user doesn't input any ID and clicks Login
@@ -160,7 +147,7 @@ def Employee_sign_in_menu():
     window.close()
 
     if option_choosen == 1:
-        employee_func.Main()
+        employee_func.main()
     elif option_choosen == 2:
         Main_menu()
 
