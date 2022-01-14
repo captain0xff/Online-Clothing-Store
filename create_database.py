@@ -55,14 +55,14 @@ sql_purchase = """create table PURCHASE(
     Invoice_Number varchar(15) not null,
     Customer_Email varchar(200),
     Product_ID INT REFERENCES PRODUCTS(ID),
-    Product_Name VARCHAR(50) REFERENCES PRODUCTS(NAME),
-    Product_Brand VARCHAR(50) REFERENCES PRODUCTS(Brand),
-    Product_Size VARCHAR(4) REFERENCES PRODUCTS(Size),
-    Product_Category VARCHAR(5) REFERENCES PRODUCTS(Category),
+    Product_Name VARCHAR(50),
+    Product_Brand VARCHAR(50),
+    Product_Size VARCHAR(4),
+    Product_Category VARCHAR(5),
     Quantity_Purchased INTEGER,
     Product_tot_cost decimal(8,2),
     Purchase_Date date,
-    foreign key(Customer_Email) references CUSTOMERS(EMAIL_ID))"""
+    foreign key(Customer_Email) references CUSTOMERS(Email_ID))"""
 
 """INVOICE-NUMBER   EMAIL-ID   PRODUCT-ID     NAME   BRAND    SIZE   QUANTITY    CATEGORY    COST    PURCHASE-DATE 
 """
@@ -83,7 +83,7 @@ sample_data.generate_customer()
 print("Data of Customers added...")
 
 
-cursor.execute('''insert into products
+cursor.execute('''insert into PRODUCTS
 values('1','Jeans','Wrangler','XL','23','425.23','699.56','Men'),
 ('2','Shirt','Peter England','L','56','256.25','352.23','Women'),
 ('3','T Shirt','Lewis','S','15','230.50','299.99','Men'),
@@ -120,7 +120,7 @@ print('Products added...')
 
 mycon.commit()
 
-sample_data.generate_purchase(2018)
+sample_data.generate_purchase(2020)
 
 mycon.close()
 print('Successful!!!')
