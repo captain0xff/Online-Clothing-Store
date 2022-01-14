@@ -24,8 +24,8 @@ def main(emp = ''):
     cursor.execute("select DISTINCT YEAR(Purchase_Date) from purchase order by year(purchase_date)")
     year = cursor.fetchall()
     stats = [[sg.Text('Finance',font = f)],
-            [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = '7',values =
-        [str(i) for i in range(1,31)],key = 'daily_profit',readonly = True,size=(7,1)),sg.Button('GO',k='Go1')],
+            [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),sg.Input('Final Date',key='Calendar_Date',size=(10,None)),sg.CalendarButton('Choose Date',close_when_date_chosen=True,title='Choose Date',format='%Y-%m-%d'),sg.Combo(default_value = '7',values =
+        [str(i) for i in range(7,31)],key = 'daily_profit',readonly = True,size=(7,1)),sg.Button('GO',k='Go1')],
         [sg.Text('Monthly Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = year[-1],values = year,k = 'y1m',readonly = True),
         sg.Combo(default_value = year[-2],values = year,key = 'y2m',readonly = True),sg.Button('GO',k='Go2')],
         [sg.Text('Revenue Generated per Category',font = ('Arial',13))],
@@ -129,7 +129,7 @@ def main(emp = ''):
             win['show'].update(disabled = False)
         if event == 'Go1':
             print(value['daily_profit'])
-            daily_profit(value['daily_profit'])
+            daily_profit(value['daily_profit'],value['Calendar_Date'])
             
         elif event == 'Go2':
             year1 = value['y1m'][0]
@@ -322,11 +322,11 @@ def more_details(invoice,date):
             break
     
     
-def daily_profit(days):
+def daily_profit(days,date):
     """This function plots daily profit"""
-    cursor.execute(f"""SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
-    GROUP BY PURCHASE_DATE 
-    ORDER BY PURCHASE_DATE DESC LIMIT {days}""")
+    cursor.execute(f""" SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
+    WHERE PURCHASE_DATE BETWEEN DATE_SUB('{date}', INTERVAL {str(int(days)-1)} DAY) AND '{date}'
+    GROUP BY PURCHASE_DATE""")
     prof_day = cursor.fetchall()
     dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
     amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
@@ -335,7 +335,7 @@ def daily_profit(days):
     plt.gcf().autofmt_xdate()
     date_format = mpl_dates.DateFormatter('%b, %d %Y')
     plt.gca().xaxis.set_major_formatter(date_format)
-    plt.title('Daily Profit (Last 7 days)')
+    plt.title(f'Daily Profit (Last {days} days)')
     plt.ylabel('Profit in rupees')
     plt.xlabel('Date')
     plt.grid()
