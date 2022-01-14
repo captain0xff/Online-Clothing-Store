@@ -1,5 +1,8 @@
 """This module will be used for functionalities of the employee"""
+import matplotlib.pyplot as plt
+import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
+import numpy as np
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
 
@@ -10,12 +13,6 @@ for i in range(len(data)):
     data[i]=data[i][:-1]
 mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
 cursor = mycon.cursor()
-
-def load_matplotlib():
-    import matplotlib.pyplot as plt
-    import matplotlib.dates as mpl_dates
-    import numpy as np
-
 def main(emp = ''):
     """This Function is responsible for the display of Employee Screen"""
     global data
@@ -24,7 +21,7 @@ def main(emp = ''):
     font = ("Arial", 11)
     stck_data = display_stock()
     f = ("Arial",15)
-    cursor.execute("select DISTINCT YEAR(Purchase_Date) from PURCHASE order by year(Purchase_Date)")
+    cursor.execute("select DISTINCT YEAR(Purchase_Date) from purchase order by year(purchase_date)")
     year = cursor.fetchall()
     stats = [[sg.Text('Finance',font = f)],
             [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = '7',values =
@@ -104,8 +101,8 @@ def main(emp = ''):
             win['name'].update('')
             win['mob'].update('')
         if event=='name' and value:
-            query = """Select Name,Phone_Number,Email_ID,Total_Price from CUSTOMERS
-            where name like '{}%' and Email_ID like '{}%' and Phone_Number like '{}%'
+            query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
+            where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
             """.format(value['name'],value['email'],value['mob'])
             cursor.execute(query)
             data =  cursor.fetchall()

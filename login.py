@@ -129,10 +129,9 @@ def Employee_sign_in_menu():
             rng=False
         elif event == "Login":
             if values["id"] and values["uname"] and values["password"]:
-                cmd="Select * from EMPLOYEES"
+                cmd="Select * from employees"
                 cursor.execute(cmd)
                 data=cursor.fetchall()
-                print(data)
                 for i in data:
                     if str(i[0])==values['id'] and i[2]==values['uname'] and i[3]==values['password']:
                         option_choosen=1
@@ -148,10 +147,6 @@ def Employee_sign_in_menu():
     window.close()
 
     if option_choosen == 1:
-        try:
-            employee_func.load_matplotlib()
-        except:
-            warnings.warn("Couldn't load matplotlib.",ImportWarning)
         employee_func.main()
     elif option_choosen == 2:
         Main_menu()
