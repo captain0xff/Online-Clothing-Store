@@ -1,4 +1,4 @@
 localhost
-root
-##11001_110@dump
+sayantan
+sayantan@sql
 denim_destination_db
