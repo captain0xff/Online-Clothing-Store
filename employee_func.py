@@ -5,7 +5,6 @@ import PySimpleGUI as sg
 import numpy as np
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
-from mysql.connector.locales.eng import client_error
 
 file=open('settings.txt')
 data=file.readlines()
@@ -27,9 +26,14 @@ def main(emp = ''):
     stats = [[sg.Text('Finance',font = f)],
             [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = '7',values =
         [str(i) for i in range(1,31)],key = 'daily_profit',readonly = True,size=(7,1)),sg.Button('GO',k='Go1')],
-        [sg.Text('Monthly Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = year[-1],values = year,k = 'y1'),
-        sg.Combo(default_value = year[-2],values = year,key = 'y2'),sg.Button('GO',k='Go2')],
-        [sg.Button('Popularity of Categories',key = 'cat_pie')],
+        [sg.Text('Monthly Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = year[-1],values = year,k = 'y1m',readonly = True),
+        sg.Combo(default_value = year[-2],values = year,key = 'y2m',readonly = True),sg.Button('GO',k='Go2')],
+        [sg.Text('Revenue Generated per Category',font = ('Arial',13))],
+        [sg.Combo(default_value = '-',values = ['Trend','Comparision'],readonly = True,enable_events=True,key='Cat_rev'),
+        sg.Combo(default_value = year[-1],values = year,k = 'year1',readonly = True,disabled = True),
+        sg.Combo(default_value = year[-1],values = year,k = 'year2',readonly = True,disabled = True),
+        sg.Button('Go',key = 'Go3',disabled=True)],
+        [sg.Button('Total Items sold per Brand', key = 'item_sold')],
         [sg.Button('Total Items sold per Brand', key = 'item_sold')]]
     customer_det = cust_details()
     layout = [
@@ -125,12 +129,20 @@ def main(emp = ''):
             daily_profit(value['daily_profit'])
             
         elif event == 'Go2':
-            year1 = value['y1'][0]
-            year2 = value['y2'][0]
+            year1 = value['y1m'][0]
+            year2 = value['y2m'][0]
             monthly(year1,year2)
             #print(year1,year2)
-        elif event == 'cat_pie':
-            categ_chart()
+        if event == 'Cat_rev' and value['Cat_rev'] == 'Trend':
+            win['year1'].update(disabled = True)
+            win['year2'].update(disabled=False)
+            win['Go3'].update(disabled = False)
+        if event == 'Cat_rev' and value['Cat_rev'] == 'Comparision':
+            win['year1'].update(disabled = False)
+            win['year2'].update(disabled=False)
+            win['Go3'].update(disabled = False)
+        if event == 'Go3' and value['Cat_rev'] == 'Comparision':
+            categ_rev_comp(value['year1'][0],value['year2'][0])
         elif event == 'item_sold':
             brand_item()
 def display_stock():
@@ -341,6 +353,21 @@ def monthly(year1,year2):
 def categ_chart():
     """This function plots the categorical popularity chart"""
     cursor.execute("""select sum(quantity_purchased), product_category from purchase
+        group by product_category;""")
+    cat_data = cursor.fetchall()
+    #print(cat_data)
+    sale_data = [cat_data[i][0] for i in range(len(cat_data))]
+    label = [cat_data[i][1] for i in range(len(cat_data))]
+    print(sale_data,label)
+    plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',
+        wedgeprops={'edgecolor':'black'})
+    plt.show()
+
+def categ_rev_comp(year1,year2):
+    y1 = min(year1,year2)
+    y2 = max(year1,year2)
+    cursor.execute(f"""select sum(product_tot_cost), product_category from purchase
+        where year(purchase_date) between {y1} and {y2}
         group by product_category;""")
     cat_data = cursor.fetchall()
     #print(cat_data)
