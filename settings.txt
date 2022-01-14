@@ -1,4 +1,0 @@
-localhost
-root
-##11001_110@dump
-denim_destination_db
