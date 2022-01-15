@@ -88,6 +88,17 @@ def Main(email):
             if event1=='Buy':
                 confirm = sg.popup_yes_no('Are you sure you want to buy these products?')
                 if confirm == 'Yes':
+                    final_data = list(cartData1)
+                    print(final_data)
+                    for i in final_data:
+                        idNow = i[0]
+                        print(idNow)
+                        cursor.execute(f'SELECT Cost_Price FROM PRODUCTS WHERE ID = {idNow}')
+                        priceNow = cursor.fetchone()[0]
+                        profit = round(float(i[6]-priceNow*i[5]), 2)
+                        i.append(profit)
+                    print(final_data)
+
                     for i in cartData1:
                         id1 = i[0]
                         cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %id1)
@@ -114,15 +125,7 @@ def Main(email):
                     query = """INSERT INTO PURCHASE
                     VALUES(%s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s)
                     """
-                    final_data = cartData1
-                    print(final_data)
-                    for i in final_data:
-                        idNow = i[0]
-                        cursor.execute(f'SELECT Cost_Price FROM PRODUCTS WHERE ID = {idNow}')
-                        priceNow = cursor.fetchone()[0]
-                        profit = round(float(i[6]-priceNow*i[5]), 2)
-                        i.append(profit)
-                    print(final_data)
+
                     #modifying list final_data as per the format of purchase table in sql
                     for i in range(len(final_data)): 
                         final_data[i].insert(0,inv_num) #Inserted Invoice number in  index 0
