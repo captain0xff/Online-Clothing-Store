@@ -17,9 +17,12 @@ def generate_customer():
     data=file.readlines()
     file.close()
     customer_dict={}
+    cmd='''SELECT Phone_Number FROM CUSTOMERS'''
+    cursor.execute(cmd)
+    phone_numbers=[i[0] for i in cursor.fetchall()]
     for i in data:
         name=i[:-1]
-        phone_number=9876575438
+        phone_number=generate_phone_number(phone_numbers)
         email_id=i[:-1].replace(' ','')+'@gmail.com'
         password=i[:-1].replace(' ','$')
         price=0.0
@@ -30,7 +33,7 @@ def generate_customer():
         cursor.execute(cmd)
         mycon.commit()
 
-def generate_purchase(y):
+def  generate_purchase(y):
     file=open('settings.txt')
     data=file.readlines()
     file.close()
@@ -108,6 +111,15 @@ def get_date(y,m,d):
     if len(ds)==1:
         ds='0'+ds
     return '{year}-{month}-{day}'.format(year=ys,month=ms,day=ds),ys+ms+ds,y,m,d
+
+def generate_phone_number(phone_numbers):
+    phone_number='9876354782'
+    while phone_number in phone_numbers:
+        phone_number=f'{rm.randint(7,9)}'
+        for i in range(9):
+            phone_number+=str(rm.randint(0,9))
+    phone_numbers.append(phone_number)
+    return phone_number
 
 if __name__ == '__main__':
     print('This file is not meant to to run alone. Run login.py or create_database.py')

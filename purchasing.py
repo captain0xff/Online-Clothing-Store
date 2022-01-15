@@ -214,6 +214,23 @@ def Main(email):
                     print(cmd)
                     cursor.execute(cmd)
                     data=cursor.fetchall()
+                    for i in range(len(data)):
+                        data[i] = list(data[i])
+                    cartContents={}
+                    for i in cartDict:
+                        cartContents[i[0]]=cartDict[i][0]
+                    product_data=[]
+                    for i in data:
+                        product_data.append(i[0])
+                    for i in cartContents:
+                        if i in product_data:
+                            index=product_data.index(i)
+                            new_quantity=int(data[index][5])-cartContents[i]
+                            if new_quantity:
+                                data[index][5]=str(new_quantity)
+                            else:
+                                data.pop(index)
+
                     if data:
                         window2.close()
                         return data
@@ -253,7 +270,8 @@ def Main(email):
     searchFlag = False
     while True:
         event, values = window.read()
-        print(event, values)
+        #print(event, values)
+        print(cartDict)
         #print(data)
         if event in (None, 'Exit'):
             print('Line 261')
@@ -308,18 +326,14 @@ def Main(email):
                 spin.update(disabled = True)
 
         if event=='FL':
-            if cartDict:
-                msg.update('Cart is not empty...')
-                print('\a')
-            else:
-                window.Disable()
-                filtered_data=filter_menu(data)
-                window.Enable()
-                window.Hide()
-                window.UnHide()
-                if filtered_data:
-                    data=filtered_data
-                    table.update(data)
+            window.Disable()
+            filtered_data=filter_menu(data)
+            window.Enable()
+            window.Hide()
+            window.UnHide()
+            if filtered_data:
+                data=filtered_data
+                table.update(data)
 
 
         if event =='Add to Cart' and flag:
@@ -378,10 +392,8 @@ def Main(email):
             filterBtn.update(disabled = False)
         else:
             gtcButton.update(disabled=False)
-            filterBtn.update(disabled=True)
 
         if event == 'Go to Cart' and len(cartDict)!=0:
-            filterBtn.update(disabled = True)
             cartDataFinal = []
             #print(cartDict)
             for i in cartDict:
