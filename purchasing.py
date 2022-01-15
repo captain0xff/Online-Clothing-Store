@@ -112,15 +112,22 @@ def Main(email):
                     
                     #print(query)
                     query = """INSERT INTO PURCHASE
-                    VALUES(%s, %s, %s,%s,%s,%s,%s,%s,%s,%s)
+                    VALUES(%s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s)
                     """
                     final_data = cartData1
-
+                    print(final_data)
+                    for i in final_data:
+                        idNow = i[0]
+                        cursor.execute(f'SELECT Cost_Price FROM PRODUCTS WHERE ID = {idNow}')
+                        priceNow = cursor.fetchone()[0]
+                        profit = round(float(i[6]-priceNow*i[5]), 2)
+                        i.append(profit)
+                    print(final_data)
                     #modifying list final_data as per the format of purchase table in sql
                     for i in range(len(final_data)): 
                         final_data[i].insert(0,inv_num) #Inserted Invoice number in  index 0
                         final_data[i].insert(1,email) #Inserted cust email in index 1
-                        final_data[i].append(pur_date) #Inserted purchase date in last
+                        final_data[i].insert(9,pur_date) #Inserted purchase date in last
                     cursor.executemany(query,final_data)
                     cursor.execute(f"SELECT Total_Price FROM CUSTOMERS WHERE Email_ID = '{email}'")
                     pri = cursor.fetchone()[0]
