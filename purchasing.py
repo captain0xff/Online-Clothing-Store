@@ -234,7 +234,7 @@ def Main(email):
                             index=product_data.index(i)
                             new_quantity=int(data[index][5])-cartContents[i]
                             if new_quantity:
-                                data[index][5]=str(new_quantity)
+                                data[index][5]=new_quantity
                             else:
                                 data.pop(index)
 
@@ -308,6 +308,7 @@ def Main(email):
                 dataUsing = data
             #print(dataUsing)
             idSelected = values['-TABLE1-'][0]
+            print(idSelected)
             prod=str(dataUsing[idSelected][0])
             inp.update(prod)
             quantity1 = dataUsing[idSelected][5]
@@ -343,6 +344,7 @@ def Main(email):
             if filtered_data:
                 data=filtered_data
                 table.update(data)
+            search.update('')
 
 
         if event =='Add to Cart' and flag:
