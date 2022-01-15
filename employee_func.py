@@ -24,7 +24,10 @@ def main(emp = ''):
     cursor.execute("select DISTINCT YEAR(Purchase_Date) from purchase order by year(purchase_date)")
     year = cursor.fetchall()
     stats = [[sg.Text('Finance',font = f)],
-            [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),sg.Input('Final Date',key='Calendar_Date',size=(10,None)),sg.CalendarButton('Choose Date',close_when_date_chosen=True,title='Choose Date',format='%Y-%m-%d'),sg.Combo(default_value = '7',values =
+            [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),
+            sg.CalendarButton('Choose Date',close_when_date_chosen=True,title='Choose Date',format='%Y-%m-%d'),
+            sg.Input('Final Date',key='Calendar_Date',size=(10,None),readonly = True),
+            sg.Combo(default_value = '7',values =
         [str(i) for i in range(7,31)],key = 'daily_profit',readonly = True,size=(7,1)),sg.Button('GO',k='Go1')],
         [sg.Text('Monthly Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = year[-1],values = year,k = 'y1m',readonly = True),
         sg.Combo(default_value = year[-2],values = year,key = 'y2m',readonly = True),sg.Button('GO',k='Go2')],
@@ -146,6 +149,8 @@ def main(emp = ''):
             win['Go3'].update(disabled = False)
         if event == 'Go3' and value['Cat_rev'] == 'Comparision':
             categ_rev_comp(value['year1'][0],value['year2'][0])
+        if event == 'Go3' and value['Cat_rev'] == 'Trend':
+            categ_rev_trend(value['year2'][0])
         if event == 'item_sold':
             brand_item()
         if event == 'Brand_rev' and value['Brand_rev'] == 'Comparision':
@@ -365,7 +370,7 @@ def monthly(year1,year2):
     plt.ylabel("Profit")
     plt.grid()
     figManager = plt.get_current_fig_manager()
-    figManager.window.state('zoomed')
+    figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
 def categ_chart():
     """This function plots the categorical popularity chart"""
@@ -408,6 +413,23 @@ def categ_rev_trend(year):
     where year(purchase_date) = {year} and product_category = 'Kids' 
     group by monthname(purchase_date)""")
     kid = cursor.fetchall()
+    print(1,men)
+    x_axis = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    men_y = []
+    women_y = []
+    kid_y = []
+    for i in range(12):
+        men_y.append(men[i][0])
+        women_y.append(women[i][0])
+        kid_y.append(kid[i][0])
+    #print(men_y,len(men_y))
+    plt.plot(x_axis,men_y,label = 'Men')
+    plt.plot(x_axis,women_y,label ='Women')
+    plt.plot(x_axis,kid_y,label = 'Kids')
+    figManager = plt.get_current_fig_manager()
+    figManager.window.state('zoomed') #For opening window in maximised screen
+    plt.legend()
+    plt.show()
 
 def brand_rev_comp(year1,year2):
     pass
