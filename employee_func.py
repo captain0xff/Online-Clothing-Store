@@ -342,7 +342,7 @@ def daily_profit(days,date):
     plt.show()
 def monthly(year1,year2):
     """This function plots monthly sale"""
-    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M'), sum(Product_tot_cost)
+    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M'), sum(PURCHASE_PROFIT)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year1}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_1data = cursor.fetchall()
@@ -352,7 +352,7 @@ def monthly(year1,year2):
     width = 0.4
     plt.bar(x_axis,profit_1,width=width,label = year1,align = 'center')
     
-    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(Product_tot_cost)
+    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(PURCHASE_PROFIT)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year2}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_2data = cursor.fetchall()
@@ -383,7 +383,7 @@ def categ_chart():
 def categ_rev_comp(year1,year2):
     y1 = min(year1,year2)
     y2 = max(year1,year2)
-    cursor.execute(f"""select sum(product_tot_cost), product_category from purchase
+    cursor.execute(f"""select sum(PURCHASE_PROFIT), product_category from purchase
         where year(purchase_date) between {y1} and {y2}
         group by product_category;""")
     cat_data = cursor.fetchall()
@@ -396,15 +396,15 @@ def categ_rev_comp(year1,year2):
     plt.show()
 
 def categ_rev_trend(year):
-    cursor.execute(f"""select sum(product_tot_cost), monthname(purchase_date) from purchase 
+    cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
     where year(purchase_date) = {year} and product_category = 'Men' 
     group by monthname(purchase_date)""")
     men = cursor.fetchall()
-    cursor.execute(f"""select sum(product_tot_cost), monthname(purchase_date) from purchase 
+    cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
     where year(purchase_date) = {year} and product_category = 'Women' 
     group by monthname(purchase_date)""")
     women = cursor.fetchall()
-    cursor.execute(f"""select sum(product_tot_cost), monthname(purchase_date) from purchase 
+    cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
     where year(purchase_date) = {year} and product_category = 'Kids' 
     group by monthname(purchase_date)""")
     kid = cursor.fetchall()
