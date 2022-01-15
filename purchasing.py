@@ -301,6 +301,7 @@ def Main(email):
             atcButton.update(disabled = True)
 
         if event=='-TABLE1-' and values['-TABLE1-'] != []:
+            spin.update(1)
             if searchFlag:
                 dataUsing = new_data
             else:
@@ -316,6 +317,7 @@ def Main(email):
 
         if event=='-IN-' and values['-IN-']!='':
             #atcButton.update(disabled=True)
+            spin.update(1)
             flag = False
             if values['-IN-'].isdigit():
                 idSelected = int(values['-IN-'])
