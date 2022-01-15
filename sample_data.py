@@ -61,7 +61,7 @@ def  generate_purchase(y):
     invoice_num=0
     date,invoice_date,year,month,day=get_date(year,month,day)
     while date!=current_date:
-        for i in range(rm.randint(1,50)):
+        for i in range(rm.randint(1,5)):
             invoice_num+=1
             invoice_str=(7-(len(str(invoice_num))))*'0'+str(invoice_num)
             full_invoice=invoice_date+invoice_str
@@ -69,11 +69,12 @@ def  generate_purchase(y):
             product_bought=rm.choice(products)
             quantity=rm.randint(1,5)
             total_price=quantity*product_bought[6]
+            profit=quantity*(product_bought[6]-product_bought[5])
             if customer_email in customer_sale_dict:
                 customer_sale_dict[customer_email]+=total_price
             else:
                 customer_sale_dict[customer_email]=total_price
-            purchases.append((full_invoice,customer_email,product_bought[0],product_bought[1],product_bought[2],product_bought[3],product_bought[7],quantity,round(float(total_price),2),date))
+            purchases.append((full_invoice,customer_email,product_bought[0],product_bought[1],product_bought[2],product_bought[3],product_bought[7],quantity,round(float(total_price),2),date,round(float(profit),2)))
         invoice_num=0
         day+=1
         date,invoice_date,year,month,day=get_date(year,month,day)

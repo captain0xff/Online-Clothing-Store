@@ -324,7 +324,7 @@ def more_details(invoice,date):
     
 def daily_profit(days,date):
     """This function plots daily profit"""
-    cursor.execute(f""" SELECT PURCHASE_DATE,SUM(PRODUCT_TOT_COST) FROM PURCHASE
+    cursor.execute(f""" SELECT PURCHASE_DATE,SUM(PURCHASE_PROFIT) FROM PURCHASE
     WHERE PURCHASE_DATE BETWEEN DATE_SUB('{date}', INTERVAL {str(int(days)-1)} DAY) AND '{date}'
     GROUP BY PURCHASE_DATE""")
     prof_day = cursor.fetchall()
