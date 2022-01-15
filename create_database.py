@@ -62,6 +62,7 @@ sql_purchase = """create table PURCHASE(
     Quantity_Purchased INTEGER,
     Product_tot_cost decimal(8,2),
     Purchase_Date date,
+    Purchase_profit decimal(8,2),
     foreign key(Customer_Email) references CUSTOMERS(Email_ID))"""
 
 """INVOICE-NUMBER   EMAIL-ID   PRODUCT-ID     NAME   BRAND    SIZE   QUANTITY    CATEGORY    COST    PURCHASE-DATE 
@@ -120,7 +121,7 @@ print('Products added...')
 
 mycon.commit()
 
-sample_data.generate_purchase(2020)
+#sample_data.generate_purchase(2020)
 
 mycon.close()
 print('Successful!!!')
