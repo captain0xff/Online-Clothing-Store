@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 import mysql.connector as sqltor
 from mysql.connector.locales.eng import client_error
 from datetime import date
+import employee_func as ef
 
 file=open('settings.txt')
 data=file.readlines()
@@ -252,10 +253,37 @@ def Main(email):
                     print('\a')
         window2.close()
     def ord_hist(mail):
-        cursor.execute(f""""SELECT Product_Name, Product_Brand, Quantity_Purchased,Product_tot_cost FROM PURCHASE
-        WHERE Customer_Email = {mail} """)
-        
+        cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
+        WHERE CUSTOMER_EMAIL = '{mail}'
+        GROUP BY INVOICE_NUMBER""")
+        purchase_data = cursor.fetchall()
+        print(1,purchase_data)
+        heading = ['Invoice Number',  'Purchase date','Total Cost']
+        if not purchase_data:
+            sg.popup('NO DATA FOUND')
+        else:
+            table = sg.Table(purchase_data,headings=heading,key='pur_table',enable_events=True)
+            layout = [
+            [table],
+            [sg.Button('Exit',key = 'Exit'),sg.Button('Show More',disabled = True,key='show_more')]
+            ]
+            win = sg.Window(f'{mail}',layout)
+            while True:
+                event1,value = win.read()  #Extracting only event
+                #print(event1, value)
+                if event1  in ('Exit',None):
+                    win.close()
+                    break
+                if event1 == 'pur_table' and value['pur_table'] != []:
+                    win['show_more'].update(disabled=False)
+                if event1 == 'show_more' and value['pur_table'] != []:
+                    ind_select = value['pur_table'][0]
+                    inv_num = purchase_data[ind_select][0]
+                    date = purchase_data[ind_select][1]
+                    ef.more_details(inv_num,date)
+
         pass
+    
     global price, cartData, cartDict, data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
@@ -290,10 +318,10 @@ def Main(email):
         print(cartDict)
         #print(data)
         if event in (None, 'Exit'):
-            print('Line 261')
             break
         if event == 'order_history':
-            pass
+            ord_hist(email)
+            #ef.show_detais()
         if event=='SB':
             new_data=[]
             """cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
