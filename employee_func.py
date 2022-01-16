@@ -60,10 +60,11 @@ def main(emp = ''):
     win = sg.Window('Welcome',layout)
     while True:
         event,value = win.read()
-        #print(event,value)
+        print(event,value)
         if event in (None, 'Exit'):
             break
         if event == 'show':
+            print(data[value['cust_Table'][0]])
             show_details(data[value['cust_Table'][0]])
         if event == 'Add':
             add_stock()
@@ -290,12 +291,13 @@ def cust_details():
 
 def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
     """This function shows the details of the customer"""
-    heading = ['Invoice Number', 'Total Cost', 'Purchase date']
+    print(dat)
+    heading = ['Invoice Number',  'Purchase date','Total Cost']
     cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
     WHERE CUSTOMER_EMAIL = '{dat[2]}'
     GROUP BY INVOICE_NUMBER""")
     purchase_data = cursor.fetchall()
-    print(1,purchase_data)
+    #print(1,purchase_data)
     if not purchase_data:
         sg.popup('NO DATA FOUND')
     
@@ -312,7 +314,7 @@ def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
         win = sg.Window(f'{dat[2]}',layout)
         while True:
             event1,value = win.read()  #Extracting only event
-            print(event1, value)
+            #print(event1, value)
             if event1  in ('Exit',None):
                 win.close()
                 break
