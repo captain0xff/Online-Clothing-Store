@@ -251,6 +251,11 @@ def Main(email):
                     txt.update('No category or brand selected',text_color='red')
                     print('\a')
         window2.close()
+    def ord_hist(mail):
+        cursor.execute(f""""SELECT Product_Name, Product_Brand, Quantity_Purchased,Product_tot_cost FROM PURCHASE
+        WHERE Customer_Email = {mail} """)
+        
+        pass
     global price, cartData, cartDict, data
     sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
@@ -262,7 +267,8 @@ def Main(email):
     gtcButton = sg.Button('Go to Cart', disabled = True)
     search=sg.Input(key='SB',enable_events=True)
     filterBtn = sg.Btn('Filters',key='FL')
-    layout = [[sg.Text('Search'),search, filterBtn],
+    ord_button = sg.Button('Order History',key = 'order_history')
+    layout = [[sg.Text('Search'),search, filterBtn,ord_button],
               [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
@@ -286,6 +292,8 @@ def Main(email):
         if event in (None, 'Exit'):
             print('Line 261')
             break
+        if event == 'order_history':
+            pass
         if event=='SB':
             new_data=[]
             """cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
