@@ -388,18 +388,6 @@ def monthly(year1,year2):
     figManager = plt.get_current_fig_manager()
     figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
-def categ_chart():
-    """This function plots the categorical popularity chart"""
-    cursor.execute("""select sum(quantity_purchased), product_category from purchase
-        group by product_category;""")
-    cat_data = cursor.fetchall()
-    #print(cat_data)
-    sale_data = [cat_data[i][0] for i in range(len(cat_data))]
-    label = [cat_data[i][1] for i in range(len(cat_data))]
-    print(sale_data,label)
-    plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',
-        wedgeprops={'edgecolor':'black'})
-    plt.show()
 
 def categ_rev_comp(year1,year2):
     y1 = min(year1,year2)
@@ -415,7 +403,6 @@ def categ_rev_comp(year1,year2):
     plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',
         wedgeprops={'edgecolor':'black'})
     plt.show()
-
 def categ_rev_trend(year):
     cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
     where year(purchase_date) = {year} and product_category = 'Men' 
