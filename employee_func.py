@@ -23,6 +23,9 @@ def main(emp = ''):
     f = ("Arial",15)
     cursor.execute("select DISTINCT YEAR(Purchase_Date) from purchase order by year(purchase_date)")
     year = cursor.fetchall()
+    cursor.execute("SELECT DISTINCT Product_Brand FROM PURCHASE")
+    brand = cursor.fetchall()
+    brand = [i[0] for i in brand]
     stats = [[sg.Text('Finance',font = f)],
             [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),
              sg.Input('Final Date', key='Calendar_Date', size=(10, None), readonly=True, disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black'),
@@ -40,7 +43,10 @@ def main(emp = ''):
         [sg.Combo(default_value = '-',values = ['Trend','Comparision'],readonly = True,enable_events=True,key='Brand_rev'),
         sg.Combo(default_value = year[-1],values = year,k = 'year1_b',readonly = True,disabled = True),
         sg.Combo(default_value = year[-1],values = year,k = 'year2_b',readonly = True,disabled = True),
-        sg.Button('Go',key = 'Go_b',disabled=True)]]
+        sg.Button('Go',key = 'Go_b',disabled=True)],
+        [sg.Col([[sg.Combo(values = brand,readonly = True,visible = False,key='b1')]]),
+        sg.Col([[sg.Combo(values = brand,readonly = True,visible = False,key='b2')]]),
+        sg.Col([[sg.Combo(values = brand,readonly = True,visible = False,key='b3')]])]]
     customer_det = cust_details()
     layout = [
         [sg.Text(f"Welcome {emp}",font=font)],
@@ -54,6 +60,7 @@ def main(emp = ''):
     win = sg.Window('Welcome',layout)
     while True:
         event,value = win.read()
+        #print(event,value)
         if event in (None, 'Exit'):
             break
         if event == 'show':
@@ -151,20 +158,29 @@ def main(emp = ''):
             categ_rev_comp(value['year1'][0],value['year2'][0])
         if event == 'Go3' and value['Cat_rev'] == 'Trend':
             categ_rev_trend(value['year2'][0])
-        if event == 'item_sold':
-            brand_item()
         if event == 'Brand_rev' and value['Brand_rev'] == 'Comparision':
             win['year1_b'].update(disabled = False)
             win['year2_b'].update(disabled=False)
             win['Go_b'].update(disabled = False)
+            win['b1'].update(visible = False)
+            win['b2'].update(visible =False)
+            win['b3'].update(visible =False)
         elif event == 'Brand_rev' and value['Brand_rev'] == 'Trend':
             win['year1_b'].update(disabled = True)
             win['year2_b'].update(disabled=False)
             win['Go_b'].update(disabled = False)
+            win['b1'].update(visible = True)
+            win['b2'].update(visible =True)
+            win['b3'].update(visible =True)
         if event == 'Go_b' and value['Brand_rev'] == 'Trend':
-            brand_item()
+            b1 = value['b1']
+            b2 = value['b2']
+            b3 = value['b3']
+            #print(b1,b2,b3)
+            #print(value['year1_b'])
+            brand_rev_trend(b1,b2,b3,value['year1_b'][0])
         if event == 'Go_b' and value['Brand_rev'] == 'Comparision':
-            pass
+            brand_rev_comp(value['year1_b'][0],value['year2_b'][0])
 def display_stock():
     """This displays the products"""
     cursor.execute("SELECT * FROM PRODUCTS")
@@ -432,20 +448,50 @@ def categ_rev_trend(year):
     plt.show()
 
 def brand_rev_comp(year1,year2):
-    pass
-def brand_item():
-    """This function plots brand popularity graph"""
-    cursor.execute("""select sum(quantity_purchased), product_brand from purchase
-
-        group by Product_brand;""")
-    sold_data = cursor.fetchall()
-    no_item = [sold_data[i][0] for i in  range(len(sold_data))] #y-axis
-    brand_name = [sold_data[i][1] for i in range(len(sold_data))] #x-axis
-    plt.barh(brand_name,no_item)
-    plt.tight_layout()
-    plt.ylabel("Brand Name")
-    plt.xlabel("Quantity Purchased")
+    y1 = min(year1,year2)
+    y2 = max(year1,year2)
+    cursor.execute(f""" SELECT SUM(PRODUCT_TOT_COST), product_brand FROM PURCHASE
+    where year(purchase_date) between {y1} and {y2}
+    group by product_brand;""")
+    data = cursor.fetchall()
+    brand_names = [i[1] for i in data]
+    sum = [i[0] for i in data]
+    plt.barh(brand_names,sum)
+    for index, value in enumerate(sum):
+        plt.text(value, index,
+             str(round(value)))
+    figManager = plt.get_current_fig_manager()
+    figManager.window.state('zoomed') #For opening window in maximised screen
+    plt.xlabel('Profit in lakhs')
+    plt.ylabel('Brand Name')
+    plt.xticks(range(0,round(max(sum)),100000))
     plt.show()
+def brand_rev_trend(brand1,brand2,brand3,year):
+    """This function plots brand popularity trend"""
+    cursor.execute(f"""select sum(product_tot_cost) from purchase 
+    where product_brand = '{brand1}' and year(purchase_date) = {year} 
+    group by month(purchase_date);""")
+    b1_data = cursor.fetchall()
+
+    cursor.execute(f"""select sum(product_tot_cost) from purchase 
+    where product_brand = '{brand2}' and year(purchase_date) = {year} 
+    group by month(purchase_date);""")
+    b2_data = cursor.fetchall()
+
+    cursor.execute(f"""select sum(product_tot_cost) from purchase 
+    where product_brand = '{brand3}' and year(purchase_date) = {year} 
+    group by month(purchase_date);""")
+    b3_data = cursor.fetchall()
+    print(b1_data)
+    month = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    plt.plot(month,b1_data,label = brand1)
+    plt.plot(month,b2_data,label = brand2)
+    plt.plot(month,b3_data,label = brand3)
+    plt.legend()
+    figManager = plt.get_current_fig_manager()
+    figManager.window.state('zoomed') #For opening window in maximised screen
+    plt.show()
+    
 
 if __name__=='__main__':
     main()
