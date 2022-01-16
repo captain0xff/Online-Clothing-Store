@@ -31,7 +31,7 @@ except sqltor.errors.ProgrammingError:
     layout=[
     [sg.Text('Host',size=(7,None)),sg.Input('localhost',key='H')],
     [sg.Text('User',size=(7,None)),sg.Input('root',key='U')],
-    [sg.Text('Password',size=(7,None)),sg.Input('',key='P')],
+    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='*')],
     [sg.Button('Done',key='DN')]
     ]
     window=sg.Window('Credentials',layout)

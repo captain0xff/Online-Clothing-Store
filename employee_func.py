@@ -25,8 +25,8 @@ def main(emp = ''):
     year = cursor.fetchall()
     stats = [[sg.Text('Finance',font = f)],
             [sg.Text('Daily Profit:',size = (15,1),font = ('Arial',13)),
+             sg.Input('Final Date', key='Calendar_Date', size=(10, None), readonly=True, disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black'),
             sg.CalendarButton('Choose Date',close_when_date_chosen=True,title='Choose Date',format='%Y-%m-%d'),
-            sg.Input('Final Date',key='Calendar_Date',size=(10,None),readonly = True),
             sg.Combo(default_value = '7',values =
         [str(i) for i in range(7,31)],key = 'daily_profit',readonly = True,size=(7,1)),sg.Button('GO',k='Go1')],
         [sg.Text('Monthly Profit:',size = (15,1),font = ('Arial',13)),sg.Combo(default_value = year[-1],values = year,k = 'y1m',readonly = True),
