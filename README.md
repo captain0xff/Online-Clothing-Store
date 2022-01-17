@@ -14,4 +14,5 @@ They can select multiple products and add them to cart and make purchases.
 
 #Synopsis
 https://docs.google.com/document/d/1r9DZN59mxrZVFsoo1HH7hSGWUhkXhKXFZiB1FXE2g64/edit#
+
 Final Project Document: https://docs.google.com/document/d/1_PH93dJUGp8xH5HQFJnCNhAMd-Kpes9gRtX7YGyifTM/edit?usp=sharing (Access to link is restricted to this group only)
