@@ -326,34 +326,41 @@ def Main(email):
             ord_hist(email)
             #ef.show_detais()
         if event=='SB':
-            new_data=[]
-            """cmd='''SELECT ID,Name,Brand,Size,Quantity,Selling_Price 
-                                                FROM PRODUCTS
-                                                WHERE NAME LIKE \'{name}%\'
-                                                '''
-                                                cmd=cmd.format(name=values['SB'])
-                                                cursor.execute(cmd)
-                                                data=cursor.fetchall()"""
+            cmd='''SELECT ID,Name,Brand,Size,Category,Quantity,Selling_Price 
+            FROM PRODUCTS
+            WHERE NAME LIKE \'{name}%\''''
+            cmd=cmd.format(name=values['SB'])
+            cursor.execute(cmd)
+            data=cursor.fetchall()
+            print(data)
+            for i in range(len(data)):
+                data[i] = list(data[i])
+            cartContents={}
+            for i in cartDict:
+                cartContents[i[0]]=cartDict[i][0]
+            product_data=[]
             for i in data:
-                if values['SB'] in i[1]:
-                    new_data.append(i)
-            table.update(new_data)
-            searchFlag = True
+                product_data.append(i[0])
+            for i in cartContents:
+                if i in product_data:
+                    index=product_data.index(i)
+                    new_quantity=int(data[index][5])-cartContents[i]
+                    if new_quantity:
+                        data[index][5]=new_quantity
+                    else:
+                        data.pop(index)
+            table.update(data)
         if values['-TABLE1-']==[] and values['-IN-']=='':
             atcButton.update(disabled = True)
 
         if event=='-TABLE1-' and values['-TABLE1-'] != []:
             spin.update(1)
-            if searchFlag:
-                dataUsing = new_data
-            else:
-                dataUsing = data
-            #print(dataUsing)
             idSelected = values['-TABLE1-'][0]
             print(idSelected)
-            prod=str(dataUsing[idSelected][0])
+            prod=str(data[idSelected][0])
             inp.update(prod)
-            quantity1 = dataUsing[idSelected][5]
+            quantity1 = data[idSelected][5]
+            print(quantity1)
             spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
             atcButton.update(disabled = False)
             flag = True
