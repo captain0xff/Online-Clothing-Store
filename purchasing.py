@@ -255,7 +255,7 @@ def Main(email):
     def ord_hist(mail):
         cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
         WHERE CUSTOMER_EMAIL = '{mail}'
-        GROUP BY INVOICE_NUMBER""")
+        GROUP BY INVOICE_NUMBER ORDER BY PURCHASE_DATE DESC""")
         purchase_data = cursor.fetchall()
         print(1,purchase_data)
         heading = ['Invoice Number',  'Purchase date','Total Cost']
@@ -296,7 +296,10 @@ def Main(email):
     search=sg.Input(key='SB',enable_events=True)
     filterBtn = sg.Btn('Filters',key='FL')
     ord_button = sg.Button('Order History',key = 'order_history')
-    layout = [[sg.Text('Search'),search, filterBtn,ord_button],
+    cursor.execute(f"SELECT Name FROM CUSTOMERS WHERE Email_ID = '{email}'")
+    name = cursor.fetchone()
+    layout = [[sg.Text(f'Hello, {name[0]}')],
+              [sg.Text('Search'),search, filterBtn,ord_button],
               [table],
               [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
               [inp],
