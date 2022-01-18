@@ -124,4 +124,4 @@ def generate_phone_number(phone_numbers):
     return phone_number
 
 if __name__ == '__main__':
-    print('This file is not meant to to run alone. Run login.py or create_database.py')
+    print('This file is not meant to run alone. Run login.py or create_database.py')
