@@ -295,9 +295,9 @@ def cust_details():
     layout = [[sg.Radio("Sort by Purchase Amount",group_id='sort',key = 'sort_amt',
         enable_events=True, font=main_font_normal),
         sg.Radio("Sort by Name",default=True,group_id='sort',key = 'sort_name',enable_events=True, font=main_font_normal)],
-    [sg.Text('Search by Name',size = (14,1), font=main_font_normal),sg.Input(key = 'name',enable_events=True, font=main_font_normal)],
-    [sg.Text('Search by Email ID',size = (14,1), font=main_font_normal),sg.Input(key = 'email',enable_events=True, font=main_font_normal)],
-    [sg.Text('Search by Mobile',size = (14,1), font=main_font_normal),sg.Input(key = 'mob',enable_events=True, font=main_font_normal)],
+    [sg.Text('Search by Name',size = (15,1), font=main_font_normal),sg.Input(key = 'name',enable_events=True, font=main_font_normal)],
+    [sg.Text('Search by Email ID',size = (15,1), font=main_font_normal),sg.Input(key = 'email',enable_events=True, font=main_font_normal)],
+    [sg.Text('Search by Mobile',size = (15,1), font=main_font_normal),sg.Input(key = 'mob',enable_events=True, font=main_font_normal)],
     [table],
     [sg.Input(key = 'show_det', font=main_font_normal),sg.Button('Show Details', disabled=True,key = 'show', font=main_font_normal)],
     [sg.Button('Exit', font=main_font_normal)]
@@ -408,7 +408,7 @@ def monthly(year1,year2):
     plt.ylabel("Profit")
     plt.grid()
     figManager = plt.get_current_fig_manager()
-    figManager.window.state('zoomed') #For opening window in maximised screen
+    #figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
 
 def categ_rev_comp(year1,year2):
@@ -452,7 +452,7 @@ def categ_rev_trend(year):
     plt.plot(x_axis,women_y,label ='Women')
     plt.plot(x_axis,kid_y,label = 'Kids')
     figManager = plt.get_current_fig_manager()
-    figManager.window.state('zoomed') #For opening window in maximised screen
+    #figManager.window.state('zoomed') #For opening window in maximised screen
     plt.legend()
     plt.show()
 
@@ -470,7 +470,7 @@ def brand_rev_comp(year1,year2):
         plt.text(value, index,
              str(round(value)))
     figManager = plt.get_current_fig_manager()
-    figManager.window.state('zoomed') #For opening window in maximised screen
+    #figManager.window.state('zoomed') #For opening window in maximised screen
     plt.xlabel('Profit in lakhs')
     plt.ylabel('Brand Name')
     plt.xticks(range(0,round(max(sum)),2000000))
@@ -498,7 +498,7 @@ def brand_rev_trend(brand1,brand2,brand3,year):
     plt.plot(month,b3_data,label = brand3)
     plt.legend()
     figManager = plt.get_current_fig_manager()
-    figManager.window.state('zoomed') #For opening window in maximised screen
+    #figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
     
 

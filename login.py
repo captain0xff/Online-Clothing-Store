@@ -112,9 +112,9 @@ def Employee_sign_in_menu():
     msg = sg.Text("Please Login...", size=(50, 1), font=main_font_normal)
     layout = [
         [msg],
-        [sg.Text("Employee ID", font=main_font_normal, size=(9, 1)), sg.Input(key="id", font=main_font_normal)],
-        [sg.Text("User Name", font=main_font_normal, size=(9, 1)), sg.Input(key="uname", font=main_font_normal)],
-        [sg.Text("Password", font=main_font_normal, size=(9, 1)), sg.Input(key="password", password_char="\u2022", font=main_font_normal)],
+        [sg.Text("Employee ID", font=main_font_normal, size=(10, 1)), sg.Input(key="id", font=main_font_normal)],
+        [sg.Text("User Name", font=main_font_normal, size=(10, 1)), sg.Input(key="uname", font=main_font_normal)],
+        [sg.Text("Password", font=main_font_normal, size=(10, 1)), sg.Input(key="password", password_char="\u2022", font=main_font_normal)],
         [sg.Button("Login", font=main_font_normal), sg.Button("Go Back", font=main_font_normal)],
     ]
     # password_char parameter masks the given password with *
@@ -248,10 +248,11 @@ def Customer_sign_up():
     while rng:
         # Take events and values
         e, v = window.read()
+        print(e, v)
         if e == sg.WIN_CLOSED or e == "CN2":
             rng = False
-        elif v["CK"] == True:
-            button.update(disabled=False)
+        elif e == "CK":
+            button.update(disabled = not v['CK'])
         if e == "DN":
             name = v["NM"]
             email = v["EI"]
