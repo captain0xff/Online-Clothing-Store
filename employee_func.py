@@ -31,11 +31,11 @@ def main(emp = ''):
     brand = [i[0] for i in brand]
     stats = [[sg.Text('Finance', font=main_font_normal)],
             [sg.Text('Daily Profit:',size = (15,1), font=main_font_normal),
-             sg.Input('Final Date', key='Calendar_Date', size=(10, None), readonly=True, disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black', font=main_font_normal),
-            sg.CalendarButton('Choose Date',close_when_date_chosen=True,title='Choose Date',format='%Y-%m-%d'),
+             sg.Input('Final Date', key='Calendar_Date', size=(10, None), readonly=True, disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black', font=main_font_normal, enable_events=True),
+            sg.CalendarButton('Choose Date',close_when_date_chosen=False,title='Choose Date',format='%Y-%m-%d', key='Calendar', enable_events=True),
             sg.Combo(default_value = '7',values =
-        [str(i) for i in range(7,31)],key = 'daily_profit',readonly = True,size=(7,1), font=main_font_normal),sg.Button('GO',k='Go1', font=main_font_normal)],
-        [sg.Text('Monthly Profit:',size = (15,1),),sg.Combo(default_value = year[-1],values = year,k = 'y1m',readonly = True, font=main_font_normal),
+        [str(i) for i in range(7,31)],key = 'daily_profit',readonly = True,size=(7,1), font=main_font_normal),sg.Button('GO',k='Go1', font=main_font_normal, disabled=True)],
+        [sg.Text('Monthly Profit:',size = (15,1), font=main_font_normal),sg.Combo(default_value = year[-1],values = year,k = 'y1m',readonly = True, font=main_font_normal),
         sg.Combo(default_value = year[-2],values = year,key = 'y2m',readonly = True, font=main_font_normal),sg.Button('GO',k='Go2', font=main_font_normal)],
         [sg.Text('Revenue Generated per Category', font=main_font_normal)],
         [sg.Combo(default_value = '-',values = ['Trend','Comparision'],readonly = True,enable_events=True,key='Cat_rev', font=main_font_normal),
@@ -65,6 +65,8 @@ def main(emp = ''):
         print(event,value)
         if event in (None, 'Exit'):
             break
+        if event=='Calendar_Date':
+            win['Go1'].update(disabled=False)
         if event == 'show':
             print(data[value['cust_Table'][0]])
             show_details(data[value['cust_Table'][0]])
@@ -364,18 +366,23 @@ def daily_profit(days,date):
     WHERE PURCHASE_DATE BETWEEN DATE_SUB('{date}', INTERVAL {str(int(days)-1)} DAY) AND '{date}'
     GROUP BY PURCHASE_DATE""")
     prof_day = cursor.fetchall()
-    dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
-    amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
-    print(dates)
-    plt.plot_date(dates,amt,linestyle='solid')
-    plt.gcf().autofmt_xdate()
-    date_format = mpl_dates.DateFormatter('%b, %d %Y')
-    plt.gca().xaxis.set_major_formatter(date_format)
-    plt.title(f'Daily Profit (Last {days} days)')
-    plt.ylabel('Profit in rupees')
-    plt.xlabel('Date')
-    plt.grid()
-    plt.show()
+    print(prof_day)
+    if prof_day:
+        dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
+        amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
+        print(dates)
+        plt.plot_date(dates,amt,linestyle='solid')
+        plt.gcf().autofmt_xdate()
+        date_format = mpl_dates.DateFormatter('%b, %d %Y')
+        plt.gca().xaxis.set_major_formatter(date_format)
+        plt.title(f'Daily Profit (Last {days} days)')
+        plt.ylabel('Profit in rupees')
+        plt.xlabel('Date')
+        plt.grid()
+        plt.show()
+    else:
+        sg.popup('NO DATA FOUND', font=main_font_normal)
+
 def monthly(year1,year2):
     """This function plots monthly sale"""
     cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M'), sum(PURCHASE_PROFIT)
