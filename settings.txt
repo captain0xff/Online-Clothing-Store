@@ -1,4 +1,4 @@
 localhost
 root
-sayantan@sql
+sayantan@sq
 denim_destination_db

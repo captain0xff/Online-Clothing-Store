@@ -15,8 +15,8 @@ cursor = mycon.cursor()
 
 # Set the PysimpleGUI theme and font
 sg.theme("DarkAmber")
-main_font_title=("Times New Roman", "14")
-main_font_normal=("Times New Roman", "12")
+main_font_title=("Times New Roman", "12")
+main_font_normal=("Times New Roman", "11")
 
 def Main(email):
     def cart(cartData1):

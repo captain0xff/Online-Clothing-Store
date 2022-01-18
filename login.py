@@ -11,8 +11,8 @@ import os
 
 # Set the PysimpleGUI theme and font
 sg.theme("DarkAmber")
-main_font_title=("Times New Roman", "14")
-main_font_normal=("Times New Roman", "12")
+main_font_title=("Times New Roman", "12")
+main_font_normal=("Times New Roman", "11")
 
 """Code for checking environment"""
 idle = True if "idlelib.run" in sys.modules else False  # Credit goes to stackexchange
@@ -31,10 +31,10 @@ try:
     mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
 except sqltor.errors.ProgrammingError:
     layout=[
-    [sg.Text('Host',size=(7,None), font=main_font),sg.Input('localhost',key='H', font=main_font)],
-    [sg.Text('User',size=(7,None), font=main_font),sg.Input('root',key='U')],
-    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='\u2022', font=main_font)],
-    [sg.Button('Done',key='DN', font=main_font)]
+    [sg.Text('Host',size=(7,None), font=main_font_normal),sg.Input('localhost',key='H', font=main_font_normal)],
+    [sg.Text('User',size=(7,None), font=main_font_normal),sg.Input('root',key='U')],
+    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='\u2022', font=main_font_normal)],
+    [sg.Button('Done',key='DN', font=main_font_normal)]
     ]
     window=sg.Window('Credentials',layout)
     while True:
