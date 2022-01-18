@@ -13,6 +13,7 @@ def generate_customer():
         data[i]=data[i][:-1]
     mycon = sql.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
     cursor=mycon.cursor()
+    cursor.execute('set global max_allowed_packet=67108864')
     file=open('name.txt')
     data=file.readlines()
     file.close()

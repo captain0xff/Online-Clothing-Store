@@ -142,12 +142,15 @@ def main(emp = ''):
             win['show'].update(disabled = False)
         if event == 'Go1':
             print(value['daily_profit'])
+            win.hide()
             daily_profit(value['daily_profit'],value['Calendar_Date'])
-            
+            win.un_hide()
         elif event == 'Go2':
             year1 = value['y1m'][0]
             year2 = value['y2m'][0]
+            win.hide()
             monthly(year1,year2)
+            win.un_hide()
             #print(year1,year2)
         if event == 'Cat_rev' and value['Cat_rev'] == 'Trend':
             win['year1'].update(disabled = True)
@@ -158,9 +161,13 @@ def main(emp = ''):
             win['year2'].update(disabled=False)
             win['Go3'].update(disabled = False)
         if event == 'Go3' and value['Cat_rev'] == 'Comparision':
+            win.hide()
             categ_rev_comp(value['year1'][0],value['year2'][0])
+            win.un_hide()
         if event == 'Go3' and value['Cat_rev'] == 'Trend':
+            win.hide()
             categ_rev_trend(value['year2'][0])
+            win.un_hide()
         if event == 'Brand_rev' and value['Brand_rev'] == 'Comparision':
             win['year1_b'].update(disabled = False)
             win['year2_b'].update(disabled=False)
@@ -181,9 +188,13 @@ def main(emp = ''):
             b3 = value['b3']
             #print(b1,b2,b3)
             #print(value['year1_b'])
+            win.hide()
             brand_rev_trend(b1,b2,b3,value['year1_b'][0])
+            win.un_hide()
         if event == 'Go_b' and value['Brand_rev'] == 'Comparision':
+            win.hide()
             brand_rev_comp(value['year1_b'][0],value['year2_b'][0])
+            win.un_hide()
 def display_stock():
     """This displays the products"""
     cursor.execute("SELECT * FROM PRODUCTS")
