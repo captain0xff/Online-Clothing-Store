@@ -9,8 +9,10 @@ import time
 import os
 
 
-# Set the PysimpleGUI theme
+# Set the PysimpleGUI theme and font
 sg.theme("DarkAmber")
+main_font_title=("Times New Roman", "14")
+main_font_normal=("Times New Roman", "12")
 
 """Code for checking environment"""
 idle = True if "idlelib.run" in sys.modules else False  # Credit goes to stackexchange
@@ -29,10 +31,10 @@ try:
     mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
 except sqltor.errors.ProgrammingError:
     layout=[
-    [sg.Text('Host',size=(7,None)),sg.Input('localhost',key='H')],
-    [sg.Text('User',size=(7,None)),sg.Input('root',key='U')],
-    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='\u2022')],
-    [sg.Button('Done',key='DN')]
+    [sg.Text('Host',size=(7,None), font=main_font),sg.Input('localhost',key='H', font=main_font)],
+    [sg.Text('User',size=(7,None), font=main_font),sg.Input('root',key='U')],
+    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='\u2022', font=main_font)],
+    [sg.Button('Done',key='DN', font=main_font)]
     ]
     window=sg.Window('Credentials',layout)
     while True:
@@ -66,8 +68,8 @@ def Main_menu():
     layout = [
         [sg.Image(key="IMG")],
         [
-            sg.Btn("Customer Login", key="CL", expand_x=True),
-            sg.Btn("Employee Login", key="EL", expand_x=True),
+            sg.Btn("Customer Login", key="CL", expand_x=True, font=main_font_title),
+            sg.Btn("Employee Login", key="EL", expand_x=True, font=main_font_title),
         ],
     ]
 
@@ -107,13 +109,13 @@ def Employee_sign_in_menu():
     If the user chooses Employee in the window produced by custEmp(), this function is called
     It is a login page for the employees
     """
-    msg = sg.Text("Please Login...", size=(50, 1))
+    msg = sg.Text("Please Login...", size=(50, 1), font=main_font_normal)
     layout = [
         [msg],
-        [sg.Text("Employee ID: "), sg.Input(key="id")],
-        [sg.Text("User Name:   "), sg.Input(key="uname")],
-        [sg.Text("Password:     "), sg.Input(key="password", password_char="\u2022")],
-        [sg.Button("Login"), sg.Button("Go Back")],
+        [sg.Text("Employee ID", font=main_font_normal, size=(9, 1)), sg.Input(key="id", font=main_font_normal)],
+        [sg.Text("User Name", font=main_font_normal, size=(9, 1)), sg.Input(key="uname", font=main_font_normal)],
+        [sg.Text("Password", font=main_font_normal, size=(9, 1)), sg.Input(key="password", password_char="\u2022", font=main_font_normal)],
+        [sg.Button("Login", font=main_font_normal), sg.Button("Go Back", font=main_font_normal)],
     ]
     # password_char parameter masks the given password with *
     window = sg.Window("Login - Employee", layout)
@@ -155,18 +157,18 @@ def Employee_sign_in_menu():
 def Customer_sign_in_menu():
     # Customer sign_in menu
     # The layout for the sign in window
-    msg = sg.Text("Login to access our wide range of products...")
+    msg = sg.Text("Login to access our wide range of products...", font=main_font_normal)
     layout = [
         [msg],
-        [sg.Text("Email ID", size=(7, 1)), sg.Input("", key="ID")],
+        [sg.Text("Email ID", size=(7, 1), font=main_font_normal), sg.Input("", key="ID", font=main_font_normal)],
         [
-            sg.Text("Password", size=(7, 1)),
-            sg.Input("", key="PD", password_char="\u2022"),
+            sg.Text("Password", size=(7, 1), font=main_font_normal),
+            sg.Input("", key="PD", password_char="\u2022", font=main_font_normal),
         ],
         [
-            sg.Btn("Login", key="OK"),
-            sg.Btn("Go Back", key="GB"),
-            sg.Btn("Sign up", key="SN"),
+            sg.Btn("Login", key="OK", font=main_font_normal),
+            sg.Btn("Go Back", key="GB", font=main_font_normal),
+            sg.Btn("Sign up", key="SN", font=main_font_normal),
         ],
     ]
 
@@ -218,22 +220,22 @@ def Customer_sign_up():
     button = sg.Btn("Sign up", key="DN", disabled=True)
 
     # The layout of the window
-    msg = sg.Text("New to Denim Destination? Sign up..", size=(50, 1))
+    msg = sg.Text("New to Denim Destination? Sign up..", size=(50, 1), font=main_font)
     layout = [
         [msg],
-        [sg.Text("Email ID", size=(8, 1)), sg.Input("", key="EI")],
+        [sg.Text("Email ID", size=(8, 1), font=main_font), sg.Input("", key="EI", font=main_font)],
         [
-            sg.Text("Password", size=(8, 1)),
-            sg.Input("", key="PD", password_char="\u2022"),
+            sg.Text("Password", size=(8, 1), font=main_font),
+            sg.Input("", key="PD", password_char="\u2022", font=main_font),
         ],
-        [sg.Text("Name", size=(8, 1)), sg.Input("", key="NM")],
-        [sg.Text("Phone No.", size=(8, 1)), sg.Input("", key="PH")],
+        [sg.Text("Name", size=(8, 1), font=main_font), sg.Input("", key="NM", font=main_font)],
+        [sg.Text("Phone No.", size=(8, 1), font=main_font), sg.Input("", key="PH", font=main_font)],
         [
             sg.Checkbox(
                 "I agree to the terms and conditions", key="CK", enable_events=True
             )
         ],
-        [button, sg.Btn("Cancel", key="CN2")],
+        [button, sg.Btn("Cancel", key="CN2", font=main_font)],
     ]
 
     # Create the window for sign up

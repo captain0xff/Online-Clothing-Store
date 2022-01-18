@@ -13,21 +13,24 @@ mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[
 
 cursor = mycon.cursor()
 
+# Set the PysimpleGUI theme and font
+sg.theme("DarkAmber")
+main_font_title=("Times New Roman", "14")
+main_font_normal=("Times New Roman", "12")
 
 def Main(email):
     def cart(cartData1):
         global price,data
-        sg.theme('DarkAmber')
         print(cartData1)
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
-        table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',justification='center',enable_events=True)
-        priceMsg = sg.Text('{:.2f}'.format(price))
-        buyButton = sg.Button('Buy')
-        layout1 = [[sg.Text('YOUR CART')],
+        table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',justification='center',enable_events=True, font=main_font_normal)
+        priceMsg = sg.Text('{:.2f}'.format(price), font=main_font_normal)
+        buyButton = sg.Button('Buy', font=main_font_normal)
+        layout1 = [[sg.Text('YOUR CART', font=main_font_normal)],
                   [table],
-                  [sg.Text('Total Amount = '), priceMsg],
-                  [buyButton, sg.Button('Go Back'),sg.Button('Clear',key='CLR'),sg.Button('Remove',key='RM')]]
-        window1 = sg.Window('Your Cart', layout1, finalize=True)
+                  [sg.Text('Total Amount = ', font=main_font_normal), priceMsg],
+                  [buyButton, sg.Button('Go Back', font=main_font_normal),sg.Button('Clear',key='CLR', font=main_font_normal),sg.Button('Remove',key='RM', font=main_font_normal)]]
+        window1 = sg.Window('Your Cart', layout1, finalize=True, font=main_font_normal)
         remove_from_cart=None
         
         while True:
@@ -43,7 +46,7 @@ def Main(email):
                 priceMsg.update('{}'.format(price))
                 cursor.execute('SELECT ID,Name,Brand,Size,Category, Quantity,Selling_Price FROM PRODUCTS')
                 data = list(cursor.fetchall())
-                sg.popup_timed('The cart has been cleared!')
+                sg.popup_timed('The cart has been cleared!', font=main_font_normal)
                 window1.close()
 
             if event1=='-TABLE2-' and values1['-TABLE2-']!=[]:
@@ -82,12 +85,12 @@ def Main(email):
                 priceMsg.update('{:.2f}'.format(price))
 
                 if len(cartData1)==0:
-                    sg.popup_timed('The cart is empty!')
+                    sg.popup_timed('The cart is empty!', font=main_font_normal)
                     window1.close()
 
 
             if event1=='Buy':
-                confirm = sg.popup_yes_no('Are you sure you want to buy these products?')
+                confirm = sg.popup_yes_no('Are you sure you want to buy these products?', font=main_font_normal)
                 if confirm == 'Yes':
                     final_data = list(cartData1)
                     print(final_data)
@@ -139,7 +142,7 @@ def Main(email):
                     cursor.execute(f"UPDATE CUSTOMERS SET Total_Price = {pri} WHERE Email_ID = '{email}'")
 
 
-                    sg.popup_ok(f'Purchase Successful. Total Amount Spent = {price}')
+                    sg.popup_ok(f'Purchase Successful. Total Amount Spent = {price}', font=main_font_normal)
                     window1.close()
 
                     return event1
@@ -154,23 +157,23 @@ def Main(email):
         brands=[]
         for i in cursor.fetchall():
                 brands.append(i[0])
-        txt=sg.Text('Filter or sort the data..',size=(35,1))
+        txt=sg.Text('Filter or sort the data..',size=(35,1), font=main_font_normal)
         layout=[[txt]]
-        layout.append([sg.Text('Sort')])
-        layout.append([sg.Radio('Name',1,default=True,key='R1')])
-        layout.append([sg.Radio('High To Low',1,key='R2')])
-        layout.append([sg.Radio('Low To High',1,key='R3')])
+        layout.append([sg.Text('Sort', font=main_font_normal)])
+        layout.append([sg.Radio('Name',1,default=True,key='R1', font=main_font_normal)])
+        layout.append([sg.Radio('High To Low',1,key='R2', font=main_font_normal)])
+        layout.append([sg.Radio('Low To High',1,key='R3', font=main_font_normal)])
         layout.append([sg.Text('Categories')])
         for i in categories:
-            elem=sg.Checkbox(i,default=True,key=i)
+            elem=sg.Checkbox(i,default=True,key=i, font=main_font_normal)
             layout.append([elem])
-        layout.append([sg.Text('Brands')])
-        layout.append([sg.Checkbox('All',key='BALL',enable_events=True)])
+        layout.append([sg.Text('Brands', font=main_font_normal)])
+        layout.append([sg.Checkbox('All',key='BALL',enable_events=True, font=main_font_normal)])
         for i in brands:
-            elem=sg.Checkbox(i,default=False,key=i)
+            elem=sg.Checkbox(i,default=False,key=i, font=main_font_normal)
             layout.append([elem])
         layout2=[[sg.Column(layout,scrollable=True)]]
-        layout2.append([sg.Btn('Apply Filters',key='AP')])
+        layout2.append([sg.Btn('Apply Filters',key='AP', font=main_font_normal)])
 
         window2=sg.Window('Filters',layout2)
         rng=True
@@ -260,12 +263,12 @@ def Main(email):
         print(1,purchase_data)
         heading = ['Invoice Number',  'Purchase date','Total Cost']
         if not purchase_data:
-            sg.popup('NO DATA FOUND')
+            sg.popup('NO DATA FOUND', font=main_font_normal)
         else:
-            table = sg.Table(purchase_data,headings=heading,key='pur_table',enable_events=True)
+            table = sg.Table(purchase_data,headings=heading,key='pur_table',enable_events=True, font=main_font_normal)
             layout = [
             [table],
-            [sg.Button('Exit',key = 'Exit'),sg.Button('Show More',disabled = True,key='show_more')]
+            [sg.Button('Exit',key = 'Exit', font=main_font_normal),sg.Button('Show More',disabled = True,key='show_more', font=main_font_normal)]
             ]
             win = sg.Window(f'{mail}',layout)
             while True:
@@ -285,32 +288,30 @@ def Main(email):
         pass
     
     global price, cartData, cartDict, data
-    sg.theme('DarkAmber')
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
-    msg = sg.Text('',size=(20,0))
-    inp=sg.Input(key='-IN-', enable_events = True)
-    spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True)
-    table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True)
-    atcButton = sg.Button('Add to Cart', disabled = True)
-    gtcButton = sg.Button('Go to Cart', disabled = True)
-    search=sg.Input(key='SB',enable_events=True)
-    filterBtn = sg.Btn('Filters',key='FL')
-    ord_button = sg.Button('Order History',key = 'order_history')
+    msg = sg.Text('',size=(20,0), font=main_font_normal)
+    inp=sg.Input(key='-IN-', enable_events = True, font=main_font_normal)
+    spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True, font=main_font_normal)
+    table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True, font=main_font_normal)
+    atcButton = sg.Button('Add to Cart', disabled = True, font=main_font_normal)
+    gtcButton = sg.Button('Go to Cart', disabled = True, font=main_font_normal)
+    search=sg.Input(key='SB',enable_events=True, font=main_font_normal)
+    filterBtn = sg.Btn('Filters',key='FL', font=main_font_normal)
+    ord_button = sg.Button('Order History',key = 'order_history', font=main_font_normal)
     cursor.execute(f"SELECT Name FROM CUSTOMERS WHERE Email_ID = '{email}'")
     name = cursor.fetchone()
-    layout = [[sg.Text(f'Hello, {name[0]}')],
-              [sg.Text('Search'),search, filterBtn,ord_button],
+    layout = [[sg.Text(f'Hello, {name[0]}', font=main_font_title)],
+              [sg.Text('Search', font=main_font_normal),search, filterBtn,ord_button],
               [table],
-              [sg.Text('Product ID:'), msg,sg.Text(size=(20, 1), key='-OUTPUT-')],
+              [sg.Text('Product ID:', font=main_font_normal), msg,sg.Text(size=(20, 1), key='-OUTPUT-', font=main_font_normal)],
               [inp],
-              [sg.Text('Quantity'),spin],
-              [atcButton, gtcButton, sg.Button('Exit')]]
+              [sg.Text('Quantity', font=main_font_normal),spin],
+              [atcButton, gtcButton, sg.Button('Exit', font=main_font_normal)]]
 
     window = sg.Window('Products', layout, finalize = True)
 
     if len(cartDict) != 0:
         gtcButton.update(disabled=False)
-        filterBtn.update(disabled = True)
     prod=None
     flag = False
     flag2 = False
@@ -449,7 +450,6 @@ def Main(email):
                 #print(358)
         if len(cartDict)==0:
             gtcButton.update(disabled=True)
-            filterBtn.update(disabled = False)
         else:
             gtcButton.update(disabled=False)
 
@@ -468,7 +468,7 @@ def Main(email):
         msg.update('')
             #print(action)
         if action=='Buy':
-            sg.popup_timed('Thank you for shopping with us')
+            sg.popup_timed('Thank you for shopping with us', font=main_font_normal)
             window.close()
         else:
             Main(email)
