@@ -219,6 +219,8 @@ def Main(email):
                     if sort_sel in ('Name', 'Selling_Price DESC', 'Selling_Price'):
                         if len(brands_sel)==0:
                             brands_sel = tuple(brands)
+                        if len(cats_sel)==0:
+                            cats_sel=tuple(categories)
                         print(brands_sel, cats_sel)
                     cmd="""SELECT ID,Name,Brand,Size, Category,Quantity,Selling_Price 
                     FROM PRODUCTS
