@@ -455,7 +455,7 @@ def brand_rev_comp(year1,year2):
     figManager.window.state('zoomed') #For opening window in maximised screen
     plt.xlabel('Profit in lakhs')
     plt.ylabel('Brand Name')
-    plt.xticks(range(0,round(max(sum)),200000))
+    plt.xticks(range(0,round(max(sum)),2000000))
     plt.show()
 def brand_rev_trend(brand1,brand2,brand3,year):
     """This function plots brand popularity trend"""

@@ -220,22 +220,22 @@ def Customer_sign_up():
     button = sg.Btn("Sign up", key="DN", disabled=True)
 
     # The layout of the window
-    msg = sg.Text("New to Denim Destination? Sign up..", size=(50, 1), font=main_font)
+    msg = sg.Text("New to Denim Destination? Sign up..", size=(50, 1), font=main_font_title)
     layout = [
         [msg],
-        [sg.Text("Email ID", size=(8, 1), font=main_font), sg.Input("", key="EI", font=main_font)],
+        [sg.Text("Email ID", size=(8, 1), font=main_font_normal), sg.Input("", key="EI", font=main_font_normal)],
         [
-            sg.Text("Password", size=(8, 1), font=main_font),
-            sg.Input("", key="PD", password_char="\u2022", font=main_font),
+            sg.Text("Password", size=(8, 1), font=main_font_normal),
+            sg.Input("", key="PD", password_char="\u2022", font=main_font_normal),
         ],
-        [sg.Text("Name", size=(8, 1), font=main_font), sg.Input("", key="NM", font=main_font)],
-        [sg.Text("Phone No.", size=(8, 1), font=main_font), sg.Input("", key="PH", font=main_font)],
+        [sg.Text("Name", size=(8, 1), font=main_font_normal), sg.Input("", key="NM", font=main_font_normal)],
+        [sg.Text("Phone No.", size=(8, 1), font=main_font_normal), sg.Input("", key="PH", font=main_font_normal)],
         [
             sg.Checkbox(
                 "I agree to the terms and conditions", key="CK", enable_events=True
             )
         ],
-        [button, sg.Btn("Cancel", key="CN2", font=main_font)],
+        [button, sg.Btn("Cancel", key="CN2", font=main_font_normal)],
     ]
 
     # Create the window for sign up

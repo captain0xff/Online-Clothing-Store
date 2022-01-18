@@ -85,6 +85,7 @@ def  generate_purchase(y):
     for i in customer_sale_dict:
         cmd="update CUSTOMERS set total_price={} where Email_ID='{}'".format(customer_sale_dict[i],i)
         cursor.execute(cmd)
+    print('Hello World')
     mycon.commit()
     print('Sample data added!!!')
 
