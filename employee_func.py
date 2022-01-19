@@ -280,6 +280,7 @@ def update_data(ID):
                         cursor.execute(f"""UPDATE PRODUCTS SET {i} = '{value[i]}'
                         WHERE ID = {int(ID)}""")
                 sg.popup('Data Updated', font=main_font_normal)
+                mycon.commit()
                 win.close()
         except mysql_errors.DatabaseError:
             msg.update('Wrong data entered...')
