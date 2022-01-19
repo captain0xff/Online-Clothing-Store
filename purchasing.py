@@ -334,6 +334,7 @@ def Main(email):
             WHERE NAME LIKE \'{name}%\''''
             cmd=cmd.format(name=values['SB'])
             cursor.execute(cmd)
+            dataIFEmpty = list(data)
             data=cursor.fetchall()
             print(data)
             for i in range(len(data)):
@@ -400,9 +401,8 @@ def Main(email):
 
 
         if event =='Add to Cart' and flag:
-            #search.update('')
             #print('312')
-            search.update('')
+            #search.update('')
             searchFlag = False
             for i in range(len(data)):
                 data[i] = list(data[i])
@@ -473,6 +473,8 @@ def Main(email):
             sg.popup_timed('Thank you for shopping with us', font=main_font_normal)
             window.close()
         else:
+            if not data:
+                data = dataIFEmpty
             Main(email)
 
     mycon.commit()
