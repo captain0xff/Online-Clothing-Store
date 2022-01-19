@@ -24,7 +24,7 @@ sql_products = """create table PRODUCTS(
     Name VARCHAR(50),
     Brand VARCHAR(50),
     Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL' OR SIZE='NA'),
-    Quantity INTEGER,
+    Quantity INTEGER CHECK(Quantity>0),
     Cost_Price DECIMAL(8,2),
     Selling_Price DECIMAL(8,2),
     Category VARCHAR(5) CHECK(Category = 'Kids' OR Category = 'Men' OR Category = 'Women' ))"""
