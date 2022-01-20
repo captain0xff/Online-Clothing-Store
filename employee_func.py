@@ -1,11 +1,14 @@
 """This module will be used for functionalities of the employee"""
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as mpl_dates
 import PySimpleGUI as sg
 import numpy as np
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
+import mplcursors
 
+matplotlib.use('Tkagg')
 file=open('settings.txt')
 data=file.readlines()
 file.close()
@@ -393,6 +396,7 @@ def monthly(year1,year2):
     months = [i[0] for i in year_1data]
     profit_1 = [i[1] for i in year_1data]
     x_axis = np.arange(len(months))
+    print(x_axis)
     width = 0.4
     plt.bar(x_axis,profit_1,width=width,label = year1,align = 'center')
     
@@ -409,7 +413,7 @@ def monthly(year1,year2):
     plt.ylabel("Profit")
     plt.grid()
     figManager = plt.get_current_fig_manager()
-    #figManager.window.state('zoomed') #For opening window in maximised screen
+    figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
 
 def categ_rev_comp(year1,year2):
@@ -453,7 +457,7 @@ def categ_rev_trend(year):
     plt.plot(x_axis,women_y,label ='Women')
     plt.plot(x_axis,kid_y,label = 'Kids')
     figManager = plt.get_current_fig_manager()
-    #figManager.window.state('zoomed') #For opening window in maximised screen
+    figManager.window.state('zoomed') #For opening window in maximised screen
     plt.legend()
     plt.show()
 
@@ -466,15 +470,23 @@ def brand_rev_comp(year1,year2):
     data = cursor.fetchall()
     brand_names = [i[1] for i in data]
     sum = [i[0] for i in data]
-    plt.barh(brand_names,sum)
-    for index, value in enumerate(sum):
-        plt.text(value, index,
-             str(round(value)))
+    fig,ax = plt.subplots()
+    ax.barh(brand_names,sum)
     figManager = plt.get_current_fig_manager()
-    #figManager.window.state('zoomed') #For opening window in maximised screen
-    plt.xlabel('Profit in lakhs')
-    plt.ylabel('Brand Name')
-    plt.xticks(range(0,round(max(sum)),2000000))
+    figManager.window.state('zoomed') #For opening window in maximised screen
+    ax.set_xlabel('Profit in lakhs')
+    ax.set_ylabel('Brand Name')
+    scale = round(max(sum))//5
+    plt.xticks(range(0,round(max(sum)),scale))
+    cur = mplcursors.cursor(hover=mplcursors.HoverMode.Transient)
+    @cur.connect("add")
+    def on_add(sel):
+        x, y, width, height = sel.artist[sel.target.index].get_bbox().bounds
+        sel.annotation.set(text=f"{brand_names[sel.target.index]}: {width}",
+                           position=(10, 0), anncoords="offset points")
+        sel.annotation.xy = (x + width / 2, y + height / 2)
+        sel.annotation.get_bbox_patch().set(alpha=0.8)
+    #Credits to stackoverflow @JohnC for the above piece of code
     plt.show()
 def brand_rev_trend(brand1,brand2,brand3,year):
     """This function plots brand popularity trend"""
@@ -499,7 +511,7 @@ def brand_rev_trend(brand1,brand2,brand3,year):
     plt.plot(month,b3_data,label = brand3)
     plt.legend()
     figManager = plt.get_current_fig_manager()
-    #figManager.window.state('zoomed') #For opening window in maximised screen
+    figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
     
 
