@@ -21,6 +21,7 @@ main_font_normal=("Times New Roman", "11")
 def Main(email):
     def cart(cartData1):
         global price,data
+        nonlocal dataIFEmpty
         print(cartData1)
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
         table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',justification='center',enable_events=True, font=main_font_normal)
@@ -46,6 +47,7 @@ def Main(email):
                 priceMsg.update('{}'.format(price))
                 cursor.execute('SELECT ID,Name,Brand,Size,Category, Quantity,Selling_Price FROM PRODUCTS')
                 data = list(cursor.fetchall())
+                data = list(dataIFEmpty)
                 sg.popup_timed('The cart has been cleared!', font=main_font_normal)
                 window1.close()
 
@@ -57,20 +59,24 @@ def Main(email):
                 print(cartData1)
                 dat = cartData1[remove_from_cart]
                 print(dat)
-                for i in data:
+                dataForNow = data if data else dataIFEmpty
+                for i in dataForNow:
                     if i[0]==dat[0]:
                         i[5]+=dat[5]
+                        data = dataIFEmpty = list(dataForNow)
                         break
                 else:
-                    a = len(data)
-                    for i in range(len(data)):
-                        if data[i][0]>dat[0]:
-                            a = i
-                            break
                     tempList = list(dat)
                     print(tempList)
-                    tempList[5] = round(dat[6]/dat[5], 2)
-                    data.insert(a, tempList)
+                    tempList[6] = round(dat[6]/dat[5], 2)
+                    if data:
+                        data.append(tempList)
+                        data.sort()
+                        dataIFEmpty = list(data)
+                    else:
+                        dataIFEmpty.append(tempList)
+                        dataIFEmpty.sort()
+                        data = list(dataIFEmpty)
                     print(data)
                 price-=float(dat[6])
                 price = round(price,2)
@@ -363,6 +369,7 @@ def Main(email):
             print(idSelected)
             prod=str(data[idSelected][0])
             inp.update(prod)
+            print(data)
             quantity1 = data[idSelected][5]
             print(quantity1)
             spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
