@@ -9,6 +9,7 @@ from mysql.connector import errors as mysql_errors
 import mplcursors
 
 matplotlib.use('Tkagg')
+plt.style.use('fivethirtyeight')
 file=open('settings.txt')
 data=file.readlines()
 file.close()
@@ -375,14 +376,16 @@ def daily_profit(days,date):
         dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
         amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
         print(dates)
-        plt.plot_date(dates,amt,linestyle='solid')
+        plt.plot_date(dates,amt,linestyle='--',marker = '8')
         plt.gcf().autofmt_xdate()
         date_format = mpl_dates.DateFormatter('%b, %d %Y')
         plt.gca().xaxis.set_major_formatter(date_format)
         plt.title(f'Daily Profit (Last {days} days)')
         plt.ylabel('Profit in rupees')
         plt.xlabel('Date')
-        plt.grid()
+        plt.grid(True)
+        figManager = plt.get_current_fig_manager()
+        figManager.window.state('zoomed') #For opening window in maximised screen
         plt.show()
     else:
         sg.popup('NO DATA FOUND', font=main_font_normal)
@@ -423,9 +426,10 @@ def monthly(year1,year2):
     plt.xticks(ticks = x_axis,labels=months,rotation = 45)
     plt.xlabel("Month")
     plt.ylabel("Profit")
-    plt.grid()
+    plt.grid(True)
     figManager = plt.get_current_fig_manager()
     figManager.window.state('zoomed') #For opening window in maximised screen
+    plt.tight_layout()
     plt.show()
 
 def categ_rev_comp(year1,year2):
@@ -441,6 +445,8 @@ def categ_rev_comp(year1,year2):
     print(sale_data,label)
     plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',
         wedgeprops={'edgecolor':'black'})
+    figManager = plt.get_current_fig_manager()
+    figManager.window.state('zoomed') #For opening window in maximised screen
     plt.show()
 def categ_rev_trend(year):
     cursor.execute(f"""select sum(PURCHASE_PROFIT) from purchase
@@ -470,12 +476,16 @@ def categ_rev_trend(year):
         women_y.append(women[i][0])
         kid_y.append(kid[i][0])
     print(men_y,len(men_y))
-    plt.plot(x_axis,men_y,label = 'Men')
-    plt.plot(x_axis,women_y,label ='Women')
-    plt.plot(x_axis,kid_y,label = 'Kids')
+    plt.plot(x_axis,men_y,label = 'Men',color = 'k',linestyle = '-',marker = '.')
+    plt.plot(x_axis,women_y,label ='Women',color = 'b',linestyle = '-.',marker = '.')
+    plt.plot(x_axis,kid_y,label = 'Kids',color = 'm',linestyle = ':',marker = '.')
     figManager = plt.get_current_fig_manager()
     figManager.window.state('zoomed') #For opening window in maximised screen
     plt.legend()
+    plt.title('Profit each Month')
+    plt.xlabel('Months')
+    plt.ylabel('Profit')
+    plt.tight_layout()
     plt.show()
 
 def brand_rev_comp(year1,year2):
@@ -504,6 +514,7 @@ def brand_rev_comp(year1,year2):
         sel.annotation.xy = (x + width / 2, y + height / 2)
         sel.annotation.get_bbox_patch().set(alpha=0.8)
     #Credits to stackoverflow @JohnC for the above piece of code
+    plt.subplots_adjust(left=0.15, right=0.8, bottom=0.1, top=0.8)
     plt.show()
 def brand_rev_trend(brand1,brand2,brand3,year):
     """This function plots brand popularity trend"""
@@ -536,14 +547,18 @@ def brand_rev_trend(brand1,brand2,brand3,year):
     print(month)
     #print(b1_data,b2_data,b3_data)
     
-    plt.plot(month,b1_data,label = brand1)
+    plt.plot(month,b1_data,label = brand1,color = 'k',linestyle = '-',marker = '.')
 
-    plt.plot(month,b2_data,label = brand2)
+    plt.plot(month,b2_data,label = brand2,color = 'r',linestyle = '-.',marker = '8')
 
-    plt.plot(month,b3_data,label = brand3)
+    plt.plot(month,b3_data,label = brand3,color = 'c',linestyle = '--',marker = '.')
     plt.legend()
+    plt.title('Trend of Brands')
+    plt.xlabel('Months')
+    plt.ylabel('Profit')
     figManager = plt.get_current_fig_manager()
     figManager.window.state('zoomed') #For opening window in maximised screen
+    plt.tight_layout()
     plt.show()
     
 
