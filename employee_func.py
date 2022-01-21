@@ -7,6 +7,7 @@ import numpy as np
 import mysql.connector as sqltor
 from mysql.connector import errors as mysql_errors
 import mplcursors
+from collections import Counter
 
 matplotlib.use('Tkagg')
 file=open('settings.txt')
@@ -65,7 +66,7 @@ def main(emp = ''):
     win = sg.Window('Welcome',layout)
     while True:
         event,value = win.read()
-        print(event,value)
+        #print(event,value)
         if event in (None, 'Exit'):
             break
         if event=='Calendar_Date':
@@ -393,19 +394,31 @@ def monthly(year1,year2):
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year1}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_1data = cursor.fetchall()
-    months = [i[0] for i in year_1data]
-    profit_1 = [i[1] for i in year_1data]
-    x_axis = np.arange(len(months))
-    print(x_axis)
+    x_axis = np.arange(12)
+    #print(dict(year_1data))
+    prof1 = {'January':0,'February':0,'March':0,'April':0,'May':0,
+            'June':0,'July':0,'August':0,'September':0,'October':0,
+            'November':0,'December':0}
+    months = list(prof1)
+    prof2 = prof1.copy()
+    prof1.update(year_1data)
+    profit_1 = []
+    for key in prof1:
+        profit_1.append(prof1[key])
+    #print(profit_1,len(profit_1))
     width = 0.4
-    plt.bar(x_axis,profit_1,width=width,label = year1,align = 'center')
+    plt.bar(x_axis,profit_1,width=width,label = year1)
     
-    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M %Y'), sum(PURCHASE_PROFIT)
+    cursor.execute(f"""select DATE_FORMAT(purchase_date ,'%M'), sum(PURCHASE_PROFIT)
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year2}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_2data = cursor.fetchall()
-    
-    profit2 = [i[1] for i in year_2data]
+    print(year_2data)
+    prof2.update(year_2data)
+    print(prof2,len(prof2))
+    profit2 = []
+    for key in prof2:
+        profit2.append(prof2[key])
     plt.bar(x_axis+width,profit2,width=width,label = year2)
     plt.legend()
     plt.xticks(ticks = x_axis,labels=months,rotation = 45)
@@ -490,6 +503,7 @@ def brand_rev_comp(year1,year2):
     plt.show()
 def brand_rev_trend(brand1,brand2,brand3,year):
     """This function plots brand popularity trend"""
+
     cursor.execute(f"""select sum(product_tot_cost) from purchase 
     where product_brand = '{brand1}' and year(purchase_date) = {year} 
     group by month(purchase_date);""")
@@ -504,11 +518,11 @@ def brand_rev_trend(brand1,brand2,brand3,year):
     where product_brand = '{brand3}' and year(purchase_date) = {year} 
     group by month(purchase_date);""")
     b3_data = cursor.fetchall()
-    print(b1_data)
     month = ['January','February','March','April','May','June','July','August','September','October','November','December']
-    plt.plot(month,b1_data,label = brand1)
-    plt.plot(month,b2_data,label = brand2)
-    plt.plot(month,b3_data,label = brand3)
+    #print(b1_data,b2_data,b3_data)
+    if b1_data: plt.plot(month,b1_data,label = brand1)
+    if b2_data: plt.plot(month,b2_data,label = brand2)
+    if b3_data: plt.plot(month,b3_data,label = brand3)
     plt.legend()
     figManager = plt.get_current_fig_manager()
     figManager.window.state('zoomed') #For opening window in maximised screen
