@@ -443,19 +443,24 @@ def categ_rev_comp(year1,year2):
         wedgeprops={'edgecolor':'black'})
     plt.show()
 def categ_rev_trend(year):
-    cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
+    cursor.execute(f"""select sum(PURCHASE_PROFIT) from purchase
     where year(purchase_date) = {year} and product_category = 'Men' 
     group by monthname(purchase_date)""")
     men = cursor.fetchall()
-    cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
+    men = men+[[0]]*(12-len(men))
+    cursor.execute(f"""select sum(PURCHASE_PROFIT) from purchase 
     where year(purchase_date) = {year} and product_category = 'Women' 
     group by monthname(purchase_date)""")
     women = cursor.fetchall()
-    cursor.execute(f"""select sum(PURCHASE_PROFIT), monthname(purchase_date) from purchase 
+    women = women+[[0]]*(12-len(women))
+    cursor.execute(f"""select sum(PURCHASE_PROFIT) from purchase 
     where year(purchase_date) = {year} and product_category = 'Kids' 
     group by monthname(purchase_date)""")
     kid = cursor.fetchall()
+    kid = kid+[[0]]*(12-len(kid))
     print(1,men)
+    print(2,women)
+    print(3,kid)
     x_axis = ['January','February','March','April','May','June','July','August','September','October','November','December']
     men_y = []
     women_y = []
@@ -464,7 +469,7 @@ def categ_rev_trend(year):
         men_y.append(men[i][0])
         women_y.append(women[i][0])
         kid_y.append(kid[i][0])
-    #print(men_y,len(men_y))
+    print(men_y,len(men_y))
     plt.plot(x_axis,men_y,label = 'Men')
     plt.plot(x_axis,women_y,label ='Women')
     plt.plot(x_axis,kid_y,label = 'Kids')
