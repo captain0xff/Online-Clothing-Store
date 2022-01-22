@@ -81,7 +81,8 @@ class Packages:
 requirements={
    'pysimplegui':'4.50.0',
    'mysql-connector-python':'8.0.26',
-   'matplotlib':'3.4.3'
+   'matplotlib':'3.4.3',
+   'mplcursors':'0.5.1'
 }
 
 if __name__=='__main__':
