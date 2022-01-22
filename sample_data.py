@@ -46,7 +46,7 @@ def  generate_purchase(y):
     year=y
     month=1
     day=1
-    current_date=str('2021-12-31')
+    current_date=str(dt.today())
     #print(current_date)
     cmd="select invoice_number from PURCHASE"
     purchases=[]
