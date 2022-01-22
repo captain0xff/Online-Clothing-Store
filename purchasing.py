@@ -47,7 +47,7 @@ def Main(email):
                 priceMsg.update('{}'.format(price))
                 cursor.execute('SELECT ID,Name,Brand,Size,Category, Quantity,Selling_Price FROM PRODUCTS')
                 data = list(cursor.fetchall())
-                data = list(dataIFEmpty)
+                dataIFEmpty = list(data)
                 sg.popup_timed('The cart has been cleared!', font=main_font_normal)
                 window1.close()
 
@@ -298,7 +298,7 @@ def Main(email):
     global price, cartData, cartDict, data
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
     msg = sg.Text('',size=(20,0), font=main_font_normal)
-    inp=sg.Input(key='-IN-', enable_events = True, font=main_font_normal)
+    inp=sg.Input(key='-IN-', enable_events = True, font=main_font_normal,readonly=True, disabled_readonly_background_color='Gray',disabled_readonly_text_color='Black')
     spin=sg.Spin(1,initial_value=1,disabled=True, key = 'Spin', enable_events=True, font=main_font_normal)
     table=sg.Table(data, headings = heading, justification = 'centre', key = '-TABLE1-',enable_events=True, font=main_font_normal)
     atcButton = sg.Button('Add to Cart', disabled = True, font=main_font_normal)
@@ -335,6 +335,7 @@ def Main(email):
             ord_hist(email)
             #ef.show_detais()
         if event=='SB':
+            inp.update('')
             cmd='''SELECT ID,Name,Brand,Size,Category,Quantity,Selling_Price 
             FROM PRODUCTS
             WHERE NAME LIKE \'{name}%\''''
