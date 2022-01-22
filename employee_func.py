@@ -79,6 +79,7 @@ def main(emp = ''):
             cursor.execute("SELECT * FROM PRODUCTS")
             data = cursor.fetchall()
             win['Table'].update(data)
+            data_product = list(data)
         elif event == 'Update':
             try:
                 prod_clicked = value['Table'][0]
