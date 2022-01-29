@@ -87,6 +87,8 @@ def main(emp = ''):
             win['email'].update('')
             win['name'].update('')
             win['mob'].update('')
+            win['show_det'].update('')
+            win['show'].update(disabled=True)
         elif event=='sort_name':
             query="""SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             ORDER BY Name"""
@@ -96,6 +98,8 @@ def main(emp = ''):
             win['email'].update('')
             win['name'].update('')
             win['mob'].update('')
+            win['show_det'].update('')
+            win['show'].update(disabled=True)
         if event=='name' and value:
             query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
             where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
@@ -103,6 +107,8 @@ def main(emp = ''):
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
+            win['show_det'].update('')
+            win['show'].update(disabled=True)
         elif event=='email':
             query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
             where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
@@ -110,6 +116,8 @@ def main(emp = ''):
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
+            win['show_det'].update('')
+            win['show'].update(disabled=True)
         elif event=='mob':
             query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
             where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
@@ -119,6 +127,8 @@ def main(emp = ''):
             data =  cursor.fetchall()
             #print(data)
             win['cust_Table'].update(data)
+            win['show_det'].update('')
+            win['show'].update(disabled=True)
         if event == 'cust_Table' and value['cust_Table']!=[]:
             em = data[value['cust_Table'][0]][2] #Basically extracting email
             win['show_det'].update(em)
