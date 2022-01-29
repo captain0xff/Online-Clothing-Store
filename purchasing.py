@@ -22,24 +22,25 @@ def Main(email):
     def cart(cartData1):
         global price,data
         nonlocal dataIFEmpty
-        print(cartData1)
         heading1 = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
         table=sg.Table(cartData1, headings=heading1,key='-TABLE2-',justification='center',enable_events=True, font=main_font_normal)
         priceMsg = sg.Text('{:.2f}'.format(price), font=main_font_normal)
         buyButton = sg.Button('Buy', font=main_font_normal)
+        removeButton = sg.Button('Remove',key='RM', font=main_font_normal)
+        clearButton = sg.Button('Clear',key='CLR', font=main_font_normal)
+        goBackButton = sg.Button('Go Back', font=main_font_normal)
         layout1 = [[sg.Text('YOUR CART', font=main_font_normal)],
                   [table],
                   [sg.Text('Total Amount = ', font=main_font_normal), priceMsg],
-                  [buyButton, sg.Button('Go Back', font=main_font_normal),sg.Button('Clear',key='CLR', font=main_font_normal),sg.Button('Remove',key='RM', font=main_font_normal)]]
+                  [buyButton, goBackButton, clearButton, removeButton]]
         window1 = sg.Window('Your Cart', layout1, finalize=True, font=main_font_normal)
         remove_from_cart=None
-        
         while True:
             event1, values1 = window1.read()
-            print(event1,values1)
             if event1 in (None, 'Go Back'):
                 break
-            if event1=='CLR':
+
+            elif event1=='CLR':
                 cartData1=[]
                 cartDict.clear()
                 table.update(cartData1)
@@ -51,14 +52,11 @@ def Main(email):
                 sg.popup_timed('The cart has been cleared!', font=main_font_normal)
                 window1.close()
 
-            if event1=='-TABLE2-' and values1['-TABLE2-']!=[]:
+            elif event1=='-TABLE2-' and values1['-TABLE2-']!=[]:
                 remove_from_cart=values1['-TABLE2-'][0]
-                print(49)
-            print(remove_from_cart)
-            if event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
-                print(cartData1)
+
+            elif event1=='RM' and remove_from_cart!=None and len(cartData1)>remove_from_cart:
                 dat = cartData1[remove_from_cart]
-                print(dat)
                 dataForNow = data if data else dataIFEmpty
                 for i in dataForNow:
                     if i[0]==dat[0]:
@@ -67,7 +65,6 @@ def Main(email):
                         break
                 else:
                     tempList = list(dat)
-                    print(tempList)
                     tempList[6] = round(dat[6]/dat[5], 2)
                     if data:
                         data.append(tempList)
@@ -77,7 +74,6 @@ def Main(email):
                         dataIFEmpty.append(tempList)
                         dataIFEmpty.sort()
                         data = list(dataIFEmpty)
-                    print(data)
                 price-=float(dat[6])
                 price = round(price,2)
                 var = 0
@@ -94,32 +90,26 @@ def Main(email):
                     sg.popup_timed('The cart is empty!', font=main_font_normal)
                     window1.close()
 
-
-            if event1=='Buy':
+            elif event1=='Buy':
                 confirm = sg.popup_yes_no('Are you sure you want to buy these products?', font=main_font_normal)
                 if confirm == 'Yes':
                     final_data = list(cartData1)
-                    print(final_data)
                     for i in final_data:
                         idNow = i[0]
-                        print(idNow)
                         cursor.execute(f'SELECT Cost_Price FROM PRODUCTS WHERE ID = {idNow}')
                         priceNow = cursor.fetchone()[0]
                         profit = round(float(i[6]-priceNow*i[5]), 2)
                         i.append(profit)
-                    print(final_data)
 
                     for i in cartData1:
                         id1 = i[0]
                         cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %id1)
                         quantity = cursor.fetchall()
-                        #print(id1, quantity)
                         quantity = quantity[0][4]-i[5]
                         if quantity>1:
                             cursor.execute(f'UPDATE Products SET Quantity = {quantity} WHERE ID = {id1}')
                         else: 
                             cursor.execute(f'DELETE FROM Products WHERE ID = {id1}')
-                    print(cartData1)
                     
                     """INVOICE NUMBER GENERATION"""
                     today = date.today()
@@ -129,9 +119,6 @@ def Main(email):
                     today = pur_date.replace('-','') #changing 2021-10-31 to 20211031
                     c = str(result[0]+1).zfill(6)
                     inv_num = today+'-'+c#format is %d%m%Y-N where N is cardinality of purchase
-                    print(inv_num)
-                    
-                    #print(query)
                     query = """INSERT INTO PURCHASE
                     VALUES(%s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s)
                     """
@@ -154,7 +141,7 @@ def Main(email):
                     return event1
         window1.close()
 
-    def filter_menu(data):
+    def filter_menu():
         cursor.execute('select distinct category from products')
         categories=[]
         for i in cursor.fetchall():
@@ -186,7 +173,6 @@ def Main(email):
         filters_applied=False
         while rng:
             events,values=window2.read()
-            print(events,values)
             if events==sg.WIN_CLOSED:
                 rng=False
             if events=='BALL':
@@ -227,13 +213,11 @@ def Main(email):
                             brands_sel = tuple(brands)
                         if len(cats_sel)==0:
                             cats_sel=tuple(categories)
-                        print(brands_sel, cats_sel)
                     cmd="""SELECT ID,Name,Brand,Size, Category,Quantity,Selling_Price 
                     FROM PRODUCTS
                     WHERE Brand in {brand} and category in {category}
                     ORDER BY {sort}
                     """.format(brand=brands_sel,category=cats_sel,sort=sort_sel)
-                    print(cmd)
                     cursor.execute(cmd)
                     data=cursor.fetchall()
                     for i in range(len(data)):
@@ -263,12 +247,12 @@ def Main(email):
                     txt.update('No category or brand selected',text_color='red')
                     print('\a')
         window2.close()
+
     def ord_hist(mail):
         cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
         WHERE CUSTOMER_EMAIL = '{mail}'
         GROUP BY INVOICE_NUMBER ORDER BY PURCHASE_DATE DESC""")
         purchase_data = cursor.fetchall()
-        print(1,purchase_data)
         heading = ['Invoice Number',  'Purchase date','Total Cost']
         if not purchase_data:
             sg.popup('NO DATA FOUND', font=main_font_normal)
@@ -281,7 +265,6 @@ def Main(email):
             win = sg.Window(f'{mail}',layout)
             while True:
                 event1,value = win.read()  #Extracting only event
-                #print(event1, value)
                 if event1  in ('Exit',None):
                     win.close()
                     break
@@ -293,7 +276,6 @@ def Main(email):
                     date = purchase_data[ind_select][1]
                     ef.more_details(inv_num,date)
 
-        pass
     
     global price, cartData, cartDict, data
     heading = ['Product ID', 'Product Name', 'Brand', 'Size', 'Category', 'Quantity', 'Price']
@@ -323,18 +305,15 @@ def Main(email):
     prod=None
     flag = False
     flag2 = False
-    searchFlag = False
     while True:
         event, values = window.read()
-        #print(event, values)
-        print(cartDict)
-        #print(data)
         if event in (None, 'Exit'):
             break
-        if event == 'order_history':
+
+        elif event == 'order_history':
             ord_hist(email)
-            #ef.show_detais()
-        if event=='SB':
+
+        elif event=='SB':
             inp.update('')
             cmd='''SELECT ID,Name,Brand,Size,Category,Quantity,Selling_Price 
             FROM PRODUCTS
@@ -343,7 +322,6 @@ def Main(email):
             cursor.execute(cmd)
             dataIFEmpty = list(data)
             data=cursor.fetchall()
-            print(data)
             for i in range(len(data)):
                 data[i] = list(data[i])
             cartContents={}
@@ -361,24 +339,21 @@ def Main(email):
                     else:
                         data.pop(index)
             table.update(data)
-        if values['-TABLE1-']==[] and values['-IN-']=='':
+
+        elif values['-TABLE1-']==[] and values['-IN-']=='':
             atcButton.update(disabled = True)
 
-        if event=='-TABLE1-' and values['-TABLE1-'] != []:
+        elif event=='-TABLE1-' and values['-TABLE1-'] != []:
             spin.update(1)
             idSelected = values['-TABLE1-'][0]
-            print(idSelected)
             prod=str(data[idSelected][0])
             inp.update(prod)
-            print(data)
             quantity1 = data[idSelected][5]
-            print(quantity1)
             spin.update(values=tuple(range(1,quantity1+1)),disabled=False)
             atcButton.update(disabled = False)
             flag = True
 
-        if event=='-IN-' and values['-IN-']!='':
-            #atcButton.update(disabled=True)
+        elif event=='-IN-' and values['-IN-']!='':
             spin.update(1)
             flag = False
             if values['-IN-'].isdigit():
@@ -396,7 +371,7 @@ def Main(email):
                 atcButton.update(disabled = True)
                 spin.update(disabled = True)
 
-        if event=='FL':
+        elif event=='FL':
             window.Disable()
             filtered_data=filter_menu(data)
             window.Enable()
@@ -407,22 +382,23 @@ def Main(email):
                 table.update(data)
             search.update('')
 
-
-        if event =='Add to Cart' and flag:
-            #print('312')
-            #search.update('')
-            searchFlag = False
+        elif event =='Add to Cart' and flag:
             for i in range(len(data)):
                 data[i] = list(data[i])
-            # Declared the variable for my convenience and ease of understanding
+            #Declared the variable for my convenience and ease of understanding
             prod_ID_selected = int(values['-IN-'])
             cursor.execute('SELECT * FROM PRODUCTS WHERE ID = %d' %(prod_ID_selected))
             proData = cursor.fetchall()
-            #print(proData)
             temp = (proData[0][0], proData[0][1], proData[0][2], proData[0][3], proData[0][7], proData[0][6])
             cartData.append(temp)
             q = str(values['Spin'])
-            if  (q.isdigit()==False) or ('.' in q) or (int(q)>proData[0][4]) or (int(q)<=0) or ((temp in cartDict) and (proData[0][4]-cartDict[temp][0]-int(q)<0)):
+            chk1 = q.isdigit()==False
+            chk2 = '.' in q
+            chk3 = int(q)>proData[0][4]
+            chk4 = int(q)<=0
+            chk5 = temp in cartDict
+            chk6 = chk5 and (proData[0][4]-cartDict[temp][0]-int(q)<0)
+            if  chk1 or chk2 or chk3 or chk4 or chk6:
                 msg.update('Invalid Quantity Entered')
             else:
                 q = int(q)
@@ -433,17 +409,13 @@ def Main(email):
                     cartDict[temp][1] += temp[5]*q
                 price+=float(temp[5]*q)
                 price = round(price, 2)
-                #print(cartDict)
-                # This part of the code is responsible for updating the table as we add items to cart
+                #This part of the code is responsible for updating the table as we add items to cart
                 quantity = proData[0][4]
-                #print(data)
-                #print(cartDict)
                 for i in range(len(data)):
                     prod_searched = list(data[i])
                     prod_searched.pop(5)
                     if prod_searched[0] == prod_ID_selected:
                         data[i][5] = quantity-cartDict[tuple(prod_searched)][0]
-                        #print(data)
                 msg.update('Added to Cart')
                 window['-IN-'].update('') #Clears the Input Window after we Add items to Cart
                 table.update(data)
@@ -452,12 +424,10 @@ def Main(email):
                 for i in range(len(data)):
                     if data[i][5] != 0:  #data[i][4] is the quantity
                         temp_table.append(data[i])
-                #print("Data",data)
                 table.update(temp_table)
                 data = list(temp_table)
                 spin.update(disabled = True)
                 atcButton.update(disabled = True)
-                #print(358)
         if len(cartDict)==0:
             gtcButton.update(disabled=True)
         else:
@@ -465,18 +435,15 @@ def Main(email):
 
         if event == 'Go to Cart' and len(cartDict)!=0:
             cartDataFinal = []
-            #print(cartDict)
             for i in cartDict:
                 cartDataFinal.append(list(i)[:5]+cartDict[i])
             flag2 = True
             window.close()
             break
 
-
     if flag2:
         action = cart(cartDataFinal)
         msg.update('')
-            #print(action)
         if action=='Buy':
             sg.popup_timed('Thank you for shopping with us', font=main_font_normal)
             window.close()
@@ -486,7 +453,6 @@ def Main(email):
             Main(email)
 
     mycon.commit()
-mycon.commit()
 
 price = 0
 cartData = []
@@ -495,3 +461,4 @@ cursor.execute('SELECT ID,Name,Brand,Size,Category,Quantity,Selling_Price FROM P
 data = cursor.fetchall()
 if __name__=='__main__':
     Main('gauravchanda@gmail.com')
+    mycon.commit()
