@@ -47,17 +47,17 @@ def main(emp = ''):
         if event == 'Add':
             add_stock()
             cursor.execute("SELECT * FROM PRODUCTS")
-            data = cursor.fetchall()
-            win['Table'].update(data)
-            data_product = list(data)
+            dataNew = cursor.fetchall()
+            win['Table'].update(dataNew)
+            data_product = list(dataNew)
         elif event == 'Update':
             try:
                 prod_clicked = value['Table'][0]
                 prod_click_id = int(data_product[prod_clicked][0])
                 update_data(prod_click_id)
                 cursor.execute("SELECT * FROM PRODUCTS")
-                data = cursor.fetchall()
-                win['Table'].update(data)
+                dataNew = cursor.fetchall()
+                win['Table'].update(dataNew)
             except IndexError:
                 sg.popup( "Warning: No Product Selected",title = "WARNING", font=main_font_normal)
         elif event == 'Delete' :
@@ -354,7 +354,7 @@ def cust_details():
 
 def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
     """This function shows the details of the customer"""
-    print(dat)
+    print('hello',dat)
     heading = ['Invoice Number',  'Purchase date','Total Cost']
     cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
     WHERE CUSTOMER_EMAIL = '{dat[2]}'
