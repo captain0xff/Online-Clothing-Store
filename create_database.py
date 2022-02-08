@@ -74,7 +74,8 @@ print("Relation purchase created successfully....")
 cursor.execute("""INSERT INTO EMPLOYEES
 VALUES(1,'Pratyush Prashob', 'pratyushprashob27', 'arandompassword'),
 (2,'Siddhartha Mondal', 'witty-30-06', 'iamimmortal'),
-(3,'Sayantan Deb', 'captain1947', 'rajnikanth');""")
+(3,'Sayantan Deb', 'captain1947', 'rajnikanth'),
+(4, 'Demonstration', 'admin', 'projectroot');""")
 print("Data of Employees added...")
 
 cursor.execute("""INSERT INTO CUSTOMERS
