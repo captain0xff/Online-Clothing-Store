@@ -73,11 +73,6 @@ def main(emp = ''):
             except IndexError:
                 sg.popup('NO PRODUCTS SELECTED', font=main_font_normal)
         
-        if event=='Calendar_Date':
-            win['Go1'].update(disabled=False)
-        if event == 'show':
-            print(79, data[value['cust_Table'][0]])
-            show_details(data[value['cust_Table'][0]])
         if event == "sort_amt":
             query = """SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             ORDER BY Total_Price DESC"""
@@ -100,10 +95,14 @@ def main(emp = ''):
             win['mob'].update('')
             win['show_det'].update('')
             win['show'].update(disabled=True)
+        if event == 'show':
+            print(79, data[value['cust_Table'][0]])
+            show_details(data[value['cust_Table'][0]])
+
         if event=='name' and value:
-            query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
-            where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
-            """.format(value['name'],value['email'],value['mob'])
+            query = f"""Select Name,Phone_Number,Email_ID,Total_Price from customers
+            where name like '{value['name']}%' and email_id like '{value['email']}%' and phone_number like '{value['mob']}%'
+            """
             cursor.execute(query)
             data =  cursor.fetchall()
             win['cust_Table'].update(data)
@@ -133,11 +132,14 @@ def main(emp = ''):
             em = data[value['cust_Table'][0]][2] #Basically extracting email
             win['show_det'].update(em)
             win['show'].update(disabled = False)
+        if event=='Calendar_Date':
+            win['Go1'].update(disabled=False)
         if event == 'Go1':
             print(value['daily_profit'])
             win.hide()
             daily_profit(value['daily_profit'],value['Calendar_Date'])
             win.un_hide()
+
         elif event == 'Go2':
             year1 = value['y1m'][0]
             year2 = value['y2m'][0]
@@ -193,11 +195,6 @@ def display_stock():
     cursor.execute("SELECT * FROM PRODUCTS")
     global data_product
     data_product = cursor.fetchall()
-    for i in range(len(data_product)):
-        data_product[i] = list(data_product[i])
-        for j in range(len(data_product[i])):
-            if isinstance(data_product[i][j],int):
-                data_product[i][j] = str(data_product[i][j])
     heading = ['Prod ID','Name','Brand','Size','Quantity','Cost_Price','Selling_Price']
     layout1 = [[sg.Text('Product List', font=main_font_normal)],
     [sg.Table(data_product,headings = heading,key = 'Table',justification='left'
