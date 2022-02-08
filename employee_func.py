@@ -9,7 +9,7 @@ from mysql.connector import errors as mysql_errors
 import mplcursors
 
 matplotlib.use('Tkagg')
-plt.style.use('fivethirtyeight')
+plt.style.use('seaborn-whitegrid')
 file=open('settings.txt')
 data=file.readlines()
 file.close()
@@ -469,7 +469,7 @@ def monthly(year1,year2):
     plt.grid(True)
     figManager = plt.get_current_fig_manager()
     figManager.window.state('zoomed') #For opening window in maximised screen
-    plt.tight_layout()
+    
     plt.show()
 
 def categ_rev_comp(year1,year2):
@@ -554,7 +554,7 @@ def brand_rev_comp(year1,year2):
         sel.annotation.xy = (x + width / 2, y + height / 2)
         sel.annotation.get_bbox_patch().set(alpha=0.8)
     #Credits to stackoverflow @JohnC for the above piece of code
-    plt.subplots_adjust(left=0.15, right=0.8, bottom=0.1, top=0.8)
+    
     plt.show()
 def brand_rev_trend(brand1,brand2,brand3,year):
     """This function plots brand popularity trend"""
