@@ -64,7 +64,6 @@ def main(emp = ''):
             try:
                 prod_clicked = value['Table'][0]
                 prod_click_id = int(data_product[prod_clicked][0])
-                #print(prod_click_id)
                 cursor.execute(f"DELETE FROM PRODUCTS WHERE ID = {prod_click_id}")
                 mycon.commit()
                 cursor.execute("SELECT * FROM PRODUCTS")
@@ -72,7 +71,6 @@ def main(emp = ''):
                 win['Table'].update(data_product)
             except IndexError:
                 sg.popup('NO PRODUCTS SELECTED', font=main_font_normal)
-        
         if event == "sort_amt":
             query = """SELECT Name,Phone_Number,Email_ID,Total_Price FROM CUSTOMERS
             ORDER BY Total_Price DESC"""
@@ -121,10 +119,8 @@ def main(emp = ''):
             query = """Select Name,Phone_Number,Email_ID,Total_Price from customers
             where name like '{}%' and email_id like '{}%' and phone_number like '{}%'
             """.format(value['name'],value['email'],value['mob'])
-            #print(query)
             cursor.execute(query)
             data =  cursor.fetchall()
-            #print(data)
             win['cust_Table'].update(data)
             win['show_det'].update('')
             win['show'].update(disabled=True)
@@ -146,7 +142,6 @@ def main(emp = ''):
             win.hide()
             monthly(year1,year2)
             win.un_hide()
-            #print(year1,year2)
         if event == 'Cat_rev' and value['Cat_rev'] == 'Trend':
             win['year1'].update(disabled = True)
             win['year2'].update(disabled=False)
@@ -181,8 +176,6 @@ def main(emp = ''):
             b1 = value['b1']
             b2 = value['b2']
             b3 = value['b3']
-            #print(b1,b2,b3)
-            #print(value['year1_b'])
             win.hide()
             brand_rev_trend(b1,b2,b3,value['year2_b'][0])
             win.un_hide()
@@ -220,7 +213,6 @@ def add_stock():
     window = sg.Window("New Product",layout=layout)
     while True:
         event,value = window.read()
-        #print(event,value)
         if event in (None, "Go Back"):
             window.close()
             break
@@ -234,7 +226,6 @@ def add_stock():
                 mycon.commit()
                 sg.popup('Stock Added to Database', font=main_font_normal)
                 window.close()
-                #print(upd_value)
                 break
         except mysql_errors.DatabaseError:
             msg.update("WRONG DATA ENTERED",text_color='Red')
@@ -264,7 +255,6 @@ def update_data(ID):
             if event == 'Confirm':
                 for i in value:
                     if value[i] != '' and i!= 'ID':
-                        print(i,value[i])
                         cursor.execute(f"""UPDATE PRODUCTS SET {i} = '{value[i]}'
                         WHERE ID = {int(ID)}""")
                 sg.popup('Data Updated', font=main_font_normal)
@@ -272,7 +262,6 @@ def update_data(ID):
                 win.close()
         except mysql_errors.DatabaseError:
             msg.update('Wrong data entered...')
-        #print(event,value)
 
 def revenue_analysis():
     cursor.execute("select DISTINCT YEAR(Purchase_Date) from purchase order by year(purchase_date)")
@@ -351,13 +340,11 @@ def cust_details():
 
 def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
     """This function shows the details of the customer"""
-    print('hello',dat)
     heading = ['Invoice Number',  'Purchase date','Total Cost']
     cursor.execute(f"""SELECT INVOICE_NUMBER, PURCHASE_DATE, SUM(PRODUCT_TOT_COST) FROM PURCHASE
     WHERE CUSTOMER_EMAIL = '{dat[2]}'
     GROUP BY INVOICE_NUMBER""")
     purchase_data = cursor.fetchall()
-    #print(1,purchase_data)
     if not purchase_data:
         sg.popup('NO DATA FOUND', font=main_font_normal)
     
@@ -374,7 +361,6 @@ def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
         win = sg.Window(f'{dat[2]}',layout)
         while True:
             event1,value = win.read()  #Extracting only event
-            #print(event1, value)
             if event1  in ('Exit',None):
                 win.close()
                 break
@@ -387,7 +373,6 @@ def show_details(dat):#dat is a tuple containing name, mob, email, pur_amount
                 more_details(inv_num,date)
                 
 def more_details(invoice,date):
-    #print(254,invoice)
     cursor.execute(f"""SELECT Product_ID ,Product_Name ,Product_Brand ,Product_Size ,
             Product_Category ,Quantity_Purchased ,Product_tot_cost FROM PURCHASE
             WHERE Invoice_Number = '{invoice}'""")
@@ -447,7 +432,6 @@ def monthly(year1,year2):
     profit_1 = []
     for key in prof1:
         profit_1.append(prof1[key])
-    #print(profit_1,len(profit_1))
     width = 0.4
     plt.bar(x_axis,profit_1,width=width,label = year1)
     
@@ -479,7 +463,7 @@ def categ_rev_comp(year1,year2):
         where year(purchase_date) between {y1} and {y2}
         group by product_category;""")
     cat_data = cursor.fetchall()
-    #print(cat_data)
+    
     sale_data = [cat_data[i][0] for i in range(len(cat_data))]
     label = [cat_data[i][1] for i in range(len(cat_data))]
     print(sale_data,label)
@@ -585,7 +569,6 @@ def brand_rev_trend(brand1,brand2,brand3,year):
 
     month = ['January','February','March','April','May','June','July','August','September','October','November','December']
     print(month)
-    #print(b1_data,b2_data,b3_data)
     
     plt.plot(month,b1_data,label = brand1,color = 'k',linestyle = '-',marker = '.')
 
