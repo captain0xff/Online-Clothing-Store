@@ -306,7 +306,6 @@ def Main(email):
     flag2 = False
     while True:
         event, values = window.read()
-        print(event,values)
         if event in (None, 'Exit'):
             break
 

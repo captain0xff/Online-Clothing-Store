@@ -41,7 +41,6 @@ def main(emp = ''):
     win = sg.Window('Welcome',layout)
     while True:
         event,value = win.read()
-        #print(event,value)
         if event in (None, 'Exit'):
             break
         if event == 'Add':
@@ -94,7 +93,6 @@ def main(emp = ''):
             win['show_det'].update('')
             win['show'].update(disabled=True)
         if event == 'show':
-            print(79, data[value['cust_Table'][0]])
             show_details(data[value['cust_Table'][0]])
 
         if event=='name' and value:
@@ -131,7 +129,6 @@ def main(emp = ''):
         if event=='Calendar_Date':
             win['Go1'].update(disabled=False)
         if event == 'Go1':
-            print(value['daily_profit'])
             win.hide()
             daily_profit(value['daily_profit'],value['Calendar_Date'])
             win.un_hide()
@@ -385,7 +382,6 @@ def more_details(invoice,date):
     prod_win = sg.Window(title = 'More Information', layout=layout)
     while True:
         event,value = prod_win.read()
-        print(event,value)
         if event is None:
             break
     
@@ -396,11 +392,9 @@ def daily_profit(days,date):
     WHERE PURCHASE_DATE BETWEEN DATE_SUB('{date}', INTERVAL {str(int(days)-1)} DAY) AND '{date}'
     GROUP BY PURCHASE_DATE""")
     prof_day = cursor.fetchall()
-    print(prof_day)
     if prof_day:
         dates = [prof_day[i][0] for i in range(len(prof_day))] #Extracting dates from sql db
         amt = [prof_day[i][1] for i in range(len(prof_day))] #Extracting daily profit from sql db
-        print(dates)
         plt.plot_date(dates,amt,linestyle='--',marker = '8')
         plt.gcf().autofmt_xdate()
         date_format = mpl_dates.DateFormatter('%b, %d %Y')
@@ -422,7 +416,6 @@ def monthly(year1,year2):
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_1data = cursor.fetchall()
     x_axis = np.arange(12)
-    #print(dict(year_1data))
     prof1 = {'January':0,'February':0,'March':0,'April':0,'May':0,
             'June':0,'July':0,'August':0,'September':0,'October':0,
             'November':0,'December':0}
@@ -439,9 +432,7 @@ def monthly(year1,year2):
      FROM PURCHASE WHERE YEAR(PURCHASE_DATE) = {year2}
      GROUP BY YEAR(PURCHASE_DATE), MONTH(PURCHASE_DATE);""")
     year_2data = cursor.fetchall()
-    print(year_2data)
     prof2.update(year_2data)
-    print(prof2,len(prof2))
     profit2 = []
     for key in prof2:
         profit2.append(prof2[key])
@@ -466,7 +457,6 @@ def categ_rev_comp(year1,year2):
     
     sale_data = [cat_data[i][0] for i in range(len(cat_data))]
     label = [cat_data[i][1] for i in range(len(cat_data))]
-    print(sale_data,label)
     plt.pie(sale_data,labels = label,shadow=True, autopct = '%1.1f%%',
         wedgeprops={'edgecolor':'black'})
     figManager = plt.get_current_fig_manager()
@@ -488,9 +478,6 @@ def categ_rev_trend(year):
     group by monthname(purchase_date)""")
     kid = cursor.fetchall()
     kid = kid+[[0]]*(12-len(kid))
-    print(1,men)
-    print(2,women)
-    print(3,kid)
     x_axis = ['January','February','March','April','May','June','July','August','September','October','November','December']
     men_y = []
     women_y = []
@@ -499,7 +486,6 @@ def categ_rev_trend(year):
         men_y.append(men[i][0])
         women_y.append(women[i][0])
         kid_y.append(kid[i][0])
-    print(men_y,len(men_y))
     plt.plot(x_axis,men_y,label = 'Men',color = 'k',linestyle = '-',marker = '.')
     plt.plot(x_axis,women_y,label ='Women',color = 'b',linestyle = '-.',marker = '.')
     plt.plot(x_axis,kid_y,label = 'Kids',color = 'm',linestyle = ':',marker = '.')
@@ -564,16 +550,11 @@ def brand_rev_trend(brand1,brand2,brand3,year):
     
     for i in range(len(b3_data)):
         b3_data[i] = float(b3_data[i][0])
-    b3_data = b3_data+[0.0]*(12-len(b3_data))    
-    print(b1_data,b2_data,b3_data)
+    b3_data = b3_data+[0.0]*(12-len(b3_data))
 
     month = ['January','February','March','April','May','June','July','August','September','October','November','December']
-    print(month)
-    
     plt.plot(month,b1_data,label = brand1,color = 'k',linestyle = '-',marker = '.')
-
     plt.plot(month,b2_data,label = brand2,color = 'r',linestyle = '-.',marker = '8')
-
     plt.plot(month,b3_data,label = brand3,color = 'c',linestyle = '--',marker = '.')
     plt.legend()
     plt.title('Trend of Brands')
