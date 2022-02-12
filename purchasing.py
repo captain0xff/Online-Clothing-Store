@@ -307,6 +307,7 @@ def Main(email):
     flag2 = False
     while True:
         event, values = window.read()
+        print(event,values)
         if event in (None, 'Exit'):
             break
 
@@ -340,7 +341,7 @@ def Main(email):
                         data.pop(index)
             table.update(data)
 
-        elif values['-TABLE1-']==[] and values['-IN-']=='':
+        elif values['-TABLE1-']==[] and values['-IN-']=='' and event!='FL':
             atcButton.update(disabled = True)
 
         elif event=='-TABLE1-' and values['-TABLE1-'] != []:
@@ -373,7 +374,7 @@ def Main(email):
 
         elif event=='FL':
             window.Disable()
-            filtered_data=filter_menu(data)
+            filtered_data=filter_menu()
             window.Enable()
             window.Hide()
             window.UnHide()
