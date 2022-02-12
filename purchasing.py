@@ -14,7 +14,6 @@ mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[
 cursor = mycon.cursor()
 
 # Set the PysimpleGUI theme and font
-sg.theme("DarkAmber")
 main_font_title=("Times New Roman", "12")
 main_font_normal=("Times New Roman", "11")
 

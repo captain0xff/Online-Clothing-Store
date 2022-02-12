@@ -10,7 +10,6 @@ import os
 
 
 # Set the PysimpleGUI theme and font
-sg.theme("DarkAmber")
 main_font_title=("Times New Roman", "12")
 main_font_normal=("Times New Roman", "11")
 
