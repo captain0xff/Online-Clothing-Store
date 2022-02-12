@@ -247,7 +247,6 @@ def Customer_sign_up():
     while rng:
         # Take events and values
         e, v = window.read()
-        print(e, v)
         if e == sg.WIN_CLOSED or e == "CN2":
             rng = False
         elif e == "CK":
