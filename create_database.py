@@ -143,3 +143,4 @@ sample_data.generate_purchase(2018)
 
 mycon.close()
 print('Successful!!!')
+input("Press Enter to Exit")
