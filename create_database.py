@@ -16,6 +16,7 @@ cursor.execute("DROP database IF EXISTS denim_destination_db")
 sql_create = "CREATE database denim_destination_db"
 cursor.execute(sql_create)
 cursor.execute("USE denim_destination_db")
+cursor.execute('set global max_allowed_packet=67108864')
 print("Database Created Succesfully....")
 print("Creating tables now....")
 sql_products = """create table PRODUCTS(
@@ -23,9 +24,9 @@ sql_products = """create table PRODUCTS(
     Name VARCHAR(50),
     Brand VARCHAR(50),
     Size VARCHAR(4) CHECK(Size = 'S' OR Size = 'M' OR SIZE = 'L' OR SIZE = 'XL' OR SIZE = 'XXL' OR SIZE = 'XXXL' OR SIZE='NA'),
-    Quantity INTEGER,
-    Cost_Price DECIMAL(8,2),
-    Selling_Price DECIMAL(8,2),
+    Quantity INTEGER CHECK(Quantity>0),
+    Cost_Price DECIMAL(8,2) CHECK(Cost_Price>0),
+    Selling_Price DECIMAL(8,2) CHECK(Selling_Price>0),
     Category VARCHAR(5) CHECK(Category = 'Kids' OR Category = 'Men' OR Category = 'Women' ))"""
 
 
@@ -73,7 +74,8 @@ print("Relation purchase created successfully....")
 cursor.execute("""INSERT INTO EMPLOYEES
 VALUES(1,'Pratyush Prashob', 'pratyushprashob27', 'arandompassword'),
 (2,'Siddhartha Mondal', 'witty-30-06', 'iamimmortal'),
-(3,'Sayantan Deb', 'captain1947', 'rajnikanth');""")
+(3,'Sayantan Deb', 'captain1947', 'rajnikanth'),
+(4, 'Demonstration', 'admin', 'projectroot');""")
 print("Data of Employees added...")
 
 cursor.execute("""INSERT INTO CUSTOMERS
@@ -137,7 +139,8 @@ print('Products added...')
 
 mycon.commit()
 
-sample_data.generate_purchase(2019)
+sample_data.generate_purchase(2018)
 
 mycon.close()
 print('Successful!!!')
+input("Press Enter to Exit")

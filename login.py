@@ -10,9 +10,8 @@ import os
 
 
 # Set the PysimpleGUI theme and font
-sg.theme("DarkAmber")
-main_font_title=("Times New Roman", "14")
-main_font_normal=("Times New Roman", "12")
+main_font_title=("Times New Roman", "12")
+main_font_normal=("Times New Roman", "11")
 
 """Code for checking environment"""
 idle = True if "idlelib.run" in sys.modules else False  # Credit goes to stackexchange
@@ -31,10 +30,10 @@ try:
     mycon = sqltor.connect(host=data[0], user=data[1], passwd=data[2],database=data[3])
 except sqltor.errors.ProgrammingError:
     layout=[
-    [sg.Text('Host',size=(7,None), font=main_font),sg.Input('localhost',key='H', font=main_font)],
-    [sg.Text('User',size=(7,None), font=main_font),sg.Input('root',key='U')],
-    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='\u2022', font=main_font)],
-    [sg.Button('Done',key='DN', font=main_font)]
+    [sg.Text('Host',size=(7,None), font=main_font_normal),sg.Input('localhost',key='H', font=main_font_normal)],
+    [sg.Text('User',size=(7,None), font=main_font_normal),sg.Input('root',key='U')],
+    [sg.Text('Password',size=(7,None)),sg.Input('',key='P',password_char='\u2022', font=main_font_normal)],
+    [sg.Button('Done',key='DN', font=main_font_normal)]
     ]
     window=sg.Window('Credentials',layout)
     while True:
@@ -112,9 +111,9 @@ def Employee_sign_in_menu():
     msg = sg.Text("Please Login...", size=(50, 1), font=main_font_normal)
     layout = [
         [msg],
-        [sg.Text("Employee ID", font=main_font_normal, size=(9, 1)), sg.Input(key="id", font=main_font_normal)],
-        [sg.Text("User Name", font=main_font_normal, size=(9, 1)), sg.Input(key="uname", font=main_font_normal)],
-        [sg.Text("Password", font=main_font_normal, size=(9, 1)), sg.Input(key="password", password_char="\u2022", font=main_font_normal)],
+        [sg.Text("Employee ID", font=main_font_normal, size=(10, 1)), sg.Input(key="id", font=main_font_normal)],
+        [sg.Text("User Name", font=main_font_normal, size=(10, 1)), sg.Input(key="uname", font=main_font_normal)],
+        [sg.Text("Password", font=main_font_normal, size=(10, 1)), sg.Input(key="password", password_char="\u2022", font=main_font_normal)],
         [sg.Button("Login", font=main_font_normal), sg.Button("Go Back", font=main_font_normal)],
     ]
     # password_char parameter masks the given password with *
@@ -220,22 +219,22 @@ def Customer_sign_up():
     button = sg.Btn("Sign up", key="DN", disabled=True)
 
     # The layout of the window
-    msg = sg.Text("New to Denim Destination? Sign up..", size=(50, 1), font=main_font)
+    msg = sg.Text("New to Denim Destination? Sign up..", size=(50, 1), font=main_font_title)
     layout = [
         [msg],
-        [sg.Text("Email ID", size=(8, 1), font=main_font), sg.Input("", key="EI", font=main_font)],
+        [sg.Text("Email ID", size=(8, 1), font=main_font_normal), sg.Input("", key="EI", font=main_font_normal)],
         [
-            sg.Text("Password", size=(8, 1), font=main_font),
-            sg.Input("", key="PD", password_char="\u2022", font=main_font),
+            sg.Text("Password", size=(8, 1), font=main_font_normal),
+            sg.Input("", key="PD", password_char="\u2022", font=main_font_normal),
         ],
-        [sg.Text("Name", size=(8, 1), font=main_font), sg.Input("", key="NM", font=main_font)],
-        [sg.Text("Phone No.", size=(8, 1), font=main_font), sg.Input("", key="PH", font=main_font)],
+        [sg.Text("Name", size=(8, 1), font=main_font_normal), sg.Input("", key="NM", font=main_font_normal)],
+        [sg.Text("Phone No.", size=(8, 1), font=main_font_normal), sg.Input("", key="PH", font=main_font_normal)],
         [
             sg.Checkbox(
                 "I agree to the terms and conditions", key="CK", enable_events=True
             )
         ],
-        [button, sg.Btn("Cancel", key="CN2", font=main_font)],
+        [button, sg.Btn("Cancel", key="CN2", font=main_font_normal)],
     ]
 
     # Create the window for sign up
@@ -250,8 +249,8 @@ def Customer_sign_up():
         e, v = window.read()
         if e == sg.WIN_CLOSED or e == "CN2":
             rng = False
-        elif v["CK"] == True:
-            button.update(disabled=False)
+        elif e == "CK":
+            button.update(disabled = not v['CK'])
         if e == "DN":
             name = v["NM"]
             email = v["EI"]

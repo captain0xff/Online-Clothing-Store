@@ -24,6 +24,7 @@ def generate_customer():
         name=i[:-1]
         phone_number=generate_phone_number(phone_numbers)
         email_id=i[:-1].replace(' ','')+'@gmail.com'
+        email_id=email_id.lower()
         password=i[:-1].replace(' ','$')
         price=0.0
         customer_dict[name]=(name,phone_number,email_id,password,price)
@@ -45,7 +46,7 @@ def  generate_purchase(y):
     year=y
     month=1
     day=1
-    current_date=str('2021-12-31')
+    current_date=str(dt.today())
     #print(current_date)
     cmd="select invoice_number from PURCHASE"
     purchases=[]
